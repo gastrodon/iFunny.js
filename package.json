@@ -1,0 +1,22 @@
+{
+  "name": "ifunnywrapper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AurorasPalace/IFunnyWrapper.git"
+  },
+  "author": "AurorasPalace",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AurorasPalace/IFunnyWrapper/issues"
+  },
+  "homepage": "https://github.com/AurorasPalace/IFunnyWrapper#readme",
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
