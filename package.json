@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/AurorasPalace/IFunnyWrapper#readme",
   "dependencies": {
-    "axios": "^0.19.0"
+    "axios": "^0.19.0",
+    "js-sha1": "^0.6.0"
   }
 }
