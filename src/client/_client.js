@@ -5,6 +5,8 @@ const axios = require('axios')
 const fs = require('fs')
 const sha1 = require('js-sha1')
 
+require("axios-debug-log")
+
 const {homedir} = require('os')
 
 /**
@@ -29,7 +31,9 @@ class Client extends EventEmitter{
         }
 
         options = options ? options : {}
-        this.authenticated = false
+
+        // auth setup
+        this.__bearer = null
 
         // config file setup
         this.__config_path = options.config_path ? options.config_path : `${homedir()}/.ifunnyjs/config.json`
@@ -61,9 +65,13 @@ class Client extends EventEmitter{
         return 'iFunny/5.38.1(1117733) Android/9 (OnePlus; ONEPLUS A6013; OnePlus)'
     }
 
-    // implied private methods
+    // authentication getters
 
     get basic_auth() {
+        if(this.config['basic_auth']) {
+            return this.config['basic_auth']
+        }
+
         var hex = ['A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
         var hex_array = []
         var range = hex.length
@@ -73,18 +81,34 @@ class Client extends EventEmitter{
         }
 
         const hex_string = hex_array.join('')
-        console.log(hex_string.length);
         const hex_id = `${hex_string}_${this.client_id}`
         const hash_decoded = `${hex_string}:${this.client_id}:${this.client_secret}`
         const hash_encoded = sha1(hash_decoded)
         const auth = Buffer.from(`${hex_id}:${hash_encoded}`).toString('base64')
 
-        this.__config["basic_auth"] = auth
+        this.__config['basic_auth'] = auth
         this.config = this.__config
 
         return auth
 
     }
+
+    get headers() {
+        var _headers = {
+            "User-Agent":   this.user_agent,
+            "Content-Type": 'application/x-www-form-urlencoded'
+        }
+
+        if(this.__bearer) {
+            _headers['Authorization'] = `Bearer ${this.__bearer}`
+        } else {
+            _headers['Authorization'] = `Basic ${this.basic_auth}`
+        }
+
+        return _headers
+    }
+
+    // config caching
 
     get config() {
         if(!this.__config) {
@@ -109,7 +133,62 @@ class Client extends EventEmitter{
     }
 
     clear_config() {
-        self.__config = self.config = {}
+        this.__config = this.config = {}
+    }
+
+    // public methods
+
+    async login(email, password, force) {
+        /*
+        Log into ifunny
+
+        params:
+            email: email to log in with
+            password: password to log in with
+            force: bypass saved bearer tokens
+
+        emits:
+            login: (this) bearer was either fetched from the server or local caching
+            api_error: the api told us something wacky
+        */
+
+        if(!email) {
+            throw 'Email is required to login'
+        }
+
+        if(this.config[`bearer_${email}`] && !force){
+            this.__bearer = this.config[`bearer_${email}`]
+            this.emit("login", this)
+            return
+        }
+
+        let data = {
+            'grant_type': 'password',
+            'username': email,
+            'password': password
+        }
+        data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
+
+        axios({
+            method:     'post',
+            url:        `${this.api}/oauth2/token`,
+            data:       data,
+            headers:    this.headers}
+        ).then((response) => {
+            this.__bearer = response.data['access_token']
+            this.__config[`bearer_${email}`] = response.data['access_token']
+            this.config = this.__config
+
+            this.emit("login", this)
+        }).catch((error) => {
+            if(error.response.status === 429) {
+                this.emit("api_timeout", this, error)
+            } else if(error.response.status == 400) {
+                this.emit("wrong_passord", this, error)
+            } else {
+                this.emit("api_error", this, error)
+            }
+        })
     }
 
 }
