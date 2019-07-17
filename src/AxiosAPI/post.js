@@ -7,18 +7,12 @@ async function post(token, Agent, obj) {
         "User-Agent": Agent
     }
 
-    const data = await axios({
-        url: "https://api.ifunny.mobi/v4/content",
-        method: "post",
-        headers: Headers,
-        formData: obj
-    })
+    const data = await axios({url: "https://api.ifunny.mobi/v4/content", method: "post", headers: Headers, formData: obj})
 
     return data
 
 }
 
-
 module.exports = {
-    post: post,
+    post: post
 }
