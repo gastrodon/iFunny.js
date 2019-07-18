@@ -41,6 +41,14 @@ class Client extends EventEmitter{
 
         this.__user = null
         this.__id = null
+
+        this.messenger_token = null;
+        this.about = null;
+        this.sex = null;
+        this.birth_date = null;
+        this.name = null;
+        this.id = null;
+        this.verified = null;
     }
 
     // const getters
@@ -64,7 +72,6 @@ class Client extends EventEmitter{
     get user_agent() {
         return 'iFunny/5.38.1(1117733) Android/9 (OnePlus; ONEPLUS A6013; OnePlus)'
     }
-
     // authentication getters
 
     get basic_auth() {
@@ -137,8 +144,10 @@ class Client extends EventEmitter{
     }
 
     // public methods
-
     async login(email, password, force) {
+
+        setInterval(function() {}, 10000)
+
         /*
         Log into ifunny
 
@@ -158,8 +167,8 @@ class Client extends EventEmitter{
 
         if(this.config[`bearer_${email}`] && !force){
             this.__bearer = this.config[`bearer_${email}`]
-            this.emit("login", this)
-            return
+            await this.init()
+            return this.emit("ready", this)
         }
 
         let data = {
@@ -169,26 +178,49 @@ class Client extends EventEmitter{
         }
         data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
 
+
         axios({
             method:     'post',
             url:        `${this.api}/oauth2/token`,
             data:       data,
             headers:    this.headers}
-        ).then((response) => {
+        ).then(async (response) => {
             this.__bearer = response.data['access_token']
             this.__config[`bearer_${email}`] = response.data['access_token']
             this.config = this.__config
-
-            this.emit("login", this)
+            await this.init()
+            this.emit("ready", this)
         }).catch((error) => {
             if(error.response.status === 429) {
-                this.emit("api_timeout", this, error)
+                this.emit("ready", this, error.data)
             } else if(error.response.status == 400) {
-                this.emit("wrong_passord", this, error)
+                this.emit("ready", this, error.data)
             } else {
-                this.emit("api_error", this, error)
+                this.emit("ready", this, error.data)
             }
         })
+
+    }
+
+    async init() {
+        const obj = await axios({
+            method: 'get',
+            url: `${this.api}/account`,
+            headers: this.headers
+        })
+
+        const data = obj.data.data
+
+        this.messenger_token = data.messenger_token;
+        this.about = data.about;
+        this.sex = data.sex;
+        this.birth_date = data.birth_date;
+        this.name = data.nick;
+        this.id = data.id;
+        this.verified = data.is_verified;
+
+        return obj
+
     }
 
 }
