@@ -1,8 +1,10 @@
 const axios = require('axios')
+const FreshObject = require('./FreshObject')
 
-class Post {
-    constructor(data = {}) {
-        this.setup(data)
+class Post extends FreshObject {
+    constructor(id, opts = {client: new Client(), data = null}) {
+        super(id, opts)
+        
     }
 
     async setup(data) {
