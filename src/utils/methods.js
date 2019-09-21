@@ -19,6 +19,17 @@ async function paginated_params(limit, prev, next) {
     })
 }
 
+async function short_cursors(data) {
+    return new Promise(async (resolve, reject) => {
+        let paging = {
+            prev: data.paging.hasPrev ? data.paging.cursors.prev : null,
+            next: data.paging.hasNext ? data.paging.cursors.next : null
+        }
+
+        return resolve({items: data.items, paging: paging})
+    })
+}
+
 async function paginated_data(url, opts = {ex_params: {}, next: null}) {
     /*
     Get a chunk of paginated data automatically
@@ -38,7 +49,6 @@ async function paginated_data(url, opts = {ex_params: {}, next: null}) {
     return new Promise(async (resolve, reject) => {
         params = await paginated_params(opts.limit || 25, opts.prev || null, opts.next || null)
         ex_params = opts.ex_params || {}
-        console.log(`opts: ${opts}`)
 
         response = await axios({
             method: opts.method || 'get',
@@ -46,13 +56,13 @@ async function paginated_data(url, opts = {ex_params: {}, next: null}) {
             headers: opts.headers || {},
             params: {...params, ...ex_params}
         }).catch((error) => {
-            reject(error.response.data)
+            return reject(error.response.data)
         })
 
         if (opts.key) {
-            resolve(response.data.data[opts.key])
+            return resolve(await short_cursors(response.data.data[opts.key]))
 
-        resolve(response.data.data)
+        return resolve(await short_cursors(response.data.data))
         }
     })
 }

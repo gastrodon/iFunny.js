@@ -1,52 +1,21 @@
 const axios = require('axios')
 const FreshObject = require('./FreshObject')
+const User = require('./User')
 
 class Post extends FreshObject {
-    constructor(id, opts = {client: new Client(), data = null}) {
+    constructor(id, opts = {}) {
+        /*
+        Post object, for iFunny images and videos
+        */
         super(id, opts)
-        
+        this.url = `${this.api}/content/${id}`
     }
 
-    async setup(data) {
-
-        /**
-         * The type of post
-         * * `caption` -- image
-         * * `video` -- video
-         * * `gif` -- gif
-         *
-         * @type {String}
-         */
-        this.type = data.type || "caption"
-
-        /**
-         * Array Of Tags
-         *
-         * @type {Array}
-         */
-        this.tags = data.tags || []
-
-        /**
-         * String used for auto-tagging based on text.
-         *
-         * @type {String}
-         */
-        this.text = data.text || ""
-
-        /**
-         * Binary Buffer for the image/video
-         *
-         * @type {ImageURL}
-         */
-        this.image = await async function () {
-            const res = await axios({method: 'post', url: data.image, responseType: 'stream'})
-            return res
-        }
-
-        this.image = data.imageurl
-            ? null
-            : console.log("err")
-
+    get author() {
+        return (async () => {
+            let author = await this.get('creator')
+            return new User(author.id, {data: author, client: this.client})
+        })()
     }
 
 }

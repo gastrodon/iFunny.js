@@ -6,12 +6,7 @@ const fs = require('fs')
 const sha1 = require('js-sha1')
 
 const methods = require('../utils/methods')
-
-require('axios-debug-log')
-
-const {
-    homedir
-} = require('os')
+const {homedir} = require('os')
 
 /**
  *  Base Client for all constructs
@@ -140,7 +135,7 @@ class Client extends EventEmitter {
         */
         return new Promise(async (resolve, reject) => {
             if (!email) {
-                reject('email is required')
+                return reject('email is required')
             }
 
             if (this.config[`bearer ${email}`] && !opts.force) {
@@ -155,8 +150,7 @@ class Client extends EventEmitter {
 
                 if (!flag) {
                     this.authorized = true
-                    resolve(this)
-                    return
+                    return resolve(this)
                 }
                 else {
                     this.#token = null
@@ -177,15 +171,13 @@ class Client extends EventEmitter {
                 headers: this.headers,
                 data: data
             }).catch((error) => {
-                reject(error.response.data)
-                return
+                return reject(error.response.data)
             })
             this.#token = response.data.access_token
             this.#config[`bearer ${email}`] = response.data.access_token
             this.config = this.#config
 
-            resolve(response)
-            return
+            return resolve(response)
         })
     }
 
@@ -201,12 +193,12 @@ class Client extends EventEmitter {
         */
 
         return new Promise(async (resolve, reject) => {
-            data = methods.paginated_data(`${this.api}/news/my`, {
+            let data = methods.paginated_data(`${this.api}/news/my`, {
                 limit: opts.limit || this.paginated_size, key: 'news',
                 prev: opts.prev, next: opts.next, headers: this.headers
             })
 
-            return data['items']
+            return resolve(data)
         })
     }
 
