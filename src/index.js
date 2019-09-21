@@ -1,5 +1,6 @@
 "use strict"
 
 module.exports = {
-    Client : require("./client/_client")
+    Client: require("./objects/client"),
+    objects: require("./objects/mixin")
 }
