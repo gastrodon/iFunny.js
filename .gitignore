@@ -6,3 +6,8 @@ node_modules/
 
 trial/
 test.js
+
+# codegen
+getters.py
+out
+prop.*
