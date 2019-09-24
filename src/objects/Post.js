@@ -1,6 +1,15 @@
 const axios = require('axios')
 const FreshObject = require('./FreshObject')
-const User = require('./User')
+
+/**
+ * iFunny Post object, representing a Post
+ * @extends {FreshObject}
+ * @param {String|Number} id                id of this object
+ * @param {Object} opts                     optional parameters
+ * @param {Client} opts.client=Client       Client that this object belongs to
+ * @param {Number} opts.paginated_size=25   size of each paginated request
+ * @param {Object} opts.data={}             data of this object, that can be used before fetching new info
+ */
 
 class Post extends FreshObject {
     constructor(id, opts = {}) {
@@ -12,277 +21,307 @@ class Post extends FreshObject {
     }
 
     /**
-     * Represents the author of this Post
-     * 
+     * The author of this Post
+     * @type {User}
      */
     get author() {
-        /*
-        The author of this post
-        */
         return (async () => {
-            let author = await this.get('creator')
-            return new User(author.id, { data: author, client: this.client })
+            let data = await this.get('creator')
+            let User = require('./User')
+            return new User(data.id, { data: data, client: this.client })
         })()
     }
 
+    /**
+     * Number of smiles on this Post
+     * @type {Number}
+     */
     get smile_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').smiles
         })()
     }
 
+    /**
+     * Number of unsmiles on this Post
+     * @type {Number}
+     */
     get unsmile_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').unsmiles
         })()
     }
 
+    /**
+     * Number of guest smiles on this Post
+     * @type {Number}
+     */
     get guest_smile_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').guest_smiles
         })()
     }
 
+    /**
+     * Number of comments on this Post
+     * @type {Number}
+     */
     get comment_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').comments
         })()
     }
 
+    /**
+     * Number of views on this Post
+     * @type {Number}
+     */
     get view_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').views
         })()
     }
 
+    /**
+     * Number of republications of this post
+     * @type {Number}
+     */
     get republish_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').republished
         })()
     }
 
+    /**
+     * Number of shares of this Post
+     * @type {Number}
+     */
     get share_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num').shares
         })()
     }
 
-
+    /**
+     * Type of post
+     * @type {String}
+     */
     get type() {
-        /*
-        type: str
-        */
         return this.get('type')
     }
 
+    /**
+     * Background color of this image
+     * @type {String}
+     */
     get bg_color() {
-        /*
-        type: str
-        */
         return this.get('bg_color')
     }
 
+    /**
+     * Title of this Post
+     * Published posts are published
+     * @type {String}
+     */
     get title() {
-        /*
-        type: str
-        */
         return this.get('title')
     }
 
-    get fixed_title() {
-        /*
-        type: str
-        */
+    /**
+     * Dynamic title of this Post
+     * @type {String}
+     */
+    get dynamic_title() {
         return this.get('fixed_title')
     }
 
+    /**
+     * State of this Post
+     * Regular posts appear as published
+     * Posts scheduled to be posted appear as delayed
+     * @type {String}
+     */
     get state() {
-        /*
-        type: str
-        */
         return this.get('state')
     }
 
-    get date_create() {
-        /*
-        type: int
-        */
+    /**
+     * Timestamp of post creation
+     * @time {Number}
+     */
+    get created_at() {
         return this.get('date_create')
     }
 
+    /**
+     * Timestamp of post publication
+     * @type {Number}
+     */
     get publish_at() {
-        /*
-        type: int
-        */
         return this.get('publish_at')
     }
 
+    /**
+     * Was this Post smiled by the bound Client?
+     * @type {Boolean}
+     */
     get is_smiled() {
-        /*
-        type: bool
-        */
         return this.get('is_smiled')
     }
 
+    /**
+     * Was this Post unsmiled by the bound Client?
+     * @type {Boolean}
+     */
     get is_unsmiled() {
-        /*
-        type: bool
-        */
         return this.get('is_unsmiled')
     }
 
+    /**
+     * Was this Post removed by moderators?
+     * @type {Boolean}
+     */
     get is_abused() {
-        /*
-        type: bool
-        */
         return this.get('is_abused')
     }
 
+    /**
+     * Was this Post featured?
+     * @type {Boolean}
+     */
     get is_featured() {
-        /*
-        type: bool
-        */
         return this.get('is_featured')
     }
 
+    /**
+     * Was this Post republished by the bound Client?
+     * @type {Boolean}
+     */
     get is_republished() {
-        /*
-        type: bool
-        */
         return this.get('is_republished')
     }
 
+    /**
+     * Was this Post pinned by it's author?
+     * @type {Boolean}
+     */
     get is_pinned() {
-        /*
-        type: bool
-        */
         return this.get('is_pinned')
     }
 
-    get old_watermark() {
-        /*
-        type: bool
-        */
+    /**
+     * Is this Post using the old iFunny watermark?
+     * @type {Boolean}
+     */
+    get is_old_watermark() {
         return this.get('old_watermark')
     }
 
-    get fast_start() {
-        /*
-        type: bool
-        */
-        return this.get('fast_start')
-    }
-
-    get can_be_boosted() {
-        /*
-        type: bool
-        */
+    /**
+     * Is this Post able to be boosted?
+     * @type {Boolean}
+     */
+    get is_boostable() {
         return this.get('can_be_boosted')
     }
 
+    /**
+     * Tags attached to this Post
+     * @type {Array<String>}
+     */
     get tags() {
-        /*
-        type: list
-        */
         return this.get('tags')
     }
 
-    get thumb() {
-        /*
-        type: dict
-        */
-        return this.get('thumb')
+    /**
+     * Original source of this content, if from another site
+     * @type {string}
+     */
+    get copyright_source() {
+        return (async () => {
+            return (await this.get('copyright')).url || await (this.fresh.get('copyright')).url
+        })()
     }
 
-    get size() {
-        /*
-        type: dict
-        */
-        return this.get('size')
-    }
-
-    get copyright() {
-        /*
-        type: dict
-        */
-        return this.get('copyright')
-    } // check
-
+    /**
+     * Timestamp of when this post was featured, if featured
+     * @type {Number|null}
+     */
     get issue_at() {
-        /*
-        type: int
-        */
         return this.get('issue_at')
     }
 
+    /**
+     * Visibility of this post
+     * Posts with public visibility will appear in collective and can be featured
+     * Posts with subscribers visibility will only appear in home feeds,
+     * linking to the post directly, or by viewing the authors timeline
+     * @type {String}
+     */
     get visibility() {
-        /*
-        type: str
-        */
         return this.get('visibility')
     }
 
-    get shot_status() {
-        /*
-        type: str
-        */
-        return this.get('shot_status')
-    }
-
-    get ocr_text() {
-        /*
-        type: str
-        */
+    /**
+     * Text detected in this post by iFunny ocr, if any
+     * @type {String|null}
+     */
+    get detected_text() {
         return this.get('ocr_text')
     }
 
-    get url() {
-        /*
-        type: str
-        */
-        return this.get('url')
+    /**
+     * Sharable link to this post
+     * @type {String}
+     */
+    get link() {
+        return this.get('link')
     }
 
-    get share_url() {
-        /*
-        type: str
-        */
-        return this.get('share_url')
-    }
-
-    get canonical_url() {
-        /*
-        type: str
-        */
+    /**
+     * Same as `this.link`, but with a url
+     * that indicates the type of content
+     * @type {String}
+     */
+    get canonical_link() {
         return this.get('canonical_url')
     }
 
-    get link() {
-        /*
-        type: str
-        */
-        return this.get('link')
+    /**
+     * Link to the content of this post,
+     * with the old style ifunny.co banner watermark
+     * @type {String}
+     */
+    get content_link() {
+        return this.get('url')
+    }
+
+    /**
+     * Link to the content of this post,
+     * with the new style overlay watermark
+     * @return {String}
+     */
+    get share_url() {
+        return this.get('share_url')
+    }
+
+    // undocumented because they have not been fully implemented
+    // or because their use is unknown
+
+    get thumb() {
+        return this.get('thumb')
+    }
+
+    get fast_start() {
+        return this.get('fast_start')
+    }
+
+    get shot_status() {
+        return this.get('shot_status')
+    }
+
+    get size() {
+        return this.get('size')
     }
 
 }

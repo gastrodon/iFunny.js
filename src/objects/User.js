@@ -1,6 +1,15 @@
 const FreshObject = require('./FreshObject')
-const Image = require('./small/Image')
 const axios = require('axios')
+
+/**
+ * iFunny User object, representing a user
+ * @extends {FreshObject}
+ * @param {String|Number} id                id of this object
+ * @param {Object} opts                     optional parameters
+ * @param {Client} opts.client=Client       Client that this object belongs to
+ * @param {Number} opts.paginated_size=25   size of each paginated request
+ * @param {Object} opts.data={}             data of this object, that can be used before fetching new info
+ */
 
 class User extends FreshObject {
     constructor(id, opts = {}) {
@@ -9,263 +18,183 @@ class User extends FreshObject {
     }
 
     get nick() {
-        /*
-        type: str
-        */
-        return (async () => {
-            return await this.get('nick')
-        })()
+        return this.get('nick')
     }
 
     get original_nick() {
-        /*
-        type: str
-        */
-        return (async () => {
-            return await this.get('original_nick')
-        })()
+        return this.get('original_nick')
     }
 
     get about() {
-        /*
-        type: str
-        */
-        return (async () => {
-            return await this.get('about')
-        })()
+        return this.get('about')
     }
 
     get subscriber_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[subscriptions] || this.fresh.get('num')[subscriptions]
         })()
     }
 
     get subscription_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[subscribers] || this.fresh.get('num')[subscribers]
         })()
     }
 
     get post_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[total_posts] || this.fresh.get('num')[total_posts]
         })()
     }
 
     get original_post_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[created] || this.fresh.get('num')[created]
         })()
     }
 
     get republication_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.post_count - await this.original_post_count
         })()
     }
 
     get feature_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[featured] || this.fresh.get('num')[featured]
         })()
     }
 
     get smile_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[total_smiles] || this.fresh.get('num')[total_smiles]
         })()
     }
 
     get achievement_count() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('num')[achievements] || this.fresh.get('num')[achievements]
         })()
     }
 
-    get messaging_privacy() {
-        /*
-        type: str
-        */
-        return (async () => {
-            return await this.get('messaging_privacy_status')
-        })()
-    }
-
-    get link() {
-        /*
-        type: str
-        */
-        return (async () => {
-            return await this.get('web_url')
-        })()
-    }
-
-    get can_chat() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_available_for_chat')
-        })()
-    }
-
-    get is_private() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_private')
-        })()
-    }
-
-    get is_blocked() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_blocked')
-        })()
-    }
-
-    get is_blocking_me() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('are_you_blocked')
-        })()
-    }
-
-    get is_banned() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_banned')
-        })()
-    }
-
-    get is_deleted() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_deleted')
-        })()
-    }
-
-    get is_verified() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_verified')
-        })()
-    }
-
-    get is_in_subscriptions() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_in_subscriptions')
-        })()
-    }
-
-    get is_subscribed() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_in_subscribers')
-        })()
-    }
-
-    get is_subscribed_to_updates() {
-        /*
-        type: bool
-        */
-        return (async () => {
-            return await this.get('is_subscribed_to_updates')
-        })()
-    }
-
-    get cover_url() {
-        /*
-        type: Image
-        */
-        return (async () => {
-            return new Image(this.get('cover_url'), {
-                client: this.client,
-                background: this.get('cover_bg_color')
-            })
-        })()
-    }
-
     get rating() {
-        /*
-        type: dict
-        */
+        return this.get('rating')
+    }
+
+    get points() {
         return (async () => {
-            return await this.get('rating')
-            return new Rating({
-                client: this.client,
-                data: self.get("rating")
-            })
+            return await this.get('rating').points || await this.fresh.get('rating').points
         })()
-    } // objectify
+    }
+
+    get is_level_visible() {
+        return (async () => {
+            return await this.get('rating').is_show_level || await this.fresh.get('rating').is_show_level
+        })()
+    }
+
+    get level() {
+        return this.get('current_level')
+    }
 
     get bans() {
-        /*
-        type: list
-        */
-        return (async () => {
-            return await this.get('bans')
-        })()
+        return
     } // from paginated
 
     get days() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('meme_experience').days
         })()
     }
 
     get rank() {
-        /*
-        type: int
-        */
         return (async () => {
             return await this.get('meme_experience').rank
         })()
     }
+
+    // self user
+
+    get messenger_token() {
+        return this.get('messenger_token')
+    }
+
+    get messaging_privacy_status() {
+        return this.get('messaging_privacy_status')
+    }
+
+    get phone() {
+        return this.get('phone')
+    }
+
+    get is_available_for_chat() {
+        return this.get('is_available_for_chat')
+    }
+
+    get messenger_active() {
+        return this.get('messenger_active')
+    }
+
+    get is_blocked_in_messenger() {
+        return this.get('is_blocked_in_messenger')
+    }
+
+    get is_private() {
+        return this.get('is_private')
+    }
+
+    get safe_mode() {
+        return this.get('safe_mode')
+    }
+
+    get is_moderator() {
+        return this.get('is_moderator')
+    }
+
+    get is_ifunny_team_member() {
+        return this.get('is_ifunny_team_member')
+    }
+
+    get have_unnotified_bans() {
+        return this.get('have_unnotified_bans')
+    }
+
+    get have_unnotified_strikes() {
+        return this.get('have_unnotified_strikes')
+    }
+
+    get have_unnotified_achievements() {
+        return this.get('have_unnotified_achievements')
+    }
+
+    get have_unnotifieds() {
+        return this.get('have_unnotifieds')
+    }
+
+    get need_account_setup() {
+        return this.get('need_account_setup')
+    }
+
+    get is_verified() {
+        return this.get('is_verified')
+    }
+
+    get is_banned() {
+        return this.get('is_banned')
+    }
+
+    get is_deleted() {
+        return this.get('is_deleted')
+    }
+
+    get web_url() {
+        return this.get('web_url')
+    }
+
+    get email() {
+        return this.get('email')
+    }
+
 }
 
 module.exports = User

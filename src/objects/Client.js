@@ -10,8 +10,8 @@ const { homedir } = require('os')
 /**
  * iFunny Client object, representing a logged in or guest user
  * @extends {EventEmitter}
- * @param {object} opts Optional properties
- * @param {number} [opts.paginated_size = 25] Size of each paginated request
+ * @param {Object} opts                     Optional parameters
+ * @param {Number} opts.paginated_size=25 Size of each paginated request
  */
 
 class Client extends EventEmitter {
@@ -27,13 +27,14 @@ class Client extends EventEmitter {
         }
 
         this._config_path = `${homedir()}/.ifunnyjs/config.json`
+        this._update = false
         this.paginated_size = opts.paginated_size || 25
         this.authorized = false
     }
 
     /**
      * iFunny api url
-     * @return {string}
+     * @type {String}
      */
     get api() {
         return 'http://api.ifunny.mobi/v4'
@@ -41,7 +42,7 @@ class Client extends EventEmitter {
 
     /**
      * sendbird api url
-     * @return {string}
+     * @type {String}
      */
     get sendbird_api() {
         return 'http://api-us-1.sendbird.com/v3'
@@ -50,7 +51,7 @@ class Client extends EventEmitter {
     /**
      * iFunny basic auth token
      * If none is stored in this client's config, one will be generated
-     * @return {string}
+     * @type {String}
      */
     get basic_token() {
         if (this.config.basic_token) {
@@ -65,9 +66,9 @@ class Client extends EventEmitter {
             hex_array.push(hex[Math.floor(Math.random() * range)])
         }
 
-        const hex_string = hex_array.join('')
-        const hex_id = `${hex_string}_${this._client_id}`
-        const hash_decoded = `${hex_string}:${this._client_id}:${this._client_secret}`
+        const hex_String = hex_array.join('')
+        const hex_id = `${hex_String}_${this._client_id}`
+        const hash_decoded = `${hex_String}:${this._client_id}:${this._client_secret}`
         const hash_encoded = sha1(hash_decoded)
         const auth = Buffer.from(`${hex_id}:${hash_encoded}`).toString('base64')
 
@@ -81,7 +82,7 @@ class Client extends EventEmitter {
     /**
      * iFunny headers, needed for all requests
      * Will use which appropriate authentication is available
-     * @return {object}
+     * @type {Object}
      */
     get headers() {
         var _headers = {
@@ -94,7 +95,7 @@ class Client extends EventEmitter {
 
     /**
      * This objects config, loaded from and written to a json file
-     * @return {object}
+     * @type {Object}
      */
     get config() {
         if (!this._config) {
@@ -115,24 +116,33 @@ class Client extends EventEmitter {
         }
 
         this._config = value
-        fs.writeFileSync(this._config_path, JSON.stringify(value))
+        fs.writeFileSync(this._config_path, JSON.Stringify(value))
     }
 
     /**
      * Clear this client's config and wipe the config file
-     * @return {object} this Clients config
+     * @return {Object} this Clients config
      */
     clear_config() {
         this._config = this.config = {}
         return this.config
     }
 
+    /**
+     * Set the update flag and return this object for fetching new data
+     * @type {Client}
+     */
+    get fresh() {
+        this._update = true
+        return this
+    }
+
     // public methods
 
     /**
      * Log into an iFunny account and authenticate this
-     * @param  {string}  email      description
-     * @param  {string}  password   password to the account being logged into, optional for accounts with stored bearer tokens
+     * @param  {String}  email      description
+     * @param  {String}  password   password to the account being logged into, optional for accounts with stored bearer tokens
      * @param  {Object}  opts = {}  Optional parameters
      * @param  {boolean} opts.force bypass stored tokens?
      * @return {Promise<Client>}    this client
@@ -197,7 +207,7 @@ class Client extends EventEmitter {
     /**
      * Get a chunk of this logged in users notifications
      * @param  {Object}  opts = {}       optional parameters
-     * @param  {number}  opts.limit = 25 number of items to fetch
+     * @param  {Number}  opts.limit = 25 Number of items to fetch
      * @return {Promise<Object>}         chunk of notifications with paging info
      */
 
@@ -222,7 +232,7 @@ class Client extends EventEmitter {
 
     /**
      * Generator iterating through logged in users notifications
-     * @return {Generator<Notification>} notifications
+     * @type {Generator<Notification>}
      */
     get notifications() {
         return methods.paginated_generator(this.notifications_paginated, { instance: this })

@@ -1,21 +1,34 @@
 const axios = require('axios')
-const Client = require('../Client')
+
+/**
+ * Image object
+ * @param {String} url                      url to this image source
+ * @param {Object} opts                     optional parameters
+ * @param {String} opts.background="000000" background color of this image
+ * @param {Client} opts.client              client who's headers should be used to fetch this images data
+ */
 
 class Image {
     constructor(url, opts = {}) {
-        /*
-        Image Object constructor, for images
-
-        params:
-            url: url pointing to the image
-            opts:
-                background: string html background color of this image
-                client: Client that this object should be bound to
-        */
-
+        let Client = require('../Client')
         this.url = url
-        this.client = otps.client || new Client()
-        this.background = opts.background || null
+        this.client = opts.client || new Client()
+        this.background = opts.background || "000000"
+    }
+    /**
+     * Raw content of this image
+     * @type {String}
+     */
+    get content() {
+        return (async () => {
+            let response = await axios({
+                method: 'get',
+                url: this.url,
+                headers: this.client.headers
+            })
+
+            return response.data
+        })()
     }
 }
 

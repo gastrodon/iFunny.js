@@ -1,9 +1,11 @@
-const User = require('./User')
-const Post = require('./Post')
-const Comment = require('./Comment')
-
 const axios = require('axios')
 
+/**
+ * iFunny Notification object
+ * @param {Object} data         data of this notification
+ * @param {Object} opts         optional parameters
+ * @param {Client} opts.client  client that this notification belongs to
+ */
 class Notification {
     constructor(data, opts = {}) {
         let Client = require('./Client')
@@ -15,89 +17,98 @@ class Notification {
         return this._data[key] || fallback
     }
 
-
+    /**
+     * The type of Notification
+     * @type {String}
+     */
     get type() {
-        /*
-        type: str
-        */
         return this.get('type')
     }
 
+    /**
+     * Title of this Notification, if achievement get
+     * @type {String|null}
+     */
     get title() {
-        /*
-        type: str
-        */
         return this.get('title')
     }
 
-    get text() {
-        /*
-        type: str
-        */
+    /**
+     * Description of this Notification, if achievement get
+     * @type {String|null}
+     */
+    get description() {
         return this.get('text')
     }
 
+    /**
+     * The User of this Notification, usually the one who caused it, if any
+     * @type {User|null}
+     */
     get user() {
-        /*
-        type: User
-        */
         return (async () => {
             let data = await this.get('user')
 
-            if (data) {
-                return User(data.id, { client: this.client, data: data })
+            if (!data) {
+                return null
             }
 
-            return null
+            let User = require('./User')
+            return User(data.id, { client: this.client, data: data })
 
         })()
     }
 
+    /**
+     * The Comment attached to this Notification, if any
+     * @type {Comment|null}
+     */
     get comment() {
-        /*
-        type: None
-        */
         return (async () => {
             let data = await this.get('reply') || await this.get('comment')
 
-            if (data) {
-                return Comment(data.id, this.post, { client: this.client, data: data })
+            if (!data) {
+                return null
             }
 
-            return null
+            let Comment = require('./Comment')
+            return Comment(data.id, this.post, { client: this.client, data: data })
         })()
     }
 
+    /**
+     * The Post that is attached to this Notification, if any
+     * @type {Post|null}
+     */
     get post() {
-        /*
-        type: Post
-        */
         return (async () => {
             let data = await this.get('content')
 
-            if (data) {
-                return Post(data.id, { client: this.client, data: data })
+            if (!data) {
+                return null
             }
 
-            return null
+            let Post = require('./Post')
+            return Post(data.id, { client: this.client, data: data })
+
         })()
     }
 
+    /**
+     * Timestamp of Notification recieved
+     * @type {Number}
+     */
     get created_at() {
-        /*
-        type: int
-        */
-        return this.get("date")
+        return this.get(date)
     }
 
+    /**
+     * Smile count, if smile tracker Notification
+     * @type {Number|null}
+     */
     get smile_count() {
-        /*
-        type: None
-        */
-        return this.get("smiles", null)
+        return this.get(smiles, null)
     }
-
-
 }
 
 module.exports = Notification

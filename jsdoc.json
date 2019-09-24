@@ -30,6 +30,7 @@
     "destination": "./out/",
     "encoding": "utf8",
     "template": "./node_modules/loke-jsdoc-theme",
+    "readme": "README.md",
     "private": false,
     "recurse": true,
     "sort": false
