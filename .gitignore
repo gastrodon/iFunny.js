@@ -7,7 +7,11 @@ node_modules/
 trial/
 test.js
 
-# codegen
+# Generated Code
+
 getters.py
-out
+generated
 prop.*
+
+# JSDoc out
+out

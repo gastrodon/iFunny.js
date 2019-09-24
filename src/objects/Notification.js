@@ -1,4 +1,3 @@
-const Client = require('./Client')
 const User = require('./User')
 const Post = require('./Post')
 const Comment = require('./Comment')
@@ -7,6 +6,7 @@ const axios = require('axios')
 
 class Notification {
     constructor(data, opts = {}) {
+        let Client = require('./Client')
         this.client = opts.client || new Client()
         this._data = data
     }

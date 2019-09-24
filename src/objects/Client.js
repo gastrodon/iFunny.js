@@ -1,5 +1,4 @@
 const EventEmitter = require('events')
-const Notification = require('./Notification')
 
 const axios = require('axios')
 const fs = require('fs')
@@ -9,19 +8,14 @@ const methods = require('../utils/methods')
 const { homedir } = require('os')
 
 /**
- *  Base Client for all constructs
- *  @extends {EventEmitter}
+ * iFunny Client object, representing a logged in or guest user
+ * @extends {EventEmitter}
+ * @param {object} opts Optional properties
+ * @param {number} [opts.paginated_size = 25] Size of each paginated request
  */
 
 class Client extends EventEmitter {
     constructor(opts = {}) {
-        /*
-        iFunny Client object, representing a logged in user or guest
-
-        params:
-            opts:
-                paginated_size: default pagination size
-        */
         super()
         this._client_id = 'MsOIJ39Q28'
         this._client_secret = 'PTDc3H8a)Vi=UYap'
@@ -37,18 +31,27 @@ class Client extends EventEmitter {
         this.authorized = false
     }
 
+    /**
+     * iFunny api url
+     * @return {string}
+     */
     get api() {
         return 'http://api.ifunny.mobi/v4'
     }
 
+    /**
+     * sendbird api url
+     * @return {string}
+     */
     get sendbird_api() {
         return 'http://api-us-1.sendbird.com/v3'
     }
 
-    get captcha_api() {
-        return 'https://2captcha.com'
-    }
-
+    /**
+     * iFunny basic auth token
+     * If none is stored in this client's config, one will be generated
+     * @return {string}
+     */
     get basic_token() {
         if (this.config.basic_token) {
             return this.config.basic_token
@@ -75,6 +78,11 @@ class Client extends EventEmitter {
 
     }
 
+    /**
+     * iFunny headers, needed for all requests
+     * Will use which appropriate authentication is available
+     * @return {object}
+     */
     get headers() {
         var _headers = {
             'User-Agent': this._user_agent,
@@ -84,6 +92,10 @@ class Client extends EventEmitter {
         return _headers
     }
 
+    /**
+     * This objects config, loaded from and written to a json file
+     * @return {object}
+     */
     get config() {
         if (!this._config) {
 
@@ -106,11 +118,25 @@ class Client extends EventEmitter {
         fs.writeFileSync(this._config_path, JSON.stringify(value))
     }
 
+    /**
+     * Clear this client's config and wipe the config file
+     * @return {object} this Clients config
+     */
     clear_config() {
         this._config = this.config = {}
+        return this.config
     }
 
     // public methods
+
+    /**
+     * Log into an iFunny account and authenticate this
+     * @param  {string}  email      description
+     * @param  {string}  password   password to the account being logged into, optional for accounts with stored bearer tokens
+     * @param  {Object}  opts = {}  Optional parameters
+     * @param  {boolean} opts.force bypass stored tokens?
+     * @return {Promise<Client>}    this client
+     */
     async login(email, password, opts = { force: false }) {
         /*
         Log into ifunny
@@ -168,17 +194,15 @@ class Client extends EventEmitter {
         return response
     }
 
+    /**
+     * Get a chunk of this logged in users notifications
+     * @param  {Object}  opts = {}       optional parameters
+     * @param  {number}  opts.limit = 25 number of items to fetch
+     * @return {Promise<Object>}         chunk of notifications with paging info
+     */
+
     async notifications_paginated(opts = {}) {
-        /*
-        paginated notifications
-
-        params:
-            opts:
-                limit: pagination chunk size
-                prev: prev page token
-                next: next page token
-        */
-
+        let Notification = require('./Notification')
         let instance = this || opts.instance
 
         let data = await methods.paginated_data(`${instance.api}/news/my`, {
@@ -188,14 +212,21 @@ class Client extends EventEmitter {
             next: opts.next,
             headers: instance.headers
         })
-        return new Notification(data.items[0])
+
+        data.items = data.items.map((item) => new Notification(item))
+        return data
 
     }
 
+    // public generators
+
+    /**
+     * Generator iterating through logged in users notifications
+     * @return {Generator<Notification>} notifications
+     */
     get notifications() {
-        return (async () => {
-            return await methods.paginated_generator(this.notifications_paginated, { instance: this })
-        })()
+        return methods.paginated_generator(this.notifications_paginated, { instance: this })
+
     }
 
 }
