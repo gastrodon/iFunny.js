@@ -12,7 +12,7 @@ test.js
 
 getters.py
 generated
-prop.*
+prop*.json
 
 # JSDoc out
 out

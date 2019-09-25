@@ -28,9 +28,12 @@ class Client extends EventEmitter {
 
         this._config_path = `${homedir()}/.ifunnyjs/config.json`
         this._update = false
+        this._messenger_token = null
         this.paginated_size = opts.paginated_size || 25
         this.authorized = false
     }
+
+    // getters
 
     /**
      * iFunny api url
@@ -137,7 +140,173 @@ class Client extends EventEmitter {
         return this
     }
 
-    // public methods
+    /**
+     * This clients phone number
+     * @type {String}
+     */
+    get phone_number() {
+        return this.get('phone')
+    }
+
+    /**
+     * This clients messenger token
+     * Used to start a sendbird connection, but should be replaced
+     * when a new one is given by the connection
+     * @type {String}
+     */
+    get messenger_token() {
+        if (!this._messenger_token) {
+            this._messenger_token = this.get('messenger_token')
+        }
+        return this._messenger_token
+    }
+
+    /**
+     * Update this clients messenger_token
+     * @type {String}
+     */
+    set messenger_token(value) {
+        this._messenger_token = value
+    }
+
+    /**
+     * Has this client started using chat before?
+     * @type {Boolean}
+     */
+    get is_chat_active() {
+        return this.get('messenger_active')
+    }
+
+    /**
+     * Is this client blocked from using chat?
+     * @type {Boolean}
+     */
+    get is_blocked_in_chat() {
+        return this.get('is_blocked_in_messenger')
+    }
+
+    /**
+     * Is safe mode enabled for this client?
+     * @type {Boolean}
+     */
+    get is_safe_mode_enabled() {
+        return this.get('safe_mode')
+    }
+
+    /**
+     * Is this client an iFunny moderator?
+     * @type {Boolean}
+     */
+    get is_moderator() {
+        return this.get('is_moderator')
+    }
+
+    /**
+     * Is this client an iFunny team member?
+     * @type {Boolean}
+     */
+    get is_ifunny_team_member() {
+        return this.get('is_ifunny_team_member')
+    }
+
+    /**
+     * Is this client a verified user?
+     * @type {Boolean}
+     */
+    get is_verified() {
+        return this.get('is_verified')
+    }
+
+    /**
+     * Is this client banned?
+     * @type {Boolean}
+     */
+    get is_banned() {
+        return this.get('is_banned')
+    }
+
+    /**
+     * Is this client deactivated?
+     * @type {Boolean}
+     */
+    get is_deactivated() {
+        return this.get('is_deleted')
+    }
+
+
+    /**
+     * Does this client have unnotified bans?
+     * @type {Boolean}
+     */
+    get has_unnotified_bans() {
+        return this.get('have_unnotified_bans')
+    }
+
+    /**
+     * Does this client have unnotified strikes?
+     * @type {Boolean}
+     */
+    get has_unnotified_strikes() {
+        return this.get('have_unnotified_strikes')
+    }
+
+    /**
+     * Does this client have unnotified achievements?
+     * @type {Boolean}
+     */
+    get has_unnotified_achievements() {
+        return this.get('have_unnotified_achievements')
+    }
+
+    /**
+     * Does this client have notifications of another category?
+     * @type {Boolean}
+     */
+    get has_unnotifieds() {
+        return this.get('have_unnotifieds')
+    }
+
+    /**
+     * Does this client need to go through account setup?
+     * @type {Boolean}
+     */
+    get needs_account_setup() {
+        return this.get('need_account_setup')
+    }
+
+    /**
+     * Sharable web url to this clients account
+     * @type {String}
+     */
+    get web_url() {
+        return this.get('web_url')
+    }
+
+    /**
+     * This clients registered email address
+     * @type {String}
+     */
+    get email() {
+        return this.get('email')
+    }
+
+    /**
+     * This clients nick
+     * @type {String}
+     */
+    get nick() {
+        return this.get('email')
+    }
+
+    /**
+     * This clients about
+     * @type {String}
+     */
+    get about() {
+        return this.get('email')
+    }
+
+    // methods
 
     /**
      * Log into an iFunny account and authenticate this
@@ -228,7 +397,7 @@ class Client extends EventEmitter {
 
     }
 
-    // public generators
+    // generators
 
     /**
      * Generator iterating through logged in users notifications

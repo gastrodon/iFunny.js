@@ -147,7 +147,7 @@ class Post extends FreshObject {
 
     /**
      * Timestamp of post creation
-     * @time {Number}
+     * @type {Number}
      */
     get created_at() {
         return this.get('date_create')
