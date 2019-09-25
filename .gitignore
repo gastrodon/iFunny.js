@@ -1,8 +1,18 @@
 # Packages
 
 node_modules/
+package-lock.json
 
 # Misc
 
 trial/
 test.js
+
+# Generated Code
+
+getters.py
+generated
+prop*.json
+
+# JSDoc out
+out

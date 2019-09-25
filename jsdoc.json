@@ -1,0 +1,38 @@
+
+{
+  "configHelpUrl": "http://usejsdoc.org/about-configuring-jsdoc.html",
+  "script": "jsdoc --configure ./node_modules/loke-jsdoc-theme/default.jsdoc.json --verbose",
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "source": {
+    "include": ["./src"],
+    "exclude": [],
+    "includePattern": ".js$",
+    "excludePattern": "(node_modules/|docs)"
+  },
+  "plugins": [
+    "plugins/markdown",
+    "./node_modules/loke-jsdoc-theme/plugins/async",
+    "./node_modules/loke-jsdoc-theme/plugins/rpc",
+    "./node_modules/loke-jsdoc-theme/plugins/api",
+    "./node_modules/loke-jsdoc-theme/plugins/timeout"
+  ],
+  "markdown": {
+    "excludeTags": ["author"]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": true
+  },
+  "opts": {
+    "destination": "./out/",
+    "encoding": "utf8",
+    "template": "./node_modules/loke-jsdoc-theme",
+    "readme": "README.md",
+    "private": false,
+    "recurse": true,
+    "sort": false
+  }
+}
