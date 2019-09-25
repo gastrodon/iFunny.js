@@ -315,6 +315,7 @@ class Client extends EventEmitter {
      * @param  {Object}  opts = {}  Optional parameters
      * @param  {boolean} opts.force bypass stored tokens?
      * @return {Promise<Client>}    this client
+     * @fires login#ready
      */
     async login(email, password, opts = { force: false }) {
         /*
@@ -344,6 +345,16 @@ class Client extends EventEmitter {
                 })
 
                 this.authorized = true
+
+                /**
+                 * Ready event.
+                 * 
+                 * @event login#ready
+                 * @type {object}
+                 * @property {string} token - The bearer token used to authorize.
+                 * @property {boolean} regen - If the token was regened or not.
+                 */
+                this.emit("ready", {token: this.config[`bearer ${email}`], regen: false})
                 return this
 
             } catch (error) {
@@ -370,6 +381,7 @@ class Client extends EventEmitter {
         this._config[`bearer ${email}`] = response.data.access_token
         this.config = this._config
 
+        this.emit("ready", {token: response.data.access_token, regen: true})
         return response
     }
 
