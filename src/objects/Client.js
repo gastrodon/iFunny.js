@@ -31,6 +31,9 @@ class Client extends EventEmitter {
         this._messenger_token = null
         this.paginated_size = opts.paginated_size || 25
         this.authorized = false
+
+        this.ChatConnector = require("./ChatConnector.js") 
+
     }
 
     // getters
@@ -119,7 +122,7 @@ class Client extends EventEmitter {
         }
 
         this._config = value
-        fs.writeFileSync(this._config_path, JSON.Stringify(value))
+        fs.writeFileSync(this._config_path, JSON.stringify(value))
     }
 
     /**
@@ -315,7 +318,7 @@ class Client extends EventEmitter {
      * @param  {Object}  opts = {}  Optional parameters
      * @param  {boolean} opts.force bypass stored tokens?
      * @return {Promise<Client>}    this client
-     * @fires login#ready
+     * @fires Client#ready
      */
     async login(email, password, opts = { force: false }) {
         /*
@@ -349,12 +352,11 @@ class Client extends EventEmitter {
                 /**
                  * Ready event.
                  * 
-                 * @event login#ready
+                 * @event Client#ready
                  * @type {object}
-                 * @property {string} token - The bearer token used to authorize.
                  * @property {boolean} regen - If the token was regened or not.
                  */
-                this.emit("ready", {token: this.config[`bearer ${email}`], regen: false})
+                this.emit("ready", { regen: false })
                 return this
 
             } catch (error) {
@@ -381,7 +383,7 @@ class Client extends EventEmitter {
         this._config[`bearer ${email}`] = response.data.access_token
         this.config = this._config
 
-        this.emit("ready", {token: response.data.access_token, regen: true})
+        this.emit("ready", { regen: true })
         return response
     }
 
