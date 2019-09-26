@@ -20,7 +20,6 @@ class Ban extends FreshObject {
     }
 
     async get(key, fallback = null) {
-        console.log(this.url)
         let found = this._object_payload[key]
 
         if (found != undefined && !this._update) {

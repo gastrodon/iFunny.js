@@ -28,9 +28,146 @@ class Client extends EventEmitter {
 
         this._config_path = `${homedir()}/.ifunnyjs/config.json`
         this._update = false
-        this._messenger_token = null
+        this._object_payload = {}
+        this._update = false
         this.paginated_size = opts.paginated_size || 25
+        this.url = `${this.api}/account`
         this.authorized = false
+    }
+
+    // methods
+
+    /**
+     * Get some value from this objects own internal JSON state
+     * @param  {String}  key      key to query
+     * @param  {*}  fallback=null fallback value, if no value is found for key
+     * @return {Promise<*>}       retrieved data
+     */
+    async get(key, fallback = null) {
+        let found = this._object_payload[key]
+
+        if (found != undefined && !this._update) {
+            return found
+        }
+
+        let response = await axios({
+            method: 'get',
+            url: this.url,
+            headers: this.headers
+        })
+
+        this._object_payload = response.data.data
+        return this._object_payload[key] || fallback
+    }
+
+    /**
+     * Log into an iFunny account and authenticate this
+     * @param  {String}  email      description
+     * @param  {String}  password   password to the account being logged into, optional for accounts with stored bearer tokens
+     * @param  {Object}  opts={}  Optional parameters
+     * @param  {Boolean} opts.force bypass stored tokens?
+     * @return {Promise<Client>}    this client
+     * @fires login#ready
+     */
+    /**
+     * Event emitted when this client is logged in
+     *
+     * @event Client#ready
+     * @type {Boolean}
+     * @property {Boolean} fresh did this login get a fresh token?
+     */
+    async login(email, password, opts = { force: false }) {
+        /*
+        Log into ifunny
+
+        params:
+            email: email to log in with
+            password: password to log in with
+            opts:
+                force: bypass saved bearer tokens
+
+        returns:
+            this after verifying login
+        */
+        if (!email) {
+            throw 'email is required'
+        }
+
+        if (this.config[`bearer ${email}`] && !opts.force) {
+            this._token = this.config[`bearer ${email}`]
+
+            try {
+                let response = await axios({
+                    method: 'get',
+                    url: `${this.api}/account`,
+                    headers: this.headers
+                })
+
+                this.authorized = true
+                this.emit('ready', false)
+                return this
+
+            } catch (error) {
+                this._token = null
+            }
+        }
+
+        let data = {
+            'grant_type': 'password',
+            'username': email,
+            'password': password
+        }
+
+        data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
+
+        let response = await axios({
+            method: 'post',
+            url: `${this.api}/oauth2/token`,
+            headers: this.headers,
+            data: data
+        })
+
+        this._token = response.data.access_token
+        this._config[`bearer ${email}`] = response.data.access_token
+        this.config = this._config
+
+        this.emit('ready', true)
+        return response
+    }
+
+    /**
+     * Get a chunk of this logged in users notifications
+     * @param  {Object}  opts={}       optional parameters
+     * @param  {Number}  opts.limit=25 Number of items to fetch
+     * @return {Promise<Object>}         chunk of notifications with paging info
+     */
+
+    async notifications_paginated(opts = {}) {
+        let Notification = require('./Notification')
+        let instance = this || opts.instance
+
+        let data = await methods.paginated_data(`${instance.api}/news/my`, {
+            limit: opts.limit || instance.paginated_size,
+            key: 'news',
+            prev: opts.prev,
+            next: opts.next,
+            headers: instance.headers
+        })
+
+        data.items = data.items.map((item) => new Notification(item))
+        return data
+
+    }
+
+    // generators
+
+    /**
+     * Generator iterating through logged in users notifications
+     * @type {Generator<Notification>}
+     */
+    get notifications() {
+        return methods.paginated_generator(this.notifications_paginated, { instance: this })
+
     }
 
     // getters
@@ -119,7 +256,7 @@ class Client extends EventEmitter {
         }
 
         this._config = value
-        fs.writeFileSync(this._config_path, JSON.Stringify(value))
+        fs.writeFileSync(this._config_path, JSON.stringify(value))
     }
 
     /**
@@ -155,18 +292,7 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get messenger_token() {
-        if (!this._messenger_token) {
-            this._messenger_token = this.get('messenger_token')
-        }
-        return this._messenger_token
-    }
-
-    /**
-     * Update this clients messenger_token
-     * @type {String}
-     */
-    set messenger_token(value) {
-        this._messenger_token = value
+        return this.get("messenger_token")
     }
 
     /**
@@ -295,7 +421,7 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get nick() {
-        return this.get('email')
+        return this.get('nick')
     }
 
     /**
@@ -303,123 +429,8 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get about() {
-        return this.get('email')
+        return this.get('about')
     }
-
-    // methods
-
-    /**
-     * Log into an iFunny account and authenticate this
-     * @param  {String}  email      description
-     * @param  {String}  password   password to the account being logged into, optional for accounts with stored bearer tokens
-     * @param  {Object}  opts = {}  Optional parameters
-     * @param  {boolean} opts.force bypass stored tokens?
-     * @return {Promise<Client>}    this client
-     * @fires login#ready
-     */
-    async login(email, password, opts = { force: false }) {
-        /*
-        Log into ifunny
-
-        params:
-            email: email to log in with
-            password: password to log in with
-            opts:
-                force: bypass saved bearer tokens
-
-        returns:
-            this after verifying login
-        */
-        if (!email) {
-            throw 'email is required'
-        }
-
-        if (this.config[`bearer ${email}`] && !opts.force) {
-            this._token = this.config[`bearer ${email}`]
-
-            try {
-                let response = await axios({
-                    method: 'get',
-                    url: `${this.api}/account`,
-                    headers: this.headers
-                })
-
-                this.authorized = true
-
-                /**
-                 * Ready event.
-                 * 
-                 * @event login#ready
-                 * @type {object}
-                 * @property {string} token - The bearer token used to authorize.
-                 * @property {boolean} regen - If the token was regened or not.
-                 */
-                this.emit("ready", {token: this.config[`bearer ${email}`], regen: false})
-                return this
-
-            } catch (error) {
-                this._token = null
-            }
-        }
-
-        let data = {
-            'grant_type': 'password',
-            'username': email,
-            'password': password
-        }
-
-        data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
-
-        let response = await axios({
-            method: 'post',
-            url: `${this.api}/oauth2/token`,
-            headers: this.headers,
-            data: data
-        })
-
-        this._token = response.data.access_token
-        this._config[`bearer ${email}`] = response.data.access_token
-        this.config = this._config
-
-        this.emit("ready", {token: response.data.access_token, regen: true})
-        return response
-    }
-
-    /**
-     * Get a chunk of this logged in users notifications
-     * @param  {Object}  opts = {}       optional parameters
-     * @param  {Number}  opts.limit = 25 Number of items to fetch
-     * @return {Promise<Object>}         chunk of notifications with paging info
-     */
-
-    async notifications_paginated(opts = {}) {
-        let Notification = require('./Notification')
-        let instance = this || opts.instance
-
-        let data = await methods.paginated_data(`${instance.api}/news/my`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'news',
-            prev: opts.prev,
-            next: opts.next,
-            headers: instance.headers
-        })
-
-        data.items = data.items.map((item) => new Notification(item))
-        return data
-
-    }
-
-    // generators
-
-    /**
-     * Generator iterating through logged in users notifications
-     * @type {Generator<Notification>}
-     */
-    get notifications() {
-        return methods.paginated_generator(this.notifications_paginated, { instance: this })
-
-    }
-
 }
 
 module.exports = Client

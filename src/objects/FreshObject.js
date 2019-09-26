@@ -38,7 +38,6 @@ class FreshObject extends EventEmitter {
      * @return {Promise<*>}       retrieved data
      */
     async get(key, fallback = null) {
-        console.log(this.url)
         let found = this._object_payload[key]
 
         if (found != undefined && !this._update) {

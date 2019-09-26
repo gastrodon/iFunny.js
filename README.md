@@ -1,15 +1,14 @@
-# IFunnyWrapper
+# iFunny.js
 
-A simple API wrapper for IFunny Mobile.
+A simple wrapper for iFunny's private API
 
-```javascript
-const IF = require('IFunnyWrapper')
+```js
+const ifunny = require('iFunny')
+const robot = new ifunny.Client()
 
-const bot = new IF.Client()
-
-bot.on('ready', (token) => {
-    console.log(token)
+robot.on('ready', async (fresh) => {
+    console.log(`${robot.nick} was logged on with a ${fresh? 'new': 'cached'} bearer`)
 })
 
-bot.login('username', 'password', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36')
+robot.login('username', 'password')
 ```
