@@ -33,6 +33,9 @@ class Client extends EventEmitter {
         this.paginated_size = opts.paginated_size || 25
         this.url = `${this.api}/account`
         this.authorized = false
+
+        this.ChatConnector = require("./ChatConnector.js")
+
     }
 
     // methods
