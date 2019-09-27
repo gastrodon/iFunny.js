@@ -333,7 +333,6 @@ class Client extends EventEmitter {
      * @type {String}
      */
     set sendbird_session_key(value) {
-        console.log(`captured ${value}`)
         this._sendbird_session_key = value
     }
 

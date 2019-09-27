@@ -24,8 +24,9 @@ class Message extends FreshObject {
      */
     async get(key, fallback = null) {
         let found = this._object_payload[key]
+        console.log(found);
 
-        if (found == undefined && !this.update) {
+        if (found != undefined && !this.update) {
             this._update = false
             return found
         }
@@ -96,6 +97,13 @@ class Message extends FreshObject {
      */
     get reply() {
         return this.send_text_message
+    }
+
+    get type() {
+        // fresh data and local data are not consistent
+        // local -> mime type (for files)
+        // fresh -> 'FILE' or ''
+        return this.get('type')
     }
 
     get msg_id() {

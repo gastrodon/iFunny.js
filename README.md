@@ -1,5 +1,7 @@
 # iFunny.js
 
+[![Discord](https://img.shields.io/discord/624473515327881216?label=Discord&style=flat-square)](https://discord.gg/7WJZM9q)
+
 A simple wrapper for iFunny's private API
 
 ```js

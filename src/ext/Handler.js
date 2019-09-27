@@ -35,17 +35,20 @@ class Handler extends EventEmitter {
             case 'MESG':
                 this.on_message(data)
                 break
+            case 'FILE':
+                this.on_message(data)
+                break
             case 'SYEV':
                 this.on_channel_update(data)
-                break
-            case 'FILE':
-                this.on_file(data)
                 break
             case 'PING':
                 this.on_ping(data)
                 break
             case 'READ':
                 this.on_read(data)
+                break
+            case 'BRDM':
+                this.on_broadcast(data)
                 break
             default:
                 this.default(key, data)
@@ -71,7 +74,6 @@ class Handler extends EventEmitter {
      */
     async on_connect(data) {
         this.client.sendbird_session_key = data.key
-        console.log(this.client.sendbird_headers)
         this.client.emit('connected')
         let socket = await this.client.socket
         socket._ping_interval(data.ping_interval)
@@ -82,7 +84,7 @@ class Handler extends EventEmitter {
      * @param  {Object}  raw data from the socket
      */
     /**
-     * Event emitted when a chat message is recieved
+     * Event emitted when a chat message is recieved that is not from the client
      * @event Client#message
      * @property {Message} message     message recieved
      */
@@ -95,7 +97,45 @@ class Handler extends EventEmitter {
     }
 
     async on_channel_update(data) {
-        // TODO: channel udpates
+        switch (data.cat) {
+            case 10020:
+                this.on_invite_broadcast(data)
+                break
+            case 10000:
+                // user_join is implemented by on_broadcast
+                // this.on_user_join(data)
+                break
+            case 10001:
+                // user_exit is implemented by on_broadcast
+                // this.on_user_exit(data)
+                break
+            default:
+                // this.on_other_update(data)
+        }
+    }
+
+    /**
+     * Event emitted when an invite is broadcast for a chat
+     * @event Client#invite_broadcast
+     * @property {Invite} invite invite that was broadcast
+     */
+    /**
+     * Event emitted when the client is invited to a chat
+     * @event Client#invite
+     * @property {Invite} invite invite that was broadcast
+     */
+    async on_invite_broadcast(data) {
+        let Invite = require('../objects/Invite')
+        let client = await this.client
+        let invitees = data.data.invitees.map(it => it.user_id)
+        let invite = new Invite(data, { client: this.client })
+
+        if (invitees.some(it => it == client._id)) {
+            this.client.emit('invite', invite)
+        } else {
+            this.client.emit('invite_broadcast', invite)
+        }
+
     }
 
     async on_file(data) {
@@ -103,10 +143,6 @@ class Handler extends EventEmitter {
         // this.client.emit('file', data)
     }
 
-    /**
-     * Handle a ping and pong the server
-     * @param  {Object}  raw data from the socket
-     */
     /**
      * Event emitted when the socket pings us
      * @event Client#ping
@@ -117,11 +153,7 @@ class Handler extends EventEmitter {
     }
 
     /**
-     * Handle a channel being read by a user
-     * @param  {Object}  raw data from the socket
-     */
-    /**
-     * Event emitted when a channel was marked as read
+     * Event emitted when a chat was marked as read
      * @event Client#read
      * @property {ChatUser} user    user who marked this chat as read
      * @property {Chat}     chat    chat that was marked as read
@@ -133,6 +165,95 @@ class Handler extends EventEmitter {
             new ChatUser(data.user.guest_id, chat, { client: this.client }),
             chat
         )
+    }
+
+    async on_broadcast(data) {
+        let type = JSON.parse(data.data).type
+        switch (type) {
+            case 'CHANNEL_CHANGE':
+                this.channel_change(data)
+                break;
+            case 'USER_JOIN':
+                this.user_join(data)
+                break;
+            case 'USER_LEAVE':
+                this.user_exit(data)
+                break;
+            default:
+                this.client.emit('broadcast', data)
+        }
+
+    }
+
+    /**
+     * Event emitted when a chat is changed
+     * @event Client#chat_changed
+     * @property {Chat}   chat      chat that was updated
+     * @property {String} key       type of change that was made
+     * @property {String} new_name  new value of what was changed
+     * @property {String} old_name  previous value of what was changed
+     */
+    async channel_change(data) {
+        let Chat = require('../objects/Chat')
+        let chat = new Chat(data.channel_url, { client: this.client })
+        let changes = JSON.parse(data.data).changes
+
+        for (let change of changes) {
+            let _new = changes.new
+            let _old = changes.old
+            let _key = changes.key
+
+            this.client.emit(`chat_changed`, chat, _key, _new, _old)
+        }
+    }
+
+    /**
+     * Event emitted when a user does join a chat
+     * @event Client#user_exit
+     * @property {Object} user user who did join
+     * @property {Object} chat chat that this user did join
+     * @property {Object|Null} inviter user who did invite this user
+     */
+    async user_join(data) {
+        let Chat = require('../objects/Chat')
+        let ChatUser = require('../objects/ChatUser')
+        let chat = new Chat(data.channel_url, { client: this.client })
+        let meta = JSON.parse(data.data)
+        let joined = meta.users.map(it => new ChatUser(it.user_id, chat, { client: this.client }))
+
+        let inviter
+
+        if (meta.inviter) {
+            inviter = new ChatUser(meta.inviter.user_id, chat, { client: this.client })
+        }
+
+        for (let user of joined) {
+            this.client.emit('user_join', user, chat, inviter || null)
+        }
+    }
+
+    /**
+     * Event emitted when a user does exit a chat
+     * @event Client#user_exit
+     * @property {Object} user user who did exit
+     * @property {Object} chat chat that this user did exit
+     */
+    async user_exit(data) {
+        let Chat = require('../objects/Chat')
+        let ChatUser = require('../objects/ChatUser')
+        let chat = new Chat(data.channel_url, { client: this.client })
+        let meta = JSON.parse(data.data)
+        let left = meta.users.map(it => new ChatUser(it.user_id, chat, { client: this.client }))
+
+        let inviter
+
+        if (meta.inviter) {
+            inviter = new ChatUser(meta.inviter.user_id, chat, { client: this.client })
+        }
+
+        for (let user of left) {
+            this.client.emit('user_exit', user, chat)
+        }
     }
 }
 

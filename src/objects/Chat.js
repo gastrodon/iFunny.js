@@ -37,8 +37,6 @@ class Chat extends FreshObject {
             method: 'get',
             url: this.url,
             headers: await this.sendbird_headers
-        }).catch(e => {
-            console.log(e);
         })
 
         console.log(response.data)
