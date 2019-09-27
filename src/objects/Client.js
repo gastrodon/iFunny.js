@@ -357,7 +357,7 @@ class Client extends EventEmitter {
     /**
      * Update this clients config
      * and write it to the config file
-     * @type {[type]}
+     * @type {Object}
      */
     set config(value) {
         if (typeof(value) !== 'object') {
