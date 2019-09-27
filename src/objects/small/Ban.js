@@ -10,7 +10,6 @@ const client = require('../Client')
  * @param {User} opts.user=this.client.user the User who recieved this ban
  * @param {Object} opts.data={}             data of this object, that can be used before fetching new info
  */
-
 class Ban extends FreshObject {
     constructor(id, opts = {}) {
         super(id, opts)
@@ -19,17 +18,25 @@ class Ban extends FreshObject {
         this.url = `${self.api}/users/${this.user.id}/bans/${self.id}`
     }
 
+    /**
+     * Get some value from this objects own internal JSON state
+     * @param  {String}  key      key to query
+     * @param  {*}  fallback=null fallback value, if no value is found for key
+     * @return {Promise<*>}       retrieved data
+     */
     async get(key, fallback = null) {
         let found = this._object_payload[key]
 
         if (found != undefined && !this._update) {
+            this._update = false
             return found
         }
 
+        this._update = false
         let response = await axios({
             method: 'get',
             url: this.url,
-            headers: this.headers
+            headers: await this.headers
         })
 
         this._object_payload = response.data.data.ban

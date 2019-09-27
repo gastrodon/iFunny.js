@@ -11,7 +11,6 @@ const FreshObject = require('./FreshObject')
  * @param {Number} opts.paginated_size=25   size of each paginated request
  * @param {Object} opts.data={}             data of this object, that can be used before fetching new info
  */
-
 class Comment extends FreshObject {
 
     constructor(id, post, opts = {}) {
@@ -25,13 +24,15 @@ class Comment extends FreshObject {
     async get(key, fallback = null) {
         let found = this._object_payload[key]
         if (found != undefined && !this._update) {
+            this._update = false
             return found
         }
 
+        this._update = false
         let response = await axios({
             method: 'get',
             url: this.url,
-            headers: this.headers
+            headers: await this.headers
         })
 
         this._object_payload = response.data.data.comment

@@ -1,13 +1,14 @@
 # Packages
 
-node_modules/
+node_modules
 package-lock.json
 
 # Misc
 
-trial/
+trial
 test.js
-tests/
+tests
+ignore
 
 # Generated Code
 
