@@ -10,10 +10,13 @@ const { homedir } = require('os')
 /**
  * iFunny Client object, representing a logged in or guest user
  * @extends {EventEmitter}
- * @param {Object}  opts                   Optional parameters
- * @param {Number}  opts.paginated_size=25 Size of each paginated request
- * @param {String}  opts.prefix=null       Prefix that this bot should use for commands
- * @param {Boolean} opts.reconnect=false   Reconnect to the websocket after it's closed?
+ * @param {Object}                                      opts                   Optional parameters
+ * @param {Number}                                      opts.paginated_size=25 Size of each paginated request
+ * @param {String|Set<String>|Array<String>|Function}   opts.prefix=null
+ * Prefix that this bot should use for commands
+ * Prefix can be a single String, Set/Array of strings, or a function that returns and of those.
+ * If the prefix is a callable function, it will be called with the single argument of the message that is being evauluated
+ * @param {Boolean}                                     opts.reconnect=false   Reconnect to the websocket after it's closed?
  */
 class Client extends EventEmitter {
     constructor(opts = {}) {
