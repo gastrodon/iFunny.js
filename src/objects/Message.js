@@ -8,6 +8,7 @@ const axios = require('axios')
 class Message extends FreshObject {
     constructor(id, channel, opts = {}) {
         super(id, opts)
+        this._invoked = null
 
         if (typeof(channel) == 'object') {
             channel = channel.url
@@ -54,7 +55,7 @@ class Message extends FreshObject {
      * @type {String}
      */
     get content() {
-        return this.get('message')
+        return this.get('message') || ''
     }
 
     /**
@@ -151,6 +152,16 @@ class Message extends FreshObject {
         return (async () => {
             return (await this.file_meta)['name'] || null
         })()
+    }
+
+    get invoked() {
+        return (async () => {
+            return this._invoked
+        })()
+    }
+
+    set invoked(field) {
+        this._invoked = field
     }
 
     get msg_id() {

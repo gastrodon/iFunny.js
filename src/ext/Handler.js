@@ -12,13 +12,6 @@ class Handler extends EventEmitter {
     constructor(client) {
         super()
         this.client = client
-
-        // TODO: this
-        this.channel_update_codes = {
-            10020: this.on_invite,
-            10001: this.on_user_exit,
-            10000: this.on_user_join
-        }
     }
 
     /**
@@ -81,11 +74,11 @@ class Handler extends EventEmitter {
     /**
      * Event emitted when the socket conneciton is acknowledged by sendbird
      * And the websocket is ready to use
-     * @event Client#connected
+     * @event Client#connect
      */
     async on_connect(data) {
         this.client.sendbird_session_key = data.key
-        this.client.emit('connected')
+        this.client.emit('connect')
         let socket = await this.client.socket
         socket._ping_interval(data.ping_interval)
     }
@@ -103,8 +96,10 @@ class Handler extends EventEmitter {
         if (data.user.name == await (await this.client).nick) {
             return
         }
+        let message = new Message(data.msg_id, data.channel_url, { client: this.client, data: data })
+        message.invoked = await this.client.resolve_command(message)
 
-        this.client.emit('message', new Message(data.msg_id, data.channel_url, { client: this.client, data: data }))
+        this.client.emit('message', message)
     }
 
     async on_chat_update(data) {

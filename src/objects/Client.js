@@ -10,8 +10,10 @@ const { homedir } = require('os')
 /**
  * iFunny Client object, representing a logged in or guest user
  * @extends {EventEmitter}
- * @param {Object} opts                     Optional parameters
- * @param {Number} opts.paginated_size=25 Size of each paginated request
+ * @param {Object}  opts                   Optional parameters
+ * @param {Number}  opts.paginated_size=25 Size of each paginated request
+ * @param {String}  opts.prefix=null       Prefix that this bot should use for commands
+ * @param {Boolean} opts.reconnect=false   Reconnect to the websocket after it's closed?
  */
 class Client extends EventEmitter {
     constructor(opts = {}) {
@@ -21,10 +23,25 @@ class Client extends EventEmitter {
         this._user_agent = 'iFunny/5.42(1117792) Android/5.0.2 (samsung; SCH-R530U; samsung)'
         this._update = false
         this._object_payload = {}
-        this._update = false
         this._handler = null
         this._socket = null
         this._sendbird_session_key = null
+        this._prefix = opts.prefix || null
+        this._reconnect = opts.reconnect || false
+        this._commands = []
+        this._reserved_events = [
+            'broadcast',
+            'chat_update',
+            'connected',
+            'invite',
+            'invite_broadcast',
+            'message',
+            'ping',
+            'read',
+            'ready',
+            'user_exit',
+            'unknown_event'
+        ]
 
         this.authorized = false
         this.paginated_size = opts.paginated_size || 25
@@ -174,17 +191,105 @@ class Client extends EventEmitter {
         (await this.handler).handle_message(key, data)
     }
 
+    /**
+     * Listen for a command, and emit it's name when it is called with this prefix
+     * @param  {String}  name  Command name
+     */
+    async listen_for_command(name) {
+        if (this._reserved_events.includes(name)) {
+            throw `${name} is a reserved listener`
+        }
+
+        if (this._commands.has(name)) {
+            return
+        }
+
+        this._commands.add(name)
+    }
+
+    /**
+     * Listen for a command, and emit it's name when it is called with this prefix
+     * @param  {String|Array<String>}  name  Command name
+     * @return {Promise<Client>}     This clinet instance
+     */
+    async listen_for(names) {
+        if(typeof(names) === 'string') {
+            names = new Set([names])
+        }
+
+        this._commands = new Set([...names, ...this._commands])
+    }
+
+    async resolve_command(message) {
+        if(!this._prefix) {
+            return null
+        }
+
+        let slice = await this.prefix_slice(message)
+
+        if(!slice) {
+            return null
+        }
+
+        let content = await message.content
+        let c_name = content.split(" ")[0].slice(slice)
+        let args = content.split(" ").slice(1)
+
+        if(this._commands.has(c_name)) {
+            this.emit(c_name, message, args)
+            return c_name
+        }
+
+        return null
+    }
+
+    // Determine if a message starts with a possible prefix
+    // Return it's length if so
+    // Return null otherwise
+    async prefix_slice(message) {
+        let prefix = this._prefix
+        let content = await message.content
+
+        if(typeof(this._prefix) === 'function') {
+            prefix = this._prefix(message)
+        }
+
+        if(typeof(prefix) === 'string') {
+            prefix = new Set([prefix])
+        }
+
+        else if (typeof(prefix) === 'object') {
+            prefix = new Set(prefix)
+        }
+
+        for (let p of prefix) {
+            if (content.startsWith(p)) {
+                return p.length
+            }
+        }
+
+        return null
+    }
+
+    // Forward raw data to send to this websocket
     async send_to_socket(data) {
         await (await this.socket).send(data)
     }
 
-    async send_text_message(content, channel_url) {
+    /**
+     * Send a text message to a chat
+     * @param  {String}       content Message content
+     * @param  {Chat|String}  chat    Chat or channel_url of the chat to send this message to
+     * @return {Promise<Chat|String>} Chat or channel_url, whichever was passed to the method
+     */
+    async send_text_message(content, chat) {
         let data = {
-            'channel_url': channel_url,
+            'channel_url': chat.channel_url || chat,
             'message': content
         }
 
         this.send_to_socket(`MESG${JSON.stringify(data)}\n`)
+        return chat
     }
 
     /**
