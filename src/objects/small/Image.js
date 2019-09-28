@@ -7,7 +7,6 @@ const axios = require('axios')
  * @param {String} opts.background="000000" background color of this image
  * @param {Client} opts.client              client who's headers should be used to fetch this images data
  */
-
 class Image {
     constructor(url, opts = {}) {
         let Client = require('../Client')
@@ -15,6 +14,7 @@ class Image {
         this.client = opts.client || new Client()
         this.background = opts.background || "000000"
     }
+
     /**
      * Raw content of this image
      * @type {String}

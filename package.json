@@ -1,31 +1,33 @@
 {
-  "name": "ifunnywrapper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./src/index",
-  "scripts": {
-    "docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
-    "host-docs": "./node_modules/.bin/jsdoc -c jsdoc.json; mkdir -pv ~/ifunnyjs-docs/docs/ ; cp -r ./out ~/ifunnyjs-docs/docs/",
-    "clean": "rm -rf ./out; rm -rf ~/ifunnyjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AurorasPalace/IFunnyWrapper.git"
-  },
-  "author": "AurorasPalace",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/AurorasPalace/IFunnyWrapper/issues"
-  },
-  "homepage": "https://github.com/AurorasPalace/IFunnyWrapper#readme",
-  "dependencies": {
-    "axios": "^0.19.0",
-    "js-sha1": "^0.6.0",
-    "ws": "^7.1.2"
-  },
-  "devDependencies": {
-    "axios-debug-log": " ^0.6.2",
-    "jsdoc": "^3.6.3",
-    "loke-jsdoc-theme": "^2.1.0"
-  }
+    "name": "ifunnywrapper",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./src/index",
+    "scripts": {
+        "docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
+        "clean": "rm -rf ./out; rm -rf ~/ifunnyjs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AurorasPalace/IFunny.js.git"
+    },
+    "author": "AurorasPalace",
+    "contributors": [
+        "Zero <dakoolstwunn@gmail.com> (https://github.com/basswaver)"
+    ],
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/AurorasPalace/IFunny.js/issues"
+    },
+    "homepage": "https://github.com/AurorasPalace/IFunny.js#readme",
+    "dependencies": {
+        "axios": "^0.19.0",
+        "js-sha1": "^0.6.0",
+        "ws": "^7.1.2"
+    },
+    "devDependencies": {
+        "axios-debug-log": "^0.6.2",
+        "jsdoc": "^3.6.3",
+        "loke-jsdoc-theme": "^2.1.0"
+    }
 }

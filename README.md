@@ -1,15 +1,20 @@
-# IFunnyWrapper
+# iFunny.js
 
-A simple API wrapper for IFunny Mobile.
+[![Discord](https://img.shields.io/discord/624473515327881216?label=Discord&style=flat-square)](https://discord.gg/7WJZM9q)
 
-```javascript
-const IF = require('IFunnyWrapper')
+A simple wrapper for iFunny's private API
 
-const bot = new IF.Client()
+```js
+const ifunny = require('iFunny')
+const robot = new ifunny.Client()
 
-bot.on('ready', (token) => {
-    console.log(token)
+robot.on('ready', async (fresh) => {
+    await (await robot.socket).start()
 })
 
-bot.login('username', 'password', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36')
+robot.on('message' async () => {
+    message.reply('Hello, world!')
+})
+
+robot.login('username', 'password')
 ```

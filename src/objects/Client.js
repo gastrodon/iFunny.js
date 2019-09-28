@@ -13,13 +13,22 @@ const { homedir } = require('os')
  * @param {Object} opts                     Optional parameters
  * @param {Number} opts.paginated_size=25 Size of each paginated request
  */
-
 class Client extends EventEmitter {
     constructor(opts = {}) {
         super()
         this._client_id = 'MsOIJ39Q28'
         this._client_secret = 'PTDc3H8a)Vi=UYap'
         this._user_agent = 'iFunny/5.42(1117792) Android/5.0.2 (samsung; SCH-R530U; samsung)'
+        this._update = false
+        this._object_payload = {}
+        this._update = false
+        this._handler = null
+        this._socket = null
+        this._sendbird_session_key = null
+
+        this.authorized = false
+        this.paginated_size = opts.paginated_size || 25
+        this.url = `${this.api}/account`
 
         // Make sure that our config file exists and use it
         if (!fs.existsSync(`${homedir()}/.ifunnyjs`)) {
@@ -27,23 +36,219 @@ class Client extends EventEmitter {
         }
 
         this._config_path = `${homedir()}/.ifunnyjs/config.json`
-        this._update = false
-        this._messenger_token = null
-        this.paginated_size = opts.paginated_size || 25
-        this.authorized = false
+    }
 
-        this.ChatConnector = require("./ChatConnector.js") 
+    // methods
+
+    /**
+     * Get some value from this objects own internal JSON state
+     * @param  {String}  key      key to query
+     * @param  {*}  fallback=null fallback value, if no value is found for key
+     * @return {Promise<*>}       retrieved data
+     */
+    async get(key, fallback = null) {
+        let found = this._object_payload[key]
+
+        if (found != undefined && !this._update) {
+            this._update = false
+            return found
+        }
+
+        this._update = false
+        let response = await axios({
+            method: 'get',
+            url: this.url,
+            headers: await this.headers
+        })
+
+        this._object_payload = response.data.data
+        return this._object_payload[key] || fallback
+    }
+
+    /**
+     * Log into an iFunny account and authenticate this
+     * @param  {String}  email      description
+     * @param  {String}  password   password to the account being logged into, optional for accounts with stored bearer tokens
+     * @param  {Object}  opts={}  Optional parameters
+     * @param  {Boolean} opts.force bypass stored tokens?
+     * @return {Promise<Client>}    this client
+     * @fires login#ready
+     */
+    /**
+     * Event emitted when this client is logged in
+     * @event Client#ready
+     * @property {Boolean} fresh did this login get a fresh token?
+     */
+    async login(email, password, opts = { force: false }) {
+        /*
+        Log into ifunny
+
+        params:
+            email: email to log in with
+            password: password to log in with
+            opts:
+                force: bypass saved bearer tokens
+
+        returns:
+            this after verifying login
+        */
+        if (!email) {
+            throw 'email is required'
+        }
+
+        if (this.config[`bearer ${email}`] && !opts.force) {
+            this._token = this.config[`bearer ${email}`]
+
+            try {
+                let response = await axios({
+                    method: 'get',
+                    url: `${this.api}/account`,
+                    headers: await this.headers
+                })
+
+                this.authorized = true
+                this._object_payload = response.data.data
+                this.emit('ready', false)
+                return this
+
+            } catch (error) {
+                this._token = null
+            }
+        }
+
+        let data = {
+            'grant_type': 'password',
+            'username': email,
+            'password': password
+        }
+
+        data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
+
+        let response = await axios({
+            method: 'post',
+            url: `${this.api}/oauth2/token`,
+            headers: (await this.headers),
+            data: data
+        })
+
+        this._token = response.data.access_token
+        this._config[`bearer ${email}`] = response.data.access_token
+        this.config = this._config
+
+        response = await axios({
+            method: 'get',
+            url: `${this.api}/account`,
+            headers: await this.headers
+        })
+
+        this._object_payload = response.data.data
+
+        this.emit('ready', true)
+        return response
+    }
+
+    /**
+     * Get a chunk of this logged in users notifications
+     * @param  {Object}  opts={}       optional parameters
+     * @param  {Number}  opts.limit=25 Number of items to fetch
+     * @return {Promise<Object>}         chunk of notifications with paging info
+     */
+    async notifications_paginated(opts = {}) {
+        let Notification = require('./Notification')
+        let instance = this || opts.instance
+
+        let data = await methods.paginated_data(`${instance.api}/news/my`, {
+            limit: opts.limit || instance.paginated_size,
+            key: 'news',
+            prev: opts.prev,
+            next: opts.next,
+            headers: instance.headers
+        })
+
+        data.items = data.items.map((item) => new Notification(item))
+        return data
+
+    }
+
+    async handle_message(key, data) {
+        (await this.handler).handle_message(key, data)
+    }
+
+    async send_to_socket(data) {
+        await (await this.socket).send(data)
+    }
+
+    async send_text_message(content, channel_url) {
+        let data = {
+            'channel_url': channel_url,
+            'message': content
+        }
+
+        this.send_to_socket(`MESG${JSON.stringify(data)}\n`)
+    }
+
+    /**
+     * Clear this client's config and wipe the config file
+     * @return {Object} this Clients config
+     */
+    clear_config() {
+        this._config = this.config = {}
+        return this.config
+    }
+
+    // generators
+
+    /**
+     * Generator iterating through logged in users notifications
+     * @type {Generator<Notification>}
+     */
+    get notifications() {
+        return methods.paginated_generator(this.notifications_paginated, { instance: this })
 
     }
 
     // getters
 
     /**
+     * This clients websocket hadnler
+     * If none has been created one will be
+     * created when this value is requested
+     * @type {Handler}
+     */
+    get handler() {
+        return (async () => {
+            if (!this._handler) {
+                let Handler = require('../ext/Handler')
+                this._handler = new Handler(this)
+            }
+
+            return this._handler
+        })()
+    }
+
+    /**
+     * This clients websocket
+     * If none has been created one will be
+     * created when this value is requested
+     * @type {Socket}
+     */
+    get socket() {
+        return (async () => {
+            if (!this._socket) {
+                let Socket = require('../ext/Socket')
+                this._socket = new Socket(this)
+            }
+
+            return this._socket
+        })()
+    }
+
+    /**
      * iFunny api url
      * @type {String}
      */
     get api() {
-        return 'http://api.ifunny.mobi/v4'
+        return 'https://api.ifunny.mobi/v4'
     }
 
     /**
@@ -51,7 +256,7 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get sendbird_api() {
-        return 'http://api-us-1.sendbird.com/v3'
+        return 'https://api-us-1.sendbird.com/v3'
     }
 
     /**
@@ -91,12 +296,44 @@ class Client extends EventEmitter {
      * @type {Object}
      */
     get headers() {
-        var _headers = {
-            'User-Agent': this._user_agent,
-            'Authorization': this._token ? `Bearer ${this._token}` : `Basic ${this.basic_token}`
-        }
+        return (async () => {
+            return {
+                'User-Agent': this._user_agent,
+                'Authorization': this._token ? `Bearer ${this._token}` : `Basic ${this.basic_token}`
+            }
+        })()
+    }
 
-        return _headers
+    /**
+     * Sendbird headers, needed for all sendbird requests
+     * @type {Object}
+     */
+    get sendbird_headers() {
+        return (async () => {
+            return {
+                "User-Agent": "jand/3.096",
+                "Session-Key": await this.sendbird_session_key
+            }
+        })()
+    }
+
+    /**
+     * Sendbird session key, needed
+     * to talk to iFunny's websocket
+     * @type {String}
+     */
+    get sendbird_session_key() {
+        return (async () => {
+            return this._sendbird_session_key
+        })()
+    }
+
+    /**
+     * Update this clients session key
+     * @type {String}
+     */
+    set sendbird_session_key(value) {
+        this._sendbird_session_key = value
     }
 
     /**
@@ -116,6 +353,11 @@ class Client extends EventEmitter {
         return this._config
     }
 
+    /**
+     * Update this clients config
+     * and write it to the config file
+     * @type {Object}
+     */
     set config(value) {
         if (typeof(value) !== 'object') {
             throw `value should be object, not ${typeof(value)}`
@@ -123,15 +365,6 @@ class Client extends EventEmitter {
 
         this._config = value
         fs.writeFileSync(this._config_path, JSON.stringify(value))
-    }
-
-    /**
-     * Clear this client's config and wipe the config file
-     * @return {Object} this Clients config
-     */
-    clear_config() {
-        this._config = this.config = {}
-        return this.config
     }
 
     /**
@@ -151,6 +384,10 @@ class Client extends EventEmitter {
         return this.get('phone')
     }
 
+    get _messenger_token() {
+        return this._object_payload.messenger_token
+    }
+
     /**
      * This clients messenger token
      * Used to start a sendbird connection, but should be replaced
@@ -158,18 +395,25 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get messenger_token() {
-        if (!this._messenger_token) {
-            this._messenger_token = this.get('messenger_token')
-        }
-        return this._messenger_token
+        return (async () => {
+            return this._messenger_token
+        })()
+    }
+
+    get _id() {
+        return this._object_payload.id
     }
 
     /**
-     * Update this clients messenger_token
+     * This clients messenger token
+     * Used to start a sendbird connection, but should be replaced
+     * when a new one is given by the connection
      * @type {String}
      */
-    set messenger_token(value) {
-        this._messenger_token = value
+    get id() {
+        return (async () => {
+            return this._id
+        })()
     }
 
     /**
@@ -236,7 +480,6 @@ class Client extends EventEmitter {
         return this.get('is_deleted')
     }
 
-
     /**
      * Does this client have unnotified bans?
      * @type {Boolean}
@@ -298,7 +541,7 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get nick() {
-        return this.get('email')
+        return this.get('nick')
     }
 
     /**
@@ -306,122 +549,8 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get about() {
-        return this.get('email')
+        return this.get('about')
     }
-
-    // methods
-
-    /**
-     * Log into an iFunny account and authenticate this
-     * @param  {String}  email      description
-     * @param  {String}  password   password to the account being logged into, optional for accounts with stored bearer tokens
-     * @param  {Object}  opts = {}  Optional parameters
-     * @param  {boolean} opts.force bypass stored tokens?
-     * @return {Promise<Client>}    this client
-     * @fires Client#ready
-     */
-    async login(email, password, opts = { force: false }) {
-        /*
-        Log into ifunny
-
-        params:
-            email: email to log in with
-            password: password to log in with
-            opts:
-                force: bypass saved bearer tokens
-
-        returns:
-            this after verifying login
-        */
-        if (!email) {
-            throw 'email is required'
-        }
-
-        if (this.config[`bearer ${email}`] && !opts.force) {
-            this._token = this.config[`bearer ${email}`]
-
-            try {
-                let response = await axios({
-                    method: 'get',
-                    url: `${this.api}/account`,
-                    headers: this.headers
-                })
-
-                this.authorized = true
-
-                /**
-                 * Ready event.
-                 * 
-                 * @event Client#ready
-                 * @type {object}
-                 * @property {boolean} regen - If the token was regened or not.
-                 */
-                this.emit("ready", { regen: false })
-                return this
-
-            } catch (error) {
-                this._token = null
-            }
-        }
-
-        let data = {
-            'grant_type': 'password',
-            'username': email,
-            'password': password
-        }
-
-        data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
-
-        let response = await axios({
-            method: 'post',
-            url: `${this.api}/oauth2/token`,
-            headers: this.headers,
-            data: data
-        })
-
-        this._token = response.data.access_token
-        this._config[`bearer ${email}`] = response.data.access_token
-        this.config = this._config
-
-        this.emit("ready", { regen: true })
-        return response
-    }
-
-    /**
-     * Get a chunk of this logged in users notifications
-     * @param  {Object}  opts = {}       optional parameters
-     * @param  {Number}  opts.limit = 25 Number of items to fetch
-     * @return {Promise<Object>}         chunk of notifications with paging info
-     */
-
-    async notifications_paginated(opts = {}) {
-        let Notification = require('./Notification')
-        let instance = this || opts.instance
-
-        let data = await methods.paginated_data(`${instance.api}/news/my`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'news',
-            prev: opts.prev,
-            next: opts.next,
-            headers: instance.headers
-        })
-
-        data.items = data.items.map((item) => new Notification(item))
-        return data
-
-    }
-
-    // generators
-
-    /**
-     * Generator iterating through logged in users notifications
-     * @type {Generator<Notification>}
-     */
-    get notifications() {
-        return methods.paginated_generator(this.notifications_paginated, { instance: this })
-
-    }
-
 }
 
 module.exports = Client

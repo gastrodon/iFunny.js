@@ -13,7 +13,6 @@ const { homedir } = require('os')
  * @param {Number} opts.paginated_size=25   size of each paginated request
  * @param {Object} opts.data={}             data of this object, that can be used before fetching new info
  */
-
 class FreshObject extends EventEmitter {
     constructor(id, opts = {}) {
         super()
@@ -38,17 +37,18 @@ class FreshObject extends EventEmitter {
      * @return {Promise<*>}       retrieved data
      */
     async get(key, fallback = null) {
-        console.log(this.url)
         let found = this._object_payload[key]
 
         if (found != undefined && !this._update) {
+            this._update = false
             return found
         }
 
+        this._update = false
         let response = await axios({
             method: 'get',
             url: this.url,
-            headers: this.headers
+            headers: await this.headers
         })
 
         this._object_payload = response.data.data
@@ -89,6 +89,14 @@ class FreshObject extends EventEmitter {
      */
     get headers() {
         return this.client.headers
+    }
+
+    /**
+     * Shortcut for `this.client.sendbird_headers`
+     * @type {Object}
+     */
+    get sendbird_headers() {
+        return this.client.sendbird_headers
     }
 }
 

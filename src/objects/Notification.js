@@ -13,7 +13,7 @@ class Notification {
         this._data = data
     }
 
-    async get(key, fallback) {
+    async get(key, fallback = null) {
         return this._data[key] || fallback
     }
 
