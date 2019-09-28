@@ -5,7 +5,6 @@
     "main": "./src/index",
     "scripts": {
         "docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
-        "host-docs": "./node_modules/.bin/jsdoc -c jsdoc.json; mkdir -pv ~/ifunnyjs-docs/docs/ ; cp -r ./out ~/ifunnyjs-docs/docs/",
         "clean": "rm -rf ./out; rm -rf ~/ifunnyjs"
     },
     "repository": {
