@@ -24,7 +24,6 @@ class Message extends FreshObject {
      */
     async get(key, fallback = null) {
         let found = this._object_payload[key]
-        console.log(found);
 
         if (found != undefined && !this.update) {
             this._update = false
@@ -99,11 +98,59 @@ class Message extends FreshObject {
         return this.send_text_message
     }
 
+    /**
+     * Type of message
+     * Normal text messages will return `MESG`
+     * Messages with files attached will return `FILE`
+     * @type {String}
+     */
     get type() {
+        return (async() => {
+            let type = this.get('type')
+            return type == 'MESG' ? type : 'FILE'
+        })
+    }
+
+    /**
+     * mimetype of this messages file, if any
+     * @type {String|Null}
+     */
+    get file_mime() {
         // fresh data and local data are not consistent
         // local -> mime type (for files)
         // fresh -> 'FILE' or ''
-        return this.get('type')
+        return (async () => {
+            let mime = this.get('type')
+            return mime != 'MESG' ? mime : null
+        })()
+    }
+
+    /**
+     * Metadata about the file in this message
+     * @type {Object}
+     */
+    get file_meta() {
+        return this.get('file', {})
+    }
+
+    /**
+     * Ulr to the file in this message, if any
+     * @type {String|Null}
+     */
+    get file_url() {
+        return (async () => {
+            return (await this.file_meta)['url'] || null
+        })()
+    }
+
+    /**
+     * Name of the file in this image, if any
+     * @type {String|Null}
+     */
+    get file_name() {
+        return (async () => {
+            return (await this.file_meta)['name'] || null
+        })()
     }
 
     get msg_id() {

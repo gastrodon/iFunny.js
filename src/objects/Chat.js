@@ -32,14 +32,11 @@ class Chat extends FreshObject {
         }
 
         this._update = false
-        console.log(this.sendbird_headers);
         let response = await axios({
             method: 'get',
             url: this.url,
             headers: await this.sendbird_headers
         })
-
-        console.log(response.data)
 
         this._object_payload = response.data
         return this._object_payload[key] || fallback
