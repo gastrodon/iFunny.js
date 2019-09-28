@@ -26,7 +26,7 @@ class Chat extends FreshObject {
     async get(key, fallback = null) {
         let found = this._object_payload[key]
 
-        if (found == undefined && !this._update) {
+        if (found != undefined && !this._update) {
             this._update = false
             return found
         }
@@ -206,6 +206,14 @@ class Chat extends FreshObject {
      */
     get name() {
         return this.get('name')
+    }
+
+    /**
+     * Alias to `this.name`
+     * @type {String}
+     */
+    get title() {
+        return this.name
     }
 
     /**

@@ -5,7 +5,7 @@
     "main": "./src/index",
     "scripts": {
         "docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
-        "clean": "rm -rf ./out; rm -rf ~/ifunnyjs"
+        "clean": "rm -rf ./out; rm -rf ./node_modules"
     },
     "repository": {
         "type": "git",

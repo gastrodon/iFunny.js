@@ -39,7 +39,7 @@ class Handler extends EventEmitter {
                 this.on_message(data)
                 break
             case 'SYEV':
-                this.on_channel_update(data)
+                this.on_chat_update(data)
                 break
             case 'PING':
                 this.on_ping(data)
@@ -55,12 +55,23 @@ class Handler extends EventEmitter {
         }
     }
 
+    /**
+     * Default case for handling websocket data, when the event is unknown
+     * @param  {String}  key  4 character event key, per the sendbird api
+     * @param  {Object}  data Data sent with the key
+     */
+    // /**
+    //  * Event emitted when an unmatched event is encountered
+    //  * @event Client#unknown_event
+    //  * @property  {String}  key  4 character event key, per the sendbird api
+    //  * @property  {Object}  data Data sent with the key
+    //  */
     async default (key, data) {
         // This is here as a debug untill the websocket is "fully" implemented
         // I don't think I'm missing anything, but I might be
         //
         // There seems to be a ratelimit error key, needs testing
-        console.log(`unmatched ${key}`)
+        this.client.emit('unknown_event', key, data)
     }
 
     /**
@@ -96,7 +107,7 @@ class Handler extends EventEmitter {
         this.client.emit('message', new Message(data.msg_id, data.channel_url, { client: this.client, data: data }))
     }
 
-    async on_channel_update(data) {
+    async on_chat_update(data) {
         switch (data.cat) {
             case 10020:
                 this.on_invite_broadcast(data)
@@ -110,7 +121,7 @@ class Handler extends EventEmitter {
                 // this.on_user_exit(data)
                 break
             default:
-                // this.on_other_update(data)
+                this.chat_update(data)
         }
     }
 
@@ -138,11 +149,6 @@ class Handler extends EventEmitter {
 
     }
 
-    async on_file(data) {
-        // TODO: objectify into the Message object
-        // this.client.emit('file', data)
-    }
-
     /**
      * Event emitted when the socket pings us
      * @event Client#ping
@@ -167,11 +173,16 @@ class Handler extends EventEmitter {
         )
     }
 
+    /**
+     * Event emitted when a generic broadcast is recieved
+     * @event Client#broadcast
+     * @property {data} data sent with the BRDM broadcast key
+     */
     async on_broadcast(data) {
         let type = JSON.parse(data.data).type
         switch (type) {
             case 'CHANNEL_CHANGE':
-                this.channel_change(data)
+                this.chat_update(data)
                 break;
             case 'USER_JOIN':
                 this.user_join(data)
@@ -180,31 +191,20 @@ class Handler extends EventEmitter {
                 this.user_exit(data)
                 break;
             default:
-                this.client.emit('broadcast', data)
+                // this.client.emit('broadcast', data)
         }
 
     }
 
     /**
-     * Event emitted when a chat is changed
-     * @event Client#chat_changed
+     * Event emitted when a chat is changed in some way
+     * @event Client#chat_update
      * @property {Chat}   chat      chat that was updated
-     * @property {String} key       type of change that was made
-     * @property {String} new_name  new value of what was changed
-     * @property {String} old_name  previous value of what was changed
      */
-    async channel_change(data) {
+    async chat_update(data) {
         let Chat = require('../objects/Chat')
         let chat = new Chat(data.channel_url, { client: this.client })
-        let changes = JSON.parse(data.data).changes
-
-        for (let change of changes) {
-            let _new = changes.new
-            let _old = changes.old
-            let _key = changes.key
-
-            this.client.emit(`chat_changed`, chat, _key, _new, _old)
-        }
+        this.client.emit(`chat_update`, chat)
     }
 
     /**
@@ -220,15 +220,14 @@ class Handler extends EventEmitter {
         let chat = new Chat(data.channel_url, { client: this.client })
         let meta = JSON.parse(data.data)
         let joined = meta.users.map(it => new ChatUser(it.user_id, chat, { client: this.client }))
-
-        let inviter
+        let inviter = null
 
         if (meta.inviter) {
             inviter = new ChatUser(meta.inviter.user_id, chat, { client: this.client })
         }
 
         for (let user of joined) {
-            this.client.emit('user_join', user, chat, inviter || null)
+            this.client.emit('user_join', user, chat, inviter)
         }
     }
 
@@ -244,12 +243,6 @@ class Handler extends EventEmitter {
         let chat = new Chat(data.channel_url, { client: this.client })
         let meta = JSON.parse(data.data)
         let left = meta.users.map(it => new ChatUser(it.user_id, chat, { client: this.client }))
-
-        let inviter
-
-        if (meta.inviter) {
-            inviter = new ChatUser(meta.inviter.user_id, chat, { client: this.client })
-        }
 
         for (let user of left) {
             this.client.emit('user_exit', user, chat)
