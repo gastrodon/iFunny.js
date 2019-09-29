@@ -178,6 +178,8 @@ class Chat extends FreshObject {
         return this.fresh
     }
 
+    // getters
+
     /**
      * Timestamp of when chats client was invited in seconds
      * @type {Number}
@@ -317,6 +319,10 @@ class Chat extends FreshObject {
         })()
     }
 
+    /**
+     * The operators of this group
+     * @type {Array<ChatUser>}
+     */
     get operators() {
         return (async () => {
             let ChatUser = require('./ChatUser')
@@ -358,6 +364,25 @@ class Chat extends FreshObject {
      */
     get created_at() {
         return this.get('created_at')
+    }
+
+    /**
+     * Is this chat muted by the client?
+     * @type {Boolean}
+     */
+    get is_muted() {
+        return this.get('muted')
+    }
+
+    /**
+     * A ChatUser of this client in this chat
+     * @type {ChatUser}
+     */
+    get me() {
+        return (async () => {
+            let ChatUser = require('./ChatUser')
+            return new ChatUser(this.client.id, this, { client: this.client })
+        })()
     }
 
 }

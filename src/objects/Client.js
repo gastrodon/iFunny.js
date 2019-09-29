@@ -157,7 +157,6 @@ class Client extends EventEmitter {
      * @param  {Object}  opts={}  Optional parameters
      * @param  {Boolean} opts.force bypass stored tokens?
      * @return {Promise<Client>}    this client
-     * @fires login#ready
      */
     /**
      * Event emitted when this client is logged in
@@ -165,18 +164,6 @@ class Client extends EventEmitter {
      * @property {Boolean} fresh did this login get a fresh token?
      */
     async login(email, password, opts = { force: false }) {
-        /*
-        Log into ifunny
-
-        params:
-            email: email to log in with
-            password: password to log in with
-            opts:
-                force: bypass saved bearer tokens
-
-        returns:
-            this after verifying login
-        */
         if (!email) {
             throw 'email is required'
         }

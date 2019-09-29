@@ -42,7 +42,6 @@ async function paginated_data(url, opts = {}) {
             method: http method, if not a get request
             headers: request headers
             ex_params: extra request parameters
-
     */
     params = {
         limit: opts.limit || 25,

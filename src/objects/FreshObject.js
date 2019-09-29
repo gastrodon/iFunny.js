@@ -32,9 +32,9 @@ class FreshObject extends EventEmitter {
 
     /**
      * Get some value from this objects own internal JSON state
-     * @param  {String}  key      key to query
-     * @param  {*}  fallback=null fallback value, if no value is found for key
-     * @return {Promise<*>}       retrieved data
+     * @param  {String}  key        Key to query
+     * @param  {*}  fallback=null   Fallback value, if no value is found for key
+     * @return {Promise<*>}         Retrieved data
      */
     async get(key, fallback = null) {
         let found = this._object_payload[key]
