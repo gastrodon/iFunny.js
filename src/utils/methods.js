@@ -1,6 +1,24 @@
 const axios = require('axios')
 const Client = require('../objects/Client')
 
+const mime_types = {
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'jpe': 'image/jpeg',
+    'bmp': 'image/bmp',
+    'midi': 'audio/midi',
+    'mpeg': 'video/mpeg',
+    'oog': 'video/oog',
+    'webm': 'video/webm',
+    'wav': 'audio/wav'
+}
+
+async function determine_mime(url, bias = 'image/png') {
+    let split = url.split('.')
+    return mime_types[split[split.length] - 1] || bias
+}
+
 async function short_cursors(data) {
     let paging = {
         prev: data.paging.hasPrev ? data.paging.cursors.prev : null,
@@ -64,5 +82,6 @@ async function* paginated_generator(source, opts = {}) {
 
 module.exports = {
     paginated_data: paginated_data,
-    paginated_generator: paginated_generator
+    paginated_generator: paginated_generator,
+    determine_mime: determine_mime
 }

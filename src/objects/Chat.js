@@ -43,12 +43,102 @@ class Chat extends FreshObject {
     }
 
     /**
-     * Send a text message to this channel
-     * @param  {String}  content content of this message
-     * @return {Promise<Chat>}   chat that the message was sent to
+     * Send a text message to this chat
+     * @param  {String}  content Message content
+     * @return {Promise<Chat>}   This chat instance
      */
     async send_text_message(content) {
-        return await this.client.send_text_message(content, await this.channel_url)
+        await this.client.send_text_message(content, this)
+        return this
+    }
+
+    /**
+     * Send an image message to this chat
+     * @param {String}  url             Url pointing to this image
+     * @param {Object}  [opts={}]       Optional parameters
+     * @param {Number} opts.height=780  Height of this image
+     * @param {Number} opts.width=780   Width of this image
+     * @param {String} opts.file_name   File name to send this file as
+     * @param {String} opts.file_type   MIME type of this file
+     * @return {Promise<Chat>}          This chat instance
+     */
+    async send_image_message(url, opts = {}) {
+        await this.client.send_image_message(url, this, opts)
+        return this
+    }
+
+    /**
+     * Mark this chat as read
+     * @return {Promise<Chat>} This chat instance
+     */
+    async read() {
+        await this.client.mark_chat_read(this)
+        return this.fresh
+    }
+
+    /**
+     * Add an operator to this chat
+     * @param  {User}  user                 User who should be made an operator
+     * @return {Promise<Array<ChatUser>>}   Operators of this chat, including the newly added
+     */
+    async add_operator(user) {
+        await this.client.modify_chat_operator('put', user, this)
+        return await this.fresh.operators
+    }
+
+    /**
+     * Remove an operator from this chat
+     * @param  {User}  user                 User who should no longer be an operator
+     * @return {Promise<Array<ChatUser>>}   Remaining operators of this chat
+     */
+    async remove_operator(user) {
+        await this.client.modify_chat_operator('delete', user, this)
+        return await this.fresh.operators
+    }
+
+    /**
+     * Join this chat
+     * @return {Promise<Chat>} This chat instance
+     */
+    async join() {
+        await this.client.modify_chat_presence('put', this)
+        return this.fresh
+    }
+
+    /**
+     * Leave this chat
+     * @return {Promise<Chat>} This chat instance
+     */
+    async exit() {
+        await this.client.modify_chat_presence('delete', this)
+        return this.fresh
+    }
+
+    /**
+     * Kick a user from this chat
+     * @param  {User}  user         User that should be kicked from this chat
+     * @return {Promise<ChatUser>}  User that was kicked from this chat
+     */
+    async kick(user) {
+        await this.client.kick_chat_user(user, this)
+        return user.fresh
+    }
+
+    /**
+     * Invite a single or multiple users to this chat
+     * @param  {User|Array<User>}  user     Users to invite to this chat
+     * @return {Promise<Array<ChatUser>>}   Array of users invited
+     */
+    async invite(user) {
+        let ChatUser = require('./ChatUser')
+        await this.client.invite_users_to_chat(user, this)
+        if (await user.id) {
+            return [new ChatUser(user.id, this, { client: this.client, data: user._object_payload })];
+        } else {
+            return user.map(
+                it => new ChatUser(it.id, this, { client: this.client, data: user._object_payload })
+            )
+        }
     }
 
     /**
@@ -186,7 +276,16 @@ class Chat extends FreshObject {
      */
     get meta() {
         return (async () => {
-            return JSON.parse(await this.get('data')).chatInfo
+            return JSON.parse(await this.get('data')).chatInfo || {}
+        })()
+    }
+
+    get operators() {
+        return (async () => {
+            let ChatUser = require('./ChatUser')
+            return ((await this.meta).operatorsIdList || []).map(
+                id => new ChatUser(id, this, { client: this.client })
+            )
         })()
     }
 

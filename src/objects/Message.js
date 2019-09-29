@@ -43,11 +43,38 @@ class Message extends FreshObject {
     }
 
     /**
-     * Send a chat message to the chat that this message came from
-     * @param  {String}  content text content of this message
+     * Send a text message to a chat
+     * @param  {String}             content Message content
+     * @return {Promise<Message>}   This message instance
      */
     async send_text_message(content) {
-        return await (await this.chat).send_text_message(content)
+        await (await this.chat).send_text_message(content)
+        return this
+    }
+
+    /**
+     * Send an image message to a chat
+     * @param {String}  url             Url pointing to this image
+     * @param {Chat|String}  chat       Chat or channel_url of the chat to send this image to
+     * @param {Object} opts={}          Optional parameters
+     * @param {Number} opts.height=780  Height of this image
+     * @param {Number} opts.width=780   Width of this image
+     * @param {String} opts.file_name   File name to send this file as
+     * @param {String} opts.file_type   MIME type of this file
+     * @return {Promise<Message>}       This message instance
+     */
+    async send_image_message(url, opts = {}) {
+        await (await this.chat).send_image_message(url, opts)
+        return this
+    }
+
+    /**
+     * Mark this message as read
+     * @return {Message} This message instance
+     */
+    async read() {
+        await (await this.chat).read()
+        return this
     }
 
     /**
@@ -66,7 +93,7 @@ class Message extends FreshObject {
         return (async () => {
             let ChatUser = require('./ChatUser')
             let data = await this.get('user')
-            return new ChatUser((await data.user_id), (await this.chat), { client: this.client, data: data })
+            return new ChatUser(data.guest_id, (await this.chat), { client: this.client, data: data })
         })()
     }
 
@@ -106,7 +133,7 @@ class Message extends FreshObject {
      * @type {String}
      */
     get type() {
-        return (async() => {
+        return (async () => {
             let type = this.get('type')
             return type == 'MESG' ? type : 'FILE'
         })
@@ -140,7 +167,7 @@ class Message extends FreshObject {
      */
     get file_url() {
         return (async () => {
-            return (await this.file_meta)['url'] || null
+            return (await this.file_meta).url || null
         })()
     }
 
@@ -150,7 +177,7 @@ class Message extends FreshObject {
      */
     get file_name() {
         return (async () => {
-            return (await this.file_meta)['name'] || null
+            return (await this.file_meta).name || null
         })()
     }
 

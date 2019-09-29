@@ -32,19 +32,7 @@ class Client extends EventEmitter {
         this._prefix = opts.prefix || null
         this._reconnect = opts.reconnect || false
         this._commands = []
-        this._reserved_events = [
-            'broadcast',
-            'chat_update',
-            'connected',
-            'invite',
-            'invite_broadcast',
-            'message',
-            'ping',
-            'read',
-            'ready',
-            'user_exit',
-            'unknown_event'
-        ]
+        this._req_id = parseInt(Date.now() + (Math.random() * 1000000))
 
         this.authorized = false
         this.paginated_size = opts.paginated_size || 25
@@ -59,6 +47,79 @@ class Client extends EventEmitter {
     }
 
     // methods
+
+    // internal methods
+
+    async handle_message(key, data) {
+        (await this.handler).handle_message(key, data)
+    }
+
+    async resolve_command(message) {
+        if (!this._prefix) {
+            return null
+        }
+
+        let slice = await this.prefix_slice(message)
+
+        if (!slice) {
+            return null
+        }
+
+        let content = await message.content
+        let c_name = content.split(" ")[0].slice(slice)
+        let args = content.split(" ").slice(1)
+
+        if (this._commands.has(c_name)) {
+            this.emit(`command_${c_name}`, message, args)
+            return c_name
+        }
+
+        return null
+    }
+
+    // Determine if a message starts with a possible prefix
+    // Return it's length if so
+    // Return null otherwise
+    async prefix_slice(message) {
+        let prefix = this._prefix
+        let content = await message.content
+
+        if (typeof(this._prefix) === 'function') {
+            prefix = this._prefix(message)
+        }
+
+        if (typeof(prefix) === 'string') {
+            prefix = new Set([prefix])
+        } else if (typeof(prefix) === 'object') {
+            prefix = new Set(prefix)
+        }
+
+        for (let p of prefix) {
+            if (content.startsWith(p)) {
+                return p.length
+            }
+        }
+
+        return null
+    }
+
+    // Forward raw data to send to this websocket
+    async send_to_socket(data) {
+        await (await this.socket).send(data)
+    }
+
+    get next_req_id() {
+        return (this.req_id++)
+    }
+
+    /**
+     * Clear this client's config and wipe the config file
+     * @return {Object} this Clients config
+     */
+    clear_config() {
+        this._config = this.config = {}
+        return this.config
+    }
 
     /**
      * Get some value from this objects own internal JSON state
@@ -84,6 +145,8 @@ class Client extends EventEmitter {
         this._object_payload = response.data.data
         return this._object_payload[key] || fallback
     }
+
+    // client api methods
 
     /**
      * Log into an iFunny account and authenticate this
@@ -190,94 +253,20 @@ class Client extends EventEmitter {
 
     }
 
-    async handle_message(key, data) {
-        (await this.handler).handle_message(key, data)
-    }
-
-    /**
-     * Listen for a command, and emit it's name when it is called with this prefix
-     * @param  {String}  name  Command name
-     */
-    async listen_for_command(name) {
-        if (this._reserved_events.includes(name)) {
-            throw `${name} is a reserved listener`
-        }
-
-        if (this._commands.has(name)) {
-            return
-        }
-
-        this._commands.add(name)
-    }
-
     /**
      * Listen for a command, and emit it's name when it is called with this prefix
      * @param  {String|Array<String>}  name  Command name
      * @return {Promise<Client>}     This clinet instance
      */
     async listen_for(names) {
-        if(typeof(names) === 'string') {
+        if (typeof(names) === 'string') {
             names = new Set([names])
         }
 
         this._commands = new Set([...names, ...this._commands])
     }
 
-    async resolve_command(message) {
-        if(!this._prefix) {
-            return null
-        }
-
-        let slice = await this.prefix_slice(message)
-
-        if(!slice) {
-            return null
-        }
-
-        let content = await message.content
-        let c_name = content.split(" ")[0].slice(slice)
-        let args = content.split(" ").slice(1)
-
-        if(this._commands.has(c_name)) {
-            this.emit(c_name, message, args)
-            return c_name
-        }
-
-        return null
-    }
-
-    // Determine if a message starts with a possible prefix
-    // Return it's length if so
-    // Return null otherwise
-    async prefix_slice(message) {
-        let prefix = this._prefix
-        let content = await message.content
-
-        if(typeof(this._prefix) === 'function') {
-            prefix = this._prefix(message)
-        }
-
-        if(typeof(prefix) === 'string') {
-            prefix = new Set([prefix])
-        }
-
-        else if (typeof(prefix) === 'object') {
-            prefix = new Set(prefix)
-        }
-
-        for (let p of prefix) {
-            if (content.startsWith(p)) {
-                return p.length
-            }
-        }
-
-        return null
-    }
-
-    // Forward raw data to send to this websocket
-    async send_to_socket(data) {
-        await (await this.socket).send(data)
-    }
+    // chat websocket methods
 
     /**
      * Send a text message to a chat
@@ -296,12 +285,124 @@ class Client extends EventEmitter {
     }
 
     /**
-     * Clear this client's config and wipe the config file
-     * @return {Object} this Clients config
+     * Send an image message to a chat
+     * @param {String}  url             Url pointing to this image
+     * @param {Chat|String}  chat       Chat or channel_url of the chat to send this image to
+     * @param {Object} opts={}          Optional parameters
+     * @param {Number} opts.height=780  Height of this image
+     * @param {Number} opts.width=780   Width of this image
+     * @param {String} opts.file_name   File name to send this file as
+     * @param {String} opts.file_type   MIME type of this file
      */
-    clear_config() {
-        this._config = this.config = {}
-        return this.config
+    async send_image_message(url, chat, opts = {}) {
+        let height = opts.height || 780
+        let width = opts.width || 780
+        let lower_ratio = Math.min(width / height, height / width)
+        let type = height >= width ? 'tall' : 'wide'
+        let data = {
+            'thumbnails': [{
+                'url': url,
+                'real_height': parseInt(type === 'tall' ? 780 : 780 * lower_ratio),
+                'real_width': parseInt(type === 'wide' ? 780 : 780 * lower_ratio),
+                'height': height,
+                'width': width
+            }],
+            'channel_url': chat.channel_url || chat,
+            'url': url,
+            'name': opts.file_name || url.split('/')[url.split('/').length - 1],
+            'type': opts.file_type || await methods.determine_mime(url)
+        }
+
+        this.send_to_socket(`FILE${JSON.stringify(data)}\n`)
+
+    }
+
+    /**
+     * Mark the messages in a chat as read
+     * @param  {Chat|String}  chat Chat to mark as read
+     */
+    async mark_chat_read(chat) {
+        let data = {
+            'channel_url': chat.channel_url || chat,
+            'req_id': this.next_req_id
+        }
+
+        this.send_to_socket(`READ${JSON.stringify(data)}\n`)
+    }
+
+    // chat api methods
+
+    /**
+     * Modify the operators in a chat
+     * @param  {String}         mode HTTP request type to modify with, `put` or `delete`
+     * @param  {User|String}    user User or user id of the user to modify the operator status of
+     * @param  {Chat|String}    chat Chat in which to modify operators
+     */
+    async modify_chat_operator(mode, user, chat) {
+        let data = `operators=${user.id || user}`
+
+        await axios({
+            method: mode,
+            url: `${this.api}/chats/channels/${chat.channel_url || chat}/operators`,
+            data: data,
+            headers: await this.headers
+        })
+    }
+
+    /**
+     * Modify the presence of this client in a chat (by joining or exiting)
+     * @param  {String}         mode HTTP request to modify with, `put` or `delete`
+     * @param  {Chat|String}    chat Chat or channel_url to modify presence in
+     */
+    async modify_chat_presence(mode, chat) {
+        await axios({
+            method: mode,
+            url: `${this.api}/chats/channels/${chat.channel_url || chat}/members`,
+            headers: await this.headers
+        })
+    }
+
+    /**
+     * Invite a user or list of users to a chat
+     * @param  {User|String|Array<User>|Array<String>}  users Array of or single instance of a user or id of a user to invite
+     * @param  {Chat|String}                            chat  Chat or channel_url of the chat to invite a user to
+     */
+    async invite_users_to_chat(users, chat) {
+        if (!(users.length)) {
+            users = [users]
+        }
+
+        if (users[0].id) {
+            users = users.map(it => it.id)
+        }
+
+        let data = {
+            'user_ids': users
+        }
+
+        await axios({
+            method: 'post',
+            url: `${this.sendbird_api}/group_channels/${chat.id || chat}/invite`,
+            data: JSON.stringify(data),
+            headers: await this.sendbird_headers
+
+        })
+    }
+
+    /**
+     * Kick a user from a chat
+     * @param  {User|String}  user User that should be kicked
+     * @param  {Chat|String}  chat Chat that a user should be kicked from
+     */
+    async kick_chat_user(user, chat) {
+        let data = `members=${user.id || user}`
+
+        await axios({
+            method: 'put',
+            url: `${this.api}/chats/channels/${chat.channel_url || chat}/kicked_members`,
+            data: data,
+            headers: await this.headers
+        }).catch(e => { console.log(e.response); })
     }
 
     // generators
