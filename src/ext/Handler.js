@@ -12,6 +12,7 @@ class Handler extends EventEmitter {
     constructor(client) {
         super()
         this.client = client
+        this.event = null
     }
 
     /**
@@ -64,7 +65,7 @@ class Handler extends EventEmitter {
         // I don't think I'm missing anything, but I might be
         //
         // There seems to be a ratelimit error key, needs testing
-        this.client.emit('unknown_event', key, data)
+        this.client.event.emit('unknown_event', key, data)
     }
 
     /**
@@ -78,7 +79,7 @@ class Handler extends EventEmitter {
      */
     async on_connect(data) {
         this.client.sendbird_session_key = data.key
-        this.client.emit('connect')
+        this.client.event.emit('connect')
         let socket = await this.client.socket
         socket._ping_interval(data.ping_interval)
     }
@@ -99,7 +100,7 @@ class Handler extends EventEmitter {
         let message = new Message(data.msg_id, data.channel_url, { client: this.client, data: data })
         message.invoked = await this.client.resolve_command(message)
 
-        this.client.emit('message', message)
+        this.client.event.emit('message', message)
     }
 
     async on_chat_update(data) {
@@ -137,9 +138,9 @@ class Handler extends EventEmitter {
         let invite = new Invite(data, { client: this.client })
 
         if (invitees.some(it => it == client._id)) {
-            this.client.emit('invite', invite)
+            this.client.event.emit('invite', invite)
         } else {
-            this.client.emit('invite_broadcast', invite)
+            this.client.event.emit('invite_broadcast', invite)
         }
 
     }
@@ -150,7 +151,7 @@ class Handler extends EventEmitter {
      */
     async ping(data) {
         this.client.socket.pong(data)
-        this.client.emit('ping')
+        this.client.event.emit('ping')
     }
 
     /**
@@ -161,7 +162,7 @@ class Handler extends EventEmitter {
      */
     async on_read(data) {
         let chat = new Chat(data.channel_url, { client: this.client })
-        this.client.emit(
+        this.client.event.emit(
             'read',
             new ChatUser(data.user.guest_id, chat, { client: this.client }),
             chat
@@ -186,7 +187,7 @@ class Handler extends EventEmitter {
                 this.user_exit(data)
                 break;
             default:
-                // this.client.emit('broadcast', data)
+                // this.client.event.emit('broadcast', data)
         }
 
     }
@@ -199,7 +200,7 @@ class Handler extends EventEmitter {
     async chat_update(data) {
         let Chat = require('../objects/Chat')
         let chat = new Chat(data.channel_url, { client: this.client })
-        this.client.emit(`chat_update`, chat)
+        this.client.event.emit(`chat_update`, chat)
     }
 
     /**
@@ -222,7 +223,7 @@ class Handler extends EventEmitter {
         }
 
         for (let user of joined) {
-            this.client.emit('user_join', user, chat, inviter)
+            this.client.event.emit('user_join', user, chat, inviter)
         }
     }
 
@@ -240,7 +241,7 @@ class Handler extends EventEmitter {
         let left = meta.users.map(it => new ChatUser(it.user_id, chat, { client: this.client }))
 
         for (let user of left) {
-            this.client.emit('user_exit', user, chat)
+            this.client.event.emit('user_exit', user, chat)
         }
     }
 }

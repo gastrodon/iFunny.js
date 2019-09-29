@@ -50,11 +50,10 @@ class Socket extends EventEmitter {
      */
     async _associate_listeners(connection) {
         connection.on('close', async (code, reason) => {
-            if( this.client._reconnect) {
+            if (this.client._reconnect) {
                 this.start()
-            }
-            else {
-                this.client.emit('disconnect', code)
+            } else {
+                this.client.event.emit('disconnect', code)
             }
         })
 

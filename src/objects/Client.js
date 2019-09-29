@@ -28,10 +28,12 @@ class Client extends EventEmitter {
         this._object_payload = {}
         this._handler = null
         this._socket = null
+        this._command = null
+        this._event = null
         this._sendbird_session_key = null
         this._prefix = opts.prefix || null
         this._reconnect = opts.reconnect || false
-        this._commands = []
+        this._commands = new Set()
         this._req_id = parseInt(Date.now() + (Math.random() * 1000000))
 
         this.authorized = false
@@ -70,7 +72,7 @@ class Client extends EventEmitter {
         let args = content.split(" ").slice(1)
 
         if (this._commands.has(c_name)) {
-            this.emit(`command_${c_name}`, message, args)
+            this.command.emit(c_name, message, args)
             return c_name
         }
 
@@ -450,6 +452,35 @@ class Client extends EventEmitter {
 
             return this._socket
         })()
+    }
+
+    /**
+     * This clients command emitter
+     * If none has been created one will be
+     * created when this value is requested
+     * @type {EventEmitter}
+     */
+    get command() {
+        if (!this._command) {
+            let Command = require('./small/Command')
+            this._command = new Command(this)
+        }
+
+        return this._command
+    }
+
+    /**
+     * This clients event emitter
+     * If none has been created one will be
+     * created when this value is requested
+     * @type {EventEmitter}
+     */
+    get event() {
+        if (!this._event) {
+            this._event = new EventEmitter(this)
+        }
+
+        return this._event
     }
 
     /**
