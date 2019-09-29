@@ -142,6 +142,43 @@ class Chat extends FreshObject {
     }
 
     /**
+     * Set a chat to be frozen or unfrozen
+     * @param  {Boolean}        state Should this chat be frozen?
+     * @return {Promise<Chat>}        This chat instance
+     */
+    async set_frozen(state) {
+        await this.client.modify_chat_freeze(state, this)
+        return this.fresh
+    }
+
+    /**
+     * Ensure that this chat is frozen
+     * @return {Promise<Chat>} This chat instance
+     */
+    async freeze() {
+        await this.client.modify_chat_freeze(true, this)
+        return this.fresh
+    }
+
+    /**
+     * Ensure that this chat is not frozen
+     * @return {Promise<Chat>} This chat instance
+     */
+    async unfreeze() {
+        await this.client.modify_chat_freeze(false, this)
+        return this.fresh
+    }
+
+    /**
+     * Toggle the frozen state of this chat
+     * @return {Promise<Chat>} This chat instance
+     */
+    async toggle_freeze() {
+        await this.client.modify_chat_freeze(!(await this.fresh.is_frozen), this)
+        return this.fresh
+    }
+
+    /**
      * Timestamp of when chats client was invited in seconds
      * @type {Number}
      */

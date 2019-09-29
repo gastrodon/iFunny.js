@@ -53,7 +53,7 @@ class Client extends EventEmitter {
     // internal methods
 
     async handle_message(key, data) {
-        (await this.handler).handle_message(key, data)
+        this.handler.handle_message(key, data)
     }
 
     async resolve_command(message) {
@@ -107,7 +107,7 @@ class Client extends EventEmitter {
 
     // Forward raw data to send to this websocket
     async send_to_socket(data) {
-        await (await this.socket).send(data)
+        await this.socket.send(data)
     }
 
     get next_req_id() {
@@ -353,13 +353,29 @@ class Client extends EventEmitter {
 
     /**
      * Modify the presence of this client in a chat (by joining or exiting)
-     * @param  {String}         mode HTTP request to modify with, `put` or `delete`
-     * @param  {Chat|String}    chat Chat or channel_url to modify presence in
+     * @param  {String}         state HTTP request to modify with, `put` or `delete`
+     * @param  {Chat|String}    chat  Chat or channel_url to modify presence in
      */
-    async modify_chat_presence(mode, chat) {
+    async modify_chat_presence(state, chat) {
         await axios({
-            method: mode,
+            method: state,
             url: `${this.api}/chats/channels/${chat.channel_url || chat}/members`,
+            headers: await this.headers
+        })
+    }
+
+    /**
+     * Modify the frozen state of a chat
+     * @param  {Boolean}        state Should this chat be frozen?
+     * @param  {Chat|String}    chat  Chat that should have it's frozen state modified
+     */
+    async modify_chat_freeze(state, chat) {
+        let data = `is_frozen=${state}`
+
+        await axios({
+            method: 'put',
+            url: `${this.api}/chats/channels/${chat.channel_url || chat}`,
+            data: data,
             headers: await this.headers
         })
     }
@@ -427,14 +443,12 @@ class Client extends EventEmitter {
      * @type {Handler}
      */
     get handler() {
-        return (async () => {
-            if (!this._handler) {
-                let Handler = require('../ext/Handler')
-                this._handler = new Handler(this)
-            }
+        if (!this._handler) {
+            let Handler = require('../ext/Handler')
+            this._handler = new Handler(this)
+        }
 
-            return this._handler
-        })()
+        return this._handler
     }
 
     /**
@@ -444,14 +458,12 @@ class Client extends EventEmitter {
      * @type {Socket}
      */
     get socket() {
-        return (async () => {
-            if (!this._socket) {
-                let Socket = require('../ext/Socket')
-                this._socket = new Socket(this)
-            }
+        if (!this._socket) {
+            let Socket = require('../ext/Socket')
+            this._socket = new Socket(this)
+        }
 
-            return this._socket
-        })()
+        return this._socket
     }
 
     /**
@@ -467,20 +479,6 @@ class Client extends EventEmitter {
         }
 
         return this._command
-    }
-
-    /**
-     * This clients event emitter
-     * If none has been created one will be
-     * created when this value is requested
-     * @type {EventEmitter}
-     */
-    get event() {
-        if (!this._event) {
-            this._event = new EventEmitter(this)
-        }
-
-        return this._event
     }
 
     /**

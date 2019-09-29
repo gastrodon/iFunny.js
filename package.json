@@ -5,7 +5,8 @@
     "main": "./src/index",
     "scripts": {
         "docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
-        "clean": "rm -rf ./out; rm -rf ./node_modules"
+        "read-the-docs": "./node_modules/.bin/jsdoc -c jsdoc.json; xdg-open ./out/index.html",
+        "clean": "rm -rf ./out"
     },
     "repository": {
         "type": "git",
