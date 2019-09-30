@@ -1,5 +1,7 @@
 ### 0.1.1
 - Add `Chat` methods `read`, `add_operator`, `remove_operator`, `join`, `exit`, `invite`, and `kick`
+- Add `Message` methods `delete` and `edit`
+- Add `Invite` methods `accept` and `decline`
 - Add `ChatUser` get method and getters
 
 ### 0.1.0

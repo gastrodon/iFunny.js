@@ -21,10 +21,36 @@ class Invite {
         this._invited = null
     }
 
+    // public methods
+
     async get(key, fallback = null) {
         return this._object_payload[key] || fallback
     }
 
+    /**
+     * Accept this invite
+     * @return {Chat} The chat that this user did join
+     */
+    async accept() {
+        await this.client.modify_pending_invite('accept', await this.chat)
+        return await this.chat
+    }
+
+    /**
+     * Decline this invite
+     * @return {Chat} The chat that this user did not join
+     */
+    async decline() {
+        await this.client.modify_pending_invite('decline', await this.chat)
+        return await this.chat
+    }
+
+    // public getters
+
+    /**
+     * The user who did send this invite
+     * @type {ChatUser}
+     */
     get inviter() {
         return (async () => {
             if (this._inviter) {
@@ -38,6 +64,10 @@ class Invite {
         })()
     }
 
+    /**
+     * The users who were invtied
+     * @type {Array<ChatUser>}
+     */
     get invited() {
         return (async () => {
             if (this._invited) {
@@ -52,12 +82,20 @@ class Invite {
         })()
     }
 
-    get url() {
+    /**
+     * Was this invite inviting the clinet?
+     * @type {Boolean}
+     */
+    get is_inviting_me() {
         return (async () => {
-            return `${await this.client.sendbird_api}/group_channels/${await this.channel_url}`
-        })()
+            return (await this.get('data')).invitees.contains(this.client.id)
+        })
     }
 
+    /**
+     * The type of invite
+     * @type {String}
+     */
     get type() {
         return (async () => {
             let cat = await this.get('cat')
@@ -65,8 +103,15 @@ class Invite {
         })()
     }
 
-    get sendbird_headers() {
-        return this.client.sendbird_headers
+    get chat() {
+        return (async () => {
+            if (!this._chat) {
+                let Chat = require('./Chat')
+                this._chat = new Chat(await this.get('channel_url'), { client: this.client })
+            }
+
+            return this._chat
+        })()
     }
 }
 

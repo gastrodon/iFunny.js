@@ -17,6 +17,8 @@ class Message extends FreshObject {
         this.url = `${this.sendbird_api}/group_channels/${channel}/messages/${id}`
     }
 
+    // methods
+
     /**
      * Get some value from this objects own internal JSON state
      * @param  {String}  key      key to query
@@ -76,6 +78,22 @@ class Message extends FreshObject {
         await (await this.chat).read()
         return this
     }
+
+    /**
+     * Delete this chat message
+     * @return {Message} This message instance
+     */
+    async delete() {
+        await this.client.delete_chat_message(await this.chat, this)
+        return this
+    }
+
+    async edit(content) {
+        await this.client.edit_chat_text_message(await this.chat, this, content)
+        return this.fresh
+    }
+
+    // getters
 
     /**
      * Content of this message

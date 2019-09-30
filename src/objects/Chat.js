@@ -17,6 +17,8 @@ class Chat extends FreshObject {
         this.url = `${this.sendbird_api}/group_channels/${this.channel_url}`
     }
 
+    // methods
+
     /**
      * Get some value from this objects own internal JSON state
      * @param  {String}  key      key to query
@@ -383,6 +385,14 @@ class Chat extends FreshObject {
             let ChatUser = require('./ChatUser')
             return new ChatUser(this.client.id, this, { client: this.client })
         })()
+    }
+
+    /**
+     * Total number of messages in this chat
+     * @type {Number}
+     */
+    get message_count() {
+        return this.client.chat_message_total(this)
     }
 
 }

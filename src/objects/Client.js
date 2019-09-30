@@ -322,6 +322,21 @@ class Client extends EventEmitter {
     // chat api methods
 
     /**
+     * Get the total message count of a chat
+     * @param  {Chat|String}  chat Chat to query the message count of
+     * @return {Number}            Total message count
+     */
+    async chat_message_total(chat) {
+        let response = await axios({
+            method: 'get',
+            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/total_count`,
+            headers: await this.sendbird_headers
+        })
+
+        return response.data.total
+    }
+
+    /**
      * Modify the operators in a chat
      * @param  {String}         mode HTTP request type to modify with, `put` or `delete`
      * @param  {User|String}    user User or user id of the user to modify the operator status of
@@ -395,6 +410,24 @@ class Client extends EventEmitter {
     }
 
     /**
+     * Modify the state of a pending invite by accepting or declining it
+     * @param  {String}         state To `accept` or `decline` this invite
+     * @param  {Chat|String}    chat  Chat from which the invite is broadcast
+     */
+    async modify_pending_invite(state, chat) {
+        let data = {
+            'user_id': await this.id
+        }
+
+        await axios({
+            method: 'put',
+            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/${state}`,
+            data: data,
+            headers: await this.sendbird_headers
+        })
+    }
+
+    /**
      * Kick a user from a chat
      * @param  {User|String}  user User that should be kicked
      * @param  {Chat|String}  chat Chat that a user should be kicked from
@@ -407,7 +440,40 @@ class Client extends EventEmitter {
             url: `${this.api}/chats/channels/${chat.channel_url || chat}/kicked_members`,
             data: data,
             headers: await this.headers
-        }).catch(e => { console.log(e.response); })
+        })
+    }
+
+    /**
+     * Delete a message from a chat
+     * @param  {Chat|String}    chat    Chat that this message is in
+     * @param  {Message|String} message Message that should be deleted
+     */
+    async delete_chat_message(chat, message) {
+        await axios({
+            method: 'delete',
+            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/${message.id || message}`,
+            headers: await this.sendbird_headers
+        })
+    }
+
+    /**
+     * Delete a message from a chat
+     * @param  {Chat|String}    chat    Chat that this message is in
+     * @param  {Message|String} message Message that should be edited
+     * @param  {String}         content Content that should replace the message's content
+     */
+    async edit_chat_text_message(chat, message, content) {
+        let data = {
+            message_type: 'MESG',
+            message: content
+        }
+
+        await axios({
+            method: 'put',
+            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/${message.id || message}`,
+            data: data,
+            headers: await this.sendbird_headers
+        }).catch(e => { console.log(e); })
     }
 
     // generators
@@ -609,7 +675,7 @@ class Client extends EventEmitter {
         return this.get('phone')
     }
 
-    get _messenger_token() {
+    get messenger_token_sync() {
         return this._object_payload.messenger_token
     }
 
@@ -621,11 +687,11 @@ class Client extends EventEmitter {
      */
     get messenger_token() {
         return (async () => {
-            return this._messenger_token
+            return this.messenger_token_sync
         })()
     }
 
-    get _id() {
+    get id_sync() {
         return this._object_payload.id
     }
 
@@ -637,7 +703,7 @@ class Client extends EventEmitter {
      */
     get id() {
         return (async () => {
-            return this._id
+            return this.id_sync
         })()
     }
 

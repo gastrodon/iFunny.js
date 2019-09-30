@@ -137,7 +137,7 @@ class Handler extends EventEmitter {
         let invitees = data.data.invitees.map(it => it.user_id)
         let invite = new Invite(data, { client: this.client })
 
-        if (invitees.some(it => it == client._id)) {
+        if (invitees.some(it => it == client.id_sync)) {
             this.emit('invite', invite)
         } else {
             this.emit('invite_broadcast', invite)
