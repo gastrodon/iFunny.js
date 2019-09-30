@@ -1,11 +1,12 @@
 {
     "name": "ifunnywrapper",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "",
     "main": "./src/index",
     "scripts": {
         "docs": "./node_modules/.bin/jsdoc -c jsdoc.json",
-        "clean": "rm -rf ./out; rm -rf ~/ifunnyjs"
+        "read-the-docs": "./node_modules/.bin/jsdoc -c jsdoc.json; xdg-open ./out/index.html",
+        "clean": "rm -rf ./out"
     },
     "repository": {
         "type": "git",

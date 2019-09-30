@@ -43,9 +43,18 @@ class Socket extends EventEmitter {
         this.connection.send(data)
     }
 
+    /**
+     * Event emitted when the socket is closed, and the client is not set to auto reconnect
+     * @event Client#disconnect
+     * @property {Number} code websocket code for closure reason
+     */
     async _associate_listeners(connection) {
         connection.on('close', async (code, reason) => {
-            console.log(`unimplemented - close: ${code}, ${reason}`)
+            if (this.client._reconnect) {
+                this.start()
+            } else {
+                this.client.event.emit('disconnect', code)
+            }
         })
 
         connection.on('error', async (error) => {

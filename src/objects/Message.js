@@ -8,6 +8,7 @@ const axios = require('axios')
 class Message extends FreshObject {
     constructor(id, channel, opts = {}) {
         super(id, opts)
+        this._invoked = null
 
         if (typeof(channel) == 'object') {
             channel = channel.url
@@ -15,6 +16,8 @@ class Message extends FreshObject {
 
         this.url = `${this.sendbird_api}/group_channels/${channel}/messages/${id}`
     }
+
+    // methods
 
     /**
      * Get some value from this objects own internal JSON state
@@ -42,19 +45,62 @@ class Message extends FreshObject {
     }
 
     /**
-     * Send a chat message to the chat that this message came from
-     * @param  {String}  content text content of this message
+     * Send a text message to a chat
+     * @param  {String}             content Message content
+     * @return {Promise<Message>}   This message instance
      */
     async send_text_message(content) {
-        return await (await this.chat).send_text_message(content)
+        await (await this.chat).send_text_message(content)
+        return this
     }
+
+    /**
+     * Send an image message to a chat
+     * @param {String}  url             Url pointing to this image
+     * @param {Chat|String}  chat       Chat or channel_url of the chat to send this image to
+     * @param {Object} opts={}          Optional parameters
+     * @param {Number} opts.height=780  Height of this image
+     * @param {Number} opts.width=780   Width of this image
+     * @param {String} opts.file_name   File name to send this file as
+     * @param {String} opts.file_type   MIME type of this file
+     * @return {Promise<Message>}       This message instance
+     */
+    async send_image_message(url, opts = {}) {
+        await (await this.chat).send_image_message(url, opts)
+        return this
+    }
+
+    /**
+     * Mark this message as read
+     * @return {Message} This message instance
+     */
+    async read() {
+        await (await this.chat).read()
+        return this
+    }
+
+    /**
+     * Delete this chat message
+     * @return {Message} This message instance
+     */
+    async delete() {
+        await this.client.delete_chat_message(await this.chat, this)
+        return this
+    }
+
+    async edit(content) {
+        await this.client.edit_chat_text_message(await this.chat, this, content)
+        return this.fresh
+    }
+
+    // getters
 
     /**
      * Content of this message
      * @type {String}
      */
     get content() {
-        return this.get('message')
+        return this.get('message') || ''
     }
 
     /**
@@ -65,7 +111,7 @@ class Message extends FreshObject {
         return (async () => {
             let ChatUser = require('./ChatUser')
             let data = await this.get('user')
-            return new ChatUser((await data.user_id), (await this.chat), { client: this.client, data: data })
+            return new ChatUser(data.guest_id, (await this.chat), { client: this.client, data: data })
         })()
     }
 
@@ -105,7 +151,7 @@ class Message extends FreshObject {
      * @type {String}
      */
     get type() {
-        return (async() => {
+        return (async () => {
             let type = this.get('type')
             return type == 'MESG' ? type : 'FILE'
         })
@@ -139,7 +185,7 @@ class Message extends FreshObject {
      */
     get file_url() {
         return (async () => {
-            return (await this.file_meta)['url'] || null
+            return (await this.file_meta).url || null
         })()
     }
 
@@ -149,8 +195,18 @@ class Message extends FreshObject {
      */
     get file_name() {
         return (async () => {
-            return (await this.file_meta)['name'] || null
+            return (await this.file_meta).name || null
         })()
+    }
+
+    get invoked() {
+        return (async () => {
+            return this._invoked
+        })()
+    }
+
+    set invoked(field) {
+        this._invoked = field
     }
 
     get msg_id() {
