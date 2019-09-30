@@ -1,41 +1,18 @@
 const Client = require('../Client')
 const axios = require('axios')
 const qs = require('qs')
-
-async function get_slice(source, query) {
-    let index = source.indexOf(query)
-    return index > -1 ? `${index}:${index + query.length - 1}` : null
-}
+const { compose_comment } = require('../../utils/methods')
 
 /**
  * Add a comment to a post
  * @param  {Post|String} post                           Post to add a comment to
- * @param  {String} text=null                           Text of this post
+ * @param  {String} text=null                           Text of this comment
  * @param  {Post|String} attachment=null                Post to attach to the comment
- * @param  {Array<User>|Array<String>} mentions=null    Users to mention in this post
+ * @param  {Array<User>|Array<String>} mentions=null    Users to mention in this comment
  * @return {Object}                                     API response
  */
 Client.prototype.add_comment_to_post = async function(post, text, attachment, mentions) {
-    let data = {}
-
-    if (text) {
-        data.text = text
-    }
-
-    if (attachment) {
-        data.content = attachment.id || attachment
-    }
-
-    if (mentions) {
-        let formatted = []
-        for (let user of mentions) {
-            if (typeOf(user) === 'string') {
-                let User = require('../User')
-                user = new User(user, { client: this })
-            }
-            formatted.push([user, await get_slice(text, await user.nick)])
-        }
-    }
+    let data = compose_comment(text, attachment, mentions)
 
     let response = await axios({
         method: 'post',
@@ -44,7 +21,7 @@ Client.prototype.add_comment_to_post = async function(post, text, attachment, me
         headers: await this.headers
     })
 
-    return response.data.data.id
+    return response
 }
 
 /**
@@ -95,7 +72,7 @@ Client.prototype.modify_post_republish = async function(post, method) {
 
 /**
  * Report a post
- * @param  {Post|String}    user Post to report
+ * @param  {Post|String}    post Post to report
  * @param  {String}         type Type of report to send
  *
  * `hate`   -> hate speech

@@ -64,6 +64,36 @@ async function paginated_data(url, opts = {}) {
 
 }
 
+async function get_slice(source, query) {
+    let index = source.indexOf(query)
+    return index > -1 ? `${index}:${index + query.length - 1}` : null
+}
+
+async function compose_comment(text, attachment, mentions) {
+    let data = {}
+
+    if (text) {
+        data.text = text
+    }
+
+    if (attachment) {
+        data.content = attachment.id || attachment
+    }
+
+    if (mentions) {
+        let formatted = []
+        for (let user of mentions) {
+            if (typeOf(user) === 'string') {
+                let User = require('../User')
+                user = new User(user, { client: this })
+            }
+            formatted.push([user, await get_slice(text, await user.nick)])
+        }
+    }
+
+    return data
+}
+
 async function* paginated_generator(source, opts = {}) {
     buffer = await source(opts)
 
