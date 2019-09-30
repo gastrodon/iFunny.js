@@ -175,13 +175,16 @@ class User extends FreshObject {
 
     /**
      * This user's messaging privacy setting
+     *
      * `public` allows new messages from any user
+     *
      * `subscribers` allows new messages from users who a subscription of this user
+     *
      * `closed` allows no messaging initiation on this user
      * @type {String}
      */
     get chat_privacy() {
-        return this.get('messaging_privacy_status')
+        return this.get('messaging_privacy_status') === 1
     }
 
     /**

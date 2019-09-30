@@ -165,7 +165,7 @@ class Client extends EventEmitter {
      */
     /**
      * Event emitted when this client is logged in
-     * @event Client#ready
+     * @event Client#login
      * @property {Boolean} fresh did this login get a fresh token?
      */
     async login(email, password, opts = { force: false }) {
@@ -185,7 +185,7 @@ class Client extends EventEmitter {
 
                 this.authorized = true
                 this._object_payload = response.data.data
-                this.emit('ready', false)
+                this.emit('login', false)
                 return this
 
             } catch (error) {
@@ -220,7 +220,7 @@ class Client extends EventEmitter {
 
         this._object_payload = response.data.data
 
-        this.emit('ready', true)
+        this.emit('login', true)
         return response
     }
 
@@ -348,9 +348,9 @@ class Client extends EventEmitter {
             return this.config.basic_token
         }
 
-        var hex = ['A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-        var hex_array = []
-        var range = hex.length
+        let hex = ['A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+        let hex_array = []
+        let range = hex.length
 
         for (let _ of Array(64)) {
             hex_array.push(hex[Math.floor(Math.random() * range)])
@@ -557,6 +557,28 @@ class Client extends EventEmitter {
      */
     get is_deactivated() {
         return this.get('is_deleted')
+    }
+
+    /**
+     * Is this client private?
+     * @type {Boolean}
+     */
+    get is_private() {
+        return this.get('is_private')
+    }
+
+    /**
+     * This user's messaging privacy setting
+     *
+     * `public` allows new messages from any user
+     *
+     * `subscribers` allows new messages from users who a subscription of this user
+     *
+     * `closed` allows no messaging initiation on this user
+     * @type {String}
+     */
+    get chat_privacy() {
+        return this.get('messaging_privacy_status') === 1
     }
 
     /**
