@@ -21,23 +21,32 @@ const { homedir } = require('os')
 class Client extends EventEmitter {
     constructor(opts = {}) {
         super()
+        // add proto methods
+        require('./client_proto')
+
+        // read-only implied private data
         this._client_id = 'MsOIJ39Q28'
         this._client_secret = 'PTDc3H8a)Vi=UYap'
         this._user_agent = 'iFunny/5.42(1117792) Android/5.0.2 (samsung; SCH-R530U; samsung)'
+
+        // stored values that methods will update
         this._update = false
-        this._object_payload = {}
         this._handler = null
         this._socket = null
         this._command = null
         this._event = null
+        this._object_payload = {}
         this._sendbird_session_key = null
-        this._prefix = opts.prefix || null
-        this._reconnect = opts.reconnect || false
         this._commands = new Set()
         this._req_id = parseInt(Date.now() + (Math.random() * 1000000))
 
-        this.authorized = false
+        // optional property defaults
+        this._prefix = opts.prefix || null
+        this._reconnect = opts.reconnect || false
         this.paginated_size = opts.paginated_size || 25
+
+        // public values
+        this.authorized = false
         this.url = `${this.api}/account`
 
         // Make sure that our config file exists and use it
@@ -108,10 +117,6 @@ class Client extends EventEmitter {
     // Forward raw data to send to this websocket
     async send_to_socket(data) {
         await this.socket.send(data)
-    }
-
-    get next_req_id() {
-        return (this.req_id++)
     }
 
     /**
@@ -255,227 +260,6 @@ class Client extends EventEmitter {
         this._commands = new Set([...names, ...this._commands])
     }
 
-    // chat websocket methods
-
-    /**
-     * Send a text message to a chat
-     * @param  {String}       content Message content
-     * @param  {Chat|String}  chat    Chat or channel_url of the chat to send this message to
-     * @return {Promise<Chat|String>} Chat or channel_url, whichever was passed to the method
-     */
-    async send_text_message(content, chat) {
-        let data = {
-            'channel_url': chat.channel_url || chat,
-            'message': content
-        }
-
-        this.send_to_socket(`MESG${JSON.stringify(data)}\n`)
-        return chat
-    }
-
-    /**
-     * Send an image message to a chat
-     * @param {String}  url             Url pointing to this image
-     * @param {Chat|String}  chat       Chat or channel_url of the chat to send this image to
-     * @param {Object} opts={}          Optional parameters
-     * @param {Number} opts.height=780  Height of this image
-     * @param {Number} opts.width=780   Width of this image
-     * @param {String} opts.file_name   File name to send this file as
-     * @param {String} opts.file_type   MIME type of this file
-     */
-    async send_image_message(url, chat, opts = {}) {
-        let height = opts.height || 780
-        let width = opts.width || 780
-        let lower_ratio = Math.min(width / height, height / width)
-        let type = height >= width ? 'tall' : 'wide'
-        let data = {
-            'thumbnails': [{
-                'url': url,
-                'real_height': parseInt(type === 'tall' ? 780 : 780 * lower_ratio),
-                'real_width': parseInt(type === 'wide' ? 780 : 780 * lower_ratio),
-                'height': height,
-                'width': width
-            }],
-            'channel_url': chat.channel_url || chat,
-            'url': url,
-            'name': opts.file_name || url.split('/')[url.split('/').length - 1],
-            'type': opts.file_type || await methods.determine_mime(url)
-        }
-
-        this.send_to_socket(`FILE${JSON.stringify(data)}\n`)
-
-    }
-
-    /**
-     * Mark the messages in a chat as read
-     * @param  {Chat|String}  chat Chat to mark as read
-     */
-    async mark_chat_read(chat) {
-        let data = {
-            'channel_url': chat.channel_url || chat,
-            'req_id': this.next_req_id
-        }
-
-        this.send_to_socket(`READ${JSON.stringify(data)}\n`)
-    }
-
-    // chat api methods
-
-    /**
-     * Get the total message count of a chat
-     * @param  {Chat|String}  chat Chat to query the message count of
-     * @return {Number}            Total message count
-     */
-    async chat_message_total(chat) {
-        let response = await axios({
-            method: 'get',
-            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/total_count`,
-            headers: await this.sendbird_headers
-        })
-
-        return response.data.total
-    }
-
-    /**
-     * Modify the operators in a chat
-     * @param  {String}         mode HTTP request type to modify with, `put` or `delete`
-     * @param  {User|String}    user User or user id of the user to modify the operator status of
-     * @param  {Chat|String}    chat Chat in which to modify operators
-     */
-    async modify_chat_operator(mode, user, chat) {
-        let data = `operators=${user.id || user}`
-
-        await axios({
-            method: mode,
-            url: `${this.api}/chats/channels/${chat.channel_url || chat}/operators`,
-            data: data,
-            headers: await this.headers
-        })
-    }
-
-    /**
-     * Modify the presence of this client in a chat (by joining or exiting)
-     * @param  {String}         state HTTP request to modify with, `put` or `delete`
-     * @param  {Chat|String}    chat  Chat or channel_url to modify presence in
-     */
-    async modify_chat_presence(state, chat) {
-        await axios({
-            method: state,
-            url: `${this.api}/chats/channels/${chat.channel_url || chat}/members`,
-            headers: await this.headers
-        })
-    }
-
-    /**
-     * Modify the frozen state of a chat
-     * @param  {Boolean}        state Should this chat be frozen?
-     * @param  {Chat|String}    chat  Chat that should have it's frozen state modified
-     */
-    async modify_chat_freeze(state, chat) {
-        let data = `is_frozen=${state}`
-
-        await axios({
-            method: 'put',
-            url: `${this.api}/chats/channels/${chat.channel_url || chat}`,
-            data: data,
-            headers: await this.headers
-        })
-    }
-
-    /**
-     * Invite a user or list of users to a chat
-     * @param  {User|String|Array<User>|Array<String>}  users Array of or single instance of a user or id of a user to invite
-     * @param  {Chat|String}                            chat  Chat or channel_url of the chat to invite a user to
-     */
-    async invite_users_to_chat(users, chat) {
-        if (!(users.length)) {
-            users = [users]
-        }
-
-        if (users[0].id) {
-            users = users.map(it => it.id)
-        }
-
-        let data = {
-            'user_ids': users
-        }
-
-        await axios({
-            method: 'post',
-            url: `${this.sendbird_api}/group_channels/${chat.id || chat}/invite`,
-            data: JSON.stringify(data),
-            headers: await this.sendbird_headers
-
-        })
-    }
-
-    /**
-     * Modify the state of a pending invite by accepting or declining it
-     * @param  {String}         state To `accept` or `decline` this invite
-     * @param  {Chat|String}    chat  Chat from which the invite is broadcast
-     */
-    async modify_pending_invite(state, chat) {
-        let data = {
-            'user_id': await this.id
-        }
-
-        await axios({
-            method: 'put',
-            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/${state}`,
-            data: data,
-            headers: await this.sendbird_headers
-        })
-    }
-
-    /**
-     * Kick a user from a chat
-     * @param  {User|String}  user User that should be kicked
-     * @param  {Chat|String}  chat Chat that a user should be kicked from
-     */
-    async kick_chat_user(user, chat) {
-        let data = `members=${user.id || user}`
-
-        await axios({
-            method: 'put',
-            url: `${this.api}/chats/channels/${chat.channel_url || chat}/kicked_members`,
-            data: data,
-            headers: await this.headers
-        })
-    }
-
-    /**
-     * Delete a message from a chat
-     * @param  {Chat|String}    chat    Chat that this message is in
-     * @param  {Message|String} message Message that should be deleted
-     */
-    async delete_chat_message(chat, message) {
-        await axios({
-            method: 'delete',
-            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/${message.id || message}`,
-            headers: await this.sendbird_headers
-        })
-    }
-
-    /**
-     * Delete a message from a chat
-     * @param  {Chat|String}    chat    Chat that this message is in
-     * @param  {Message|String} message Message that should be edited
-     * @param  {String}         content Content that should replace the message's content
-     */
-    async edit_chat_text_message(chat, message, content) {
-        let data = {
-            message_type: 'MESG',
-            message: content
-        }
-
-        await axios({
-            method: 'put',
-            url: `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/${message.id || message}`,
-            data: data,
-            headers: await this.sendbird_headers
-        }).catch(e => { console.log(e); })
-    }
-
     // generators
 
     /**
@@ -488,6 +272,10 @@ class Client extends EventEmitter {
     }
 
     // getters
+
+    get next_req_id() {
+        return (this.req_id++)
+    }
 
     /**
      * This clients websocket hadnler

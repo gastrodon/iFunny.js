@@ -53,7 +53,7 @@ class Socket extends EventEmitter {
             if (this.client._reconnect) {
                 this.start()
             } else {
-                this.client.event.emit('disconnect', code)
+                this.client.handler.emit('disconnect', code, reason)
             }
         })
 
