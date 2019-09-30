@@ -3,6 +3,7 @@
 - Add `Message` methods `delete` and `edit`
 - Add `Invite` methods `accept` and `decline`
 - Add `ChatUser` get method and getters
+- Add Client methods for interactions with `Chat`s, `Comment`s, `Post`s, `User`s, as well as the client instance of `Socket` and the account of a client 
 
 ### 0.1.0
 - Add basic (mostly read-only) classes for objects

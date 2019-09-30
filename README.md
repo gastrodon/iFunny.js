@@ -9,7 +9,7 @@ A simple wrapper for the iFunny API
 const ifunny = require('iFunny')
 const robot = new ifunny.Client({ prefix: '-' })
 
-robot.on('ready', async (fresh) => {
+robot.on('login', async (fresh) => {
     await robot.socket.start()
 })
 
