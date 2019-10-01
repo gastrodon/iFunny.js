@@ -1,5 +1,8 @@
 const Client = require('../Client')
+const FormData = require('form-data')
+const request = require('request')
 const axios = require('axios')
+const util = require('util')
 
 /**
  * Get the total message count of a chat
@@ -178,6 +181,34 @@ Client.prototype.modify_chat_operator = async function(mode, user, chat) {
     })
 
     return response
+}
+
+/**
+ * Upload a file to sendbird's CDN for use in chats
+ * @param  {[type]} image_data [description]
+ * @param  {[type]} chat       [description]
+ * @return {[type]}            [description]
+ */
+Client.prototype.sendbird_upload = async function(image_data, chat) {
+    let data = {
+        thumbnail1: '780, 780',
+        thumbnail2: '320, 320',
+        file: image_data
+    }
+
+    if (chat) {
+        data.channel_url = chat.channel_url || chat
+    }
+
+    let response = await util.promisify(request)({
+        method: 'post',
+        url: `${this.sendbird_api}/storage/file`,
+        formData: data,
+        headers: await this.sendbird_headers
+    })
+
+    return JSON.parse(response.body)
+
 }
 
 module.exports = Client

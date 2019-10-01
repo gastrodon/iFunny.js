@@ -23,3 +23,6 @@ robot.command.on('ping', async (message, args) => {
 
 robot.login('username', 'password')
 ```
+
+### Documentation
+The [docs](http://216.16.208.63) should get you started. Examples are coming soon.
