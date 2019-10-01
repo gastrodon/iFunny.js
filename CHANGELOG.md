@@ -1,4 +1,4 @@
-### 0.1.1
+### 1.1.1
 - Add `Chat` methods `read`, `add_operator`, `remove_operator`, `join`, `exit`, `invite`, and `kick`
 - Add `Message` methods `delete` and `edit`
 - Add `Invite` methods `accept` and `decline`
@@ -7,7 +7,7 @@
 - Add Client methods for uploading images to iFunny and sendbird
 - Update docs and package info for publishing the library
 
-### 0.1.0
+### 1.1.0
 - Add basic (mostly read-only) classes for objects
 - `Client.login` method
 - `Client.notifications_paginated` and `client.notifications`
