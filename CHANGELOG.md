@@ -1,3 +1,6 @@
+### 1.1.2
+- Add methods to the `Post` class
+
 ### 1.1.1
 - Add `Chat` methods `read`, `add_operator`, `remove_operator`, `join`, `exit`, `invite`, and `kick`
 - Add `Message` methods `delete` and `edit`

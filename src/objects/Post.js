@@ -10,7 +10,6 @@ const FreshObject = require('./FreshObject')
  * @param {Number} opts.paginated_size=25   size of each paginated request
  * @param {Object} opts.data={}             data of this object, that can be used before fetching new info
  */
-
 class Post extends FreshObject {
     constructor(id, opts = {}) {
         /*
@@ -19,6 +18,239 @@ class Post extends FreshObject {
         super(id, opts)
         this.url = `${this.api}/content/${id}`
     }
+
+    // methods for any post
+
+    /**
+     * Add a comment to this post
+     * @param  {String} text=null                           Text of this comment
+     * @param  {Post|String} attachment=null                Post to attach to the comment
+     * @param  {Array<User>|Array<String>} mentions=null    Users to mention in this comment
+     * @return {Comment}                                    Posted comment
+     * @throws                                              Throws error if bad api response, or if the comment is not posted
+     */
+    async add_comment(text, attachment, mentions) {
+        let data = await this.client.add_comment_to_post(this, text, attachment, mentions).data
+
+        if (data.id === '000000000000000000000000') {
+            throw data.toString()
+        }
+
+        let comment = require('./Comment')
+        return new Comment(data.id, { client: this.client, data: data.comment })
+    }
+
+    /**
+     * Add a smile to this post
+     * @return {Post}   This post
+     * @throws          Throws an error if bad api response
+     */
+    async smile() {
+        try {
+            await this.client.modify_post_smile(this, 'put')
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'already_smiled') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+
+    /**
+     * Remove a smile from this post
+     * @return {Post}   This post
+     * @throws          Throws an error if bad api response
+     */
+    async remove_smile() {
+        try {
+            await this.client.modify_post_smile(this, 'delete')
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'not_smiled') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+
+    /**
+     * Add an unsmile to this post
+     * @return {Post}   This post
+     * @throws          Throws an error if bad api response
+     */
+    async unsmile() {
+        try {
+            await this.client.modify_post_unsmile(this, 'put')
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'already_unsmiled') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+
+    /**
+     * Remove an unsmile from this post
+     * @return {Post}   This post
+     * @throws          Throws an error if bad api response
+     */
+    async remove_unsmile() {
+        try {
+            await this.client.modify_post_unsmile(this, 'delete')
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'not_unsmiled') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+
+    /**
+     * Republish this post
+     * @param  {Boolean}  force Remove republish and republish if already republished?
+     * @return {Post}           Instance of this republished post in the timeline of the client, if successful
+     * @throws                  Throws an error if bad api response
+     */
+    async republish(force) {
+        try {
+            let data = await this.client.modify_post_republish(this, 'post').data
+            return new Post(data.id, { client: this.client })
+        } catch (error) {
+            if (error.response && error.response.data.error === 'already_republished') {
+                if (force) {
+                    return this.remove_republish().republish()
+                } else {
+                    return null
+                }
+            }
+            throw error
+        }
+    }
+
+    /**
+     * Republish this post
+     * @return {Post}           Instance of this republished post in the timeline of the client, if successful
+     * @throws                  Throws an error if bad api response
+     */
+    async remove_republish() {
+        try {
+            let data = await this.client.modify_post_republish(this, 'delete').data
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'not_republished') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+
+    /**
+     * Report this post
+     * @param  {String}         type Type of report to send
+     *
+     * `hate`   -> hate speech
+     *
+     * `nude`   -> nudity
+     *
+     * `spam`   -> spam posting
+     *
+     * `harm`   -> encouragement of harm or violence
+     *
+     * `target` -> targeted harrassment
+     *
+     * @return {Post}                Post that was reported
+     * @throws                       Throws an error if bad api response, or if the report type is invalid
+     */
+    async report(type) {
+        await this.client.report_post(this, type)
+        return this
+    }
+
+    /**
+     * Mark this post as read
+     * @return {Post} This post
+     */
+    async read() {
+        await this.client.read_post(this)
+        return this
+    }
+
+    // methods for your own posts
+
+    /**
+     * Update the tags on this post
+     * @param  {Array<String>}  tags Tags to tag this post with
+     * @return {Post}                This post
+     * @throws                       Throws an error if bad api response, or not own content
+     */
+    async set_tags(tags) {
+        await this.client.modify_post_tags(this, tags)
+        return this.fresh
+    }
+
+    /**
+     * Delete this post
+     * @return {Post} This post (but it has been deleted!)
+     * @throws                       Throws an error if bad api response, or not own content
+     */
+    async delete() {
+        await this.client.delete_post(this)
+        return this
+    }
+
+    /**
+     * Pin this post to the timeline of the client
+     * @return {Post} This post
+     * @throws                       Throws an error if bad api response, or not own content
+     */
+    async pin() {
+        await this.client.modify_post_pinned_status(this, 'put')
+        return this.fresh
+    }
+
+    /**
+     * Unpin this post from the timeline of the client
+     * @return {Post} This post
+     * @throws                       Throws an error if bad api response, or not own content
+     */
+    async unpin() {
+        await this.client.modify_post_pinned_status(this, 'put')
+        return this.fresh
+    }
+
+    // methods for your own pending posts
+
+    /**
+     * Update the scheduled post time of a pending post
+     * @param  {Number}  time Timestamp in seconds to publish this post
+     * @return {Post}         This post
+     * @throws                       Throws an error if bad api response, not pending post, or not own content
+     */
+    async set_schedule(time) {
+        await this.client.modify_delayed_post_schedule(this, time)
+        return this.fresh
+    }
+
+    /**
+     * Update the scheduled post time of a pending post
+     * @param  {String} visibility Visibility to set for this post
+     *
+     * `public`      -> appear in collective and potentially featured feed
+     *
+     * `subscribers` -> appear only in subscriber and timeline feeds
+     *
+     * @return {Post}              This post
+     * @throws                       Throws an error if bad api response, not pending post, or not own content
+     */
+    async set_visibility(visibility) {
+        await this.client.modify_delayed_post_visibility(this, visibility)
+        return this.fresh
+    }
+
+    // getters
 
     /**
      * The author of this Post
@@ -303,6 +535,12 @@ class Post extends FreshObject {
      */
     get share_url() {
         return this.get('share_url')
+    }
+
+    // method alias'
+
+    get remove_pin() {
+        return this.unpin
     }
 
     // undocumented because they have not been fully implemented
