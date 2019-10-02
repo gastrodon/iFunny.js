@@ -1,3 +1,6 @@
+### 1.1.3
+- Add property `last_message` to the `Chat` class
+
 ### 1.1.2
 - Update User-Agent to most recent beta version
 - Add methods to the `Post` class
