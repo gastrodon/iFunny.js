@@ -3,5 +3,6 @@ module.exports = {
     SocketProto: require('./SocketProto'),
     UserProto: require('./UserProto'),
     AccountProto: require('./AccountProto'),
-    PostProto: require('./PostProto')
+    PostProto: require('./PostProto'),
+    PaginatedProto: require('./PaginatedProto')
 }

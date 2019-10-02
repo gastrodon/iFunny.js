@@ -35,7 +35,7 @@ class ChatUser extends User {
 
         let params = {
             limit: 1,
-            nickname_startswith: await this.nick
+            user_ids: this.id
         }
 
         let response = await axios({

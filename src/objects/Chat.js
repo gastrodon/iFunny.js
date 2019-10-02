@@ -1,5 +1,6 @@
 const FreshObject = require('./FreshObject')
 const axios = require('axios')
+const methods = require('../utils/methods')
 
 /**
  * iFunny chat class, representing a private, public, or direct messaging chat
@@ -15,6 +16,16 @@ class Chat extends FreshObject {
         super(channel_url, opts)
         this.channel_url = this.id
         this.url = `${this.sendbird_api}/group_channels/${this.channel_url}`
+    }
+
+    // generators
+
+    get messages() {
+        return methods.paginated_generator(this.client.chat_messages_paginated, { chat: this, instance: this.client })
+    }
+
+    get members() {
+        return methods.paginated_generator(this.client.chat_members_paginated, { chat: this, instance: this.client })
     }
 
     // methods

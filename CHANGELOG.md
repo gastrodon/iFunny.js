@@ -1,5 +1,8 @@
 ### 1.1.2
+- Update User-Agent to most recent beta version
 - Add methods to the `Post` class
+- Add methods to the `User` class
+- Add generators to the `Chat` class
 
 ### 1.1.1
 - Add `Chat` methods `read`, `add_operator`, `remove_operator`, `join`, `exit`, `invite`, and `kick`

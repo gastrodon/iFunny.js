@@ -17,6 +17,76 @@ class User extends FreshObject {
         this.url = `${this.api}/users/${id}`
     }
 
+    // methods
+
+    async subscribe() {
+        await this.client.modify_user_subscription_status('put', this)
+        return this.fresh
+    }
+
+    async unsubscribe() {
+        await this.client.modify_user_subscription_status('delete', this)
+        return this.fresh
+    }
+
+    async subscribe_to_updates() {
+        await this.client.modify_user_updates_subscription_status('put', this)
+        return this.fresh
+    }
+
+    async unsubscribe_to_updates() {
+        await this.client.modify_user_updates_subscription_status('delete', this)
+        return this.fresh
+    }
+
+    /**
+     * Block this user
+     * @param  {String}         type   Type of block to use
+     *
+     *`user`            -> block a single user
+     *
+     *`installation`    -> block all accounts owned by a user
+     *
+     * @return {User}                  This user
+     */
+    async block(type) {
+        try {
+            await this.client.modify_block_of_user('put', this, type)
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'already_blocked') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+    /**
+     * Unblock this user
+     * @param  {String}         type   Type of block to use
+     *
+     *`user`            -> block a single user
+     *
+     *`installation`    -> block all accounts owned by a user
+     *
+     * @return {User}                  This user
+     */
+    async unblock() {
+        try {
+            await this.client.modify_block_of_user('delete', this)
+            return this.fresh
+        } catch (error) {
+            if (error.response && error.response.data.error === 'not_blocked') {
+                return this.fresh
+            }
+            throw error
+        }
+    }
+
+    async report(type) {
+        await this.client.report_user(this, type)
+        return this
+    }
+
     /**
      * This user's nickname (or, username)
      * @type {String}

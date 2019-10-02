@@ -27,7 +27,7 @@ class Client extends EventEmitter {
         // read-only implied private data
         this._client_id = 'MsOIJ39Q28'
         this._client_secret = 'PTDc3H8a)Vi=UYap'
-        this._user_agent = 'iFunny/5.42(1117792) Android/5.0.2 (samsung; SCH-R530U; samsung)'
+        this._user_agent = 'iFunny/5.43.1(1117828) Android/5.0.2 (samsung; SCH-R530U; samsung)'
 
         // stored values that methods will update
         this._update = false
@@ -153,44 +153,6 @@ class Client extends EventEmitter {
         return this._object_payload[key] || fallback
     }
 
-    // client api methods
-
-    /**
-     * Get a chunk of this logged in users notifications
-     * @param  {Object}  opts={}       optional parameters
-     * @param  {Number}  opts.limit=25 Number of items to fetch
-     * @return {Promise<Object>}         chunk of notifications with paging info
-     */
-    async notifications_paginated(opts = {}) {
-        let Notification = require('./Notification')
-        let instance = this || opts.instance
-
-        let data = await methods.paginated_data(`${instance.api}/news/my`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'news',
-            prev: opts.prev,
-            next: opts.next,
-            headers: instance.headers
-        })
-
-        data.items = data.items.map((item) => new Notification(item))
-        return data
-
-    }
-
-    /**
-     * Listen for a command, and emit it's name when it is called with this prefix
-     * @param  {String|Array<String>}  name  Command name
-     * @return {Promise<Client>}     This clinet instance
-     */
-    async listen_for(names) {
-        if (typeof(names) === 'string') {
-            names = new Set([names])
-        }
-
-        this._commands = new Set([...names, ...this._commands])
-    }
-
     // generators
 
     /**
@@ -199,7 +161,6 @@ class Client extends EventEmitter {
      */
     get notifications() {
         return methods.paginated_generator(this.notifications_paginated, { instance: this })
-
     }
 
     // getters

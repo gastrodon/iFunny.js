@@ -71,7 +71,7 @@ Client.prototype.modify_user_updates_subscription_status = async function(method
  */
 Client.prototype.modify_block_of_user = async function(method, user, type) {
     let params = {
-        type: type
+        type: type || 'user'
     }
 
     let response = await axios({
