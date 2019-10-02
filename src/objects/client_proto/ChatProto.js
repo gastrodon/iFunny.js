@@ -23,7 +23,7 @@ Client.prototype.chat_message_total = async function(chat) {
  * Modify the presence of this client in a chat (by joining or exiting)
  * @param  {String}         state HTTP request to modify with, `put` or `delete`
  * @param  {Chat|String}    chat  Chat or channel_url to modify presence in
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.modify_chat_presence = async function(state, chat) {
     let response = await axios({
@@ -39,7 +39,7 @@ Client.prototype.modify_chat_presence = async function(state, chat) {
  * Modify the frozen state of a chat
  * @param  {Boolean}        state Should this chat be frozen?
  * @param  {Chat|String}    chat  Chat that should have it's frozen state modified
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.modify_chat_freeze = async function(state, chat) {
     let data = `is_frozen=${state}`
@@ -58,7 +58,7 @@ Client.prototype.modify_chat_freeze = async function(state, chat) {
  * Invite a user or list of users to a chat
  * @param  {User|String|Array<User>|Array<String>}  users Array of or single instance of a user or id of a user to invite
  * @param  {Chat|String}                            chat  Chat or channel_url of the chat to invite a user to
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.invite_users_to_chat = async function(users, chat) {
     if (!(users.length)) {
@@ -88,7 +88,7 @@ Client.prototype.invite_users_to_chat = async function(users, chat) {
  * Modify the state of a pending invite by accepting or declining it
  * @param  {String}         state To `accept` or `decline` this invite
  * @param  {Chat|String}    chat  Chat from which the invite is broadcast
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.modify_pending_invite = async function(state, chat) {
     let data = {
@@ -109,7 +109,7 @@ Client.prototype.modify_pending_invite = async function(state, chat) {
  * Kick a user from a chat
  * @param  {User|String}  user User that should be kicked
  * @param  {Chat|String}  chat Chat that a user should be kicked from
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.kick_chat_user = async function(user, chat) {
     let data = `members=${user.id || user}`
@@ -128,7 +128,7 @@ Client.prototype.kick_chat_user = async function(user, chat) {
  * Delete a message from a chat
  * @param  {Chat|String}    chat    Chat that this message is in
  * @param  {Message|String} message Message that should be deleted
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.delete_chat_message = async function(chat, message) {
     let response = await axios({
@@ -145,7 +145,7 @@ Client.prototype.delete_chat_message = async function(chat, message) {
  * @param  {Chat|String}    chat    Chat that this message is in
  * @param  {Message|String} message Message that should be edited
  * @param  {String}         content Content that should replace the message's content
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.edit_chat_text_message = async function(chat, message, content) {
     let data = {
@@ -168,7 +168,7 @@ Client.prototype.edit_chat_text_message = async function(chat, message, content)
  * @param  {String}         mode HTTP request type to modify with, `put` or `delete`
  * @param  {User|String}    user User or user id of the user to modify the operator status of
  * @param  {Chat|String}    chat Chat in which to modify operators
- * @return {Number}               Request status code
+ * @return {Object}                    API response
  */
 Client.prototype.modify_chat_operator = async function(mode, user, chat) {
     let data = `operators=${user.id || user}`
@@ -185,9 +185,9 @@ Client.prototype.modify_chat_operator = async function(mode, user, chat) {
 
 /**
  * Upload a file to sendbird's CDN for use in chats
- * @param  {[type]} image_data [description]
- * @param  {[type]} chat       [description]
- * @return {[type]}            [description]
+ * @param  {Stream}         image_data Stream of this image
+ * @param  {Chat|String}    chat=null  Chat to upload this image for
+ * @return {Object}                    API response
  */
 Client.prototype.sendbird_upload = async function(image_data, chat) {
     let data = {
