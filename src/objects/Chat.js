@@ -202,6 +202,19 @@ class Chat extends FreshObject {
     // getters
 
     /**
+     * Most recent message from this chat
+     * @type {Message}
+     */
+    get last_message() {
+        return (async () => {
+            let Message = require('./Message')
+            let data = await this.get('last_message')
+
+            return new Message(data.message_id, this, { client: this.client })
+        })()
+    }
+
+    /**
      * Timestamp of when chats client was invited in seconds
      * @type {Number}
      */
