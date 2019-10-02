@@ -20,10 +20,18 @@ class Chat extends FreshObject {
 
     // generators
 
+    /**
+     * Generator of the messages in this chat
+     * @type {Generator<Message>}
+     */
     get messages() {
         return methods.paginated_generator(this.client.chat_messages_paginated, { chat: this, instance: this.client })
     }
 
+    /**
+     * Generator of the users in this chat
+     * @type {Generator<ChatUser>}
+     */
     get members() {
         return methods.paginated_generator(this.client.chat_members_paginated, { chat: this, instance: this.client })
     }
