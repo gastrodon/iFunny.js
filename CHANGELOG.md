@@ -1,27 +1,27 @@
-### 1.2.0
+### 2.2.0
 - Fix a bug where `Chat.messages` is not getting the next token (why didn't I fix it before?)
 - Move `small/Command.js` -> `ext/Command.js`
 - Add `own_message` handler emitter, for getting messages that were sent by this client (possibly from another connection)
 
-### 1.1.5
+### 2.1.5
 - Fix a bug where `Chat.messages` is not fully iterating
 - Add docs for paginated prototype methods
 - TODO: add docs for the remaining undoc `User` methods
 
-### 1.1.4
+### 2.1.4
 - Fix a bug where `Chat.messages` generator is not passing the correct Client
 - Include all important objects in `index.js`
 
-### 1.1.3
+### 2.1.3
 - Add property `last_message` to the `Chat` class
 
-### 1.1.2
+### 2.1.2
 - Update User-Agent to most recent beta version
 - Add methods to the `Post` class
 - Add methods to the `User` class
 - Add generators to the `Chat` class
 
-### 1.1.1
+### 2.1.1
 - Add `Chat` methods `read`, `add_operator`, `remove_operator`, `join`, `exit`, `invite`, and `kick`
 - Add `Message` methods `delete` and `edit`
 - Add `Invite` methods `accept` and `decline`
@@ -30,7 +30,7 @@
 - Add Client methods for uploading images to iFunny and sendbird
 - Update docs and package info for publishing the library
 
-### 1.1.0
+### 2.1.0
 - Add basic (mostly read-only) classes for objects
 - `Client.login` method
 - `Client.notifications_paginated` and `client.notifications`
