@@ -44,6 +44,7 @@ class Client extends EventEmitter {
         this._prefix = opts.prefix || null
         this._reconnect = opts.reconnect || false
         this.paginated_size = opts.paginated_size || 25
+        this.socket_connected = false
 
         // public values
         this.authorized = false
@@ -218,7 +219,7 @@ class Client extends EventEmitter {
      */
     get command() {
         if (!this._command) {
-            let Command = require('./small/Command')
+            let Command = require('../ext/Command')
             this._command = new Command(this)
         }
 

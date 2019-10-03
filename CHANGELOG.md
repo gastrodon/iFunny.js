@@ -1,3 +1,8 @@
+### 1.2.0
+- Fix a bug where `Chat.messages` is not getting the next token (why didn't I fix it before?)
+- Move `small/Command.js` -> `ext/Command.js`
+- Add `own_message` handler emitter, for getting messages that were sent by this client (possibly from another connection)
+
 ### 1.1.5
 - Fix a bug where `Chat.messages` is not fully iterating
 - Add docs for paginated prototype methods

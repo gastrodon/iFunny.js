@@ -95,8 +95,7 @@ async function compose_comment(text, attachment, mentions) {
 }
 
 async function* paginated_generator(source, opts = {}) {
-    buffer = await source(opts)
-
+    let buffer = await source(opts)
 
     while (true) {
         yield* buffer.items

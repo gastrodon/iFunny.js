@@ -83,7 +83,7 @@ Client.prototype.chat_messages_paginated = async function(opts = {}) {
     }
 
     if (opts.next) {
-        params.message_id = next
+        params.message_id = opts.next
     } else {
         params.message_ts = Date.now()
     }
@@ -96,7 +96,7 @@ Client.prototype.chat_messages_paginated = async function(opts = {}) {
     })
 
     let index = response.data.messages.length - 1
-    let next_id = index >= 0 ? response.data.messages[index] : null
+    let next_id = index >= 0 ? response.data.messages[index].message_id : null
     let messages = response.data.messages.map(
         it => new Message(it.message_id, it.channel_url, { client: instance, data: it })
     )

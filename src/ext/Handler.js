@@ -79,6 +79,7 @@ class Handler extends EventEmitter {
      */
     async on_connect(data) {
         this.client.sendbird_session_key = data.key
+        this.client.socket_connected = true
         this.emit('connect')
         let socket = this.client.socket
         socket._ping_interval(data.ping_interval)
@@ -93,13 +94,19 @@ class Handler extends EventEmitter {
      * @event Handler#message
      * @property {Message} message     message recieved
      */
+    /**
+     * Event emitted when a chat message is recieved that was sent by this client
+     * @event Handler#own_message
+     * @property {Message} message     message recieved
+     */
     async on_message(data) {
-        if (data.user.name == await (await this.client).nick) {
-            return
-        }
         let message = new Message(data.msg_id, data.channel_url, { client: this.client, data: data })
-        message.invoked = await this.client.resolve_command(message)
 
+        if (data.user.name == await (await this.client).nick) {
+            return this.emit('own_message', message)
+        }
+
+        message.invoked = await this.client.resolve_command(message)
         this.emit('message', message)
     }
 

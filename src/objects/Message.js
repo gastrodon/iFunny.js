@@ -105,9 +105,14 @@ class Message extends FreshObject {
      */
     get author() {
         return (async () => {
-            let ChatUser = require('./ChatUser')
             let data = await this.get('user')
-            return new ChatUser(data.user_id, (await this.chat), { client: this.client, data: data })
+
+            if (data) {
+                let ChatUser = require('./ChatUser')
+                return new ChatUser(data.user_id || data.guest_id, (await this.chat), { client: this.client, data: data })
+            }
+
+            return null
         })()
     }
 
@@ -144,12 +149,13 @@ class Message extends FreshObject {
      * Type of message
      * Normal text messages will return `MESG`
      * Messages with files attached will return `FILE`
+     * Info messages will return `ADMM`
      * @type {String}
      */
     get type() {
         return (async () => {
             let type = this.get('type')
-            return type == 'MESG' ? type : 'FILE'
+            return type == 'MESG'
         })
     }
 
@@ -205,8 +211,12 @@ class Message extends FreshObject {
         this._invoked = field
     }
 
-    get msg_id() {
-        return this.get('msg_id')
+    /**
+     * Message creation timestamp in ms
+     * @type {Number}
+     */
+    get created_at() {
+        return this.get('created_at')
     }
 
     get channel_type() {
