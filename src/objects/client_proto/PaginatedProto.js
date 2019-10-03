@@ -24,9 +24,55 @@ Client.prototype.notifications_paginated = async function(opts = {}) {
     return data
 }
 
+/**
+ * Get a chunk of this logged in users chats
+ * @param  {Object}  opts={}       optional parameters
+ * @param  {Number}  opts.limit=25 Number of items to fetch
+ * @return {Promise<Object>}         chunk of chats with paging info
+ */
+Client.prototype.chats_paginated = async function(opts = {}) {
+    let Chat = require('../Chat')
+    let instance = opts.instance || this
+    params = {
+        limit: opts.limit || instance.paginated_size,
+        token: opts.next || null,
+        show_empty: true,
+        show_read_recipt: true,
+        show_member: true,
+        public_mode: 'all',
+        super_mode: 'all',
+        distinct_mode: 'all',
+        member_state_filter: 'all',
+        order: 'latest_last_message'
+    }
+
+    let response = await axios({
+        method: 'get',
+        url: `${instance.sendbird_api}/users/${instance.id_sync}/my_group_channels`,
+        params: params,
+        headers: await instance.sendbird_headers
+    })
+
+    let chats = response.data.channels.map(
+        it => new Chat(it.channel_url, { client: instance, data: it })
+    )
+    return { items: chats, paging: { next: response.data.next } }
+};
+
+/**
+ * Get a chunk of the messages in a chat
+ * @param  {Object}  opts={}       optional parameters
+ * @param  {Number}  opts.limit=25 Number of items to fetch
+ * @param  {Number}  opts.chat    Chat to fetch messages from
+ * @return {Promise<Object>}       Chunk of messages with paging info
+ */
 Client.prototype.chat_messages_paginated = async function(opts = {}) {
     let Message = require('../Message')
     let instance = opts.instance || this
+
+    if (!opts.chat) {
+        throw `a chat is required`
+    }
 
     let params = {
         prev_limit: opts.limit || instance.paginated_size,
@@ -58,6 +104,13 @@ Client.prototype.chat_messages_paginated = async function(opts = {}) {
     return { items: messages, paging: { prev: null, next: next_id } }
 }
 
+/**
+ * Get a chunk of the members of a chat
+ * @param  {Object}  opts={}       optional parameters
+ * @param  {Number}  opts.limit=25 Number of items to fetch
+ * @param  {Number}  opts.chat    Chat to fetch members from
+ * @return {Promise<Object>}         chunk of chat memebrs with paging info
+ */
 Client.prototype.chat_members_paginated = async function(opts = {}) {
     let ChatUser = require('../ChatUser')
     let instance = opts.instance || this
@@ -78,11 +131,11 @@ Client.prototype.chat_members_paginated = async function(opts = {}) {
     })
 
     let members = response.data.members.map(
-        it => new ChatUser(it.user_id, opts.chat, { client: this, chat_data: it })
+        it => new ChatUser(it.user_id, opts.chat, { client: instance, chat_data: it, data: it })
     )
 
     return { items: members, paging: { prev: null, next: response.data.next } }
 
-};
+}
 
 module.exports = Client

@@ -13,6 +13,7 @@ class Image {
         this.url = url
         this.client = opts.client || new Client()
         this.background = opts.background || "000000"
+        this.thumbs = opts.thumbs || {}
     }
 
     /**

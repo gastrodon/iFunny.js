@@ -209,8 +209,10 @@ class Chat extends FreshObject {
         return (async () => {
             let Message = require('./Message')
             let data = await this.get('last_message')
-
-            return new Message(data.message_id, this, { client: this.client })
+            if (data) {
+                return new Message(data.message_id, this, { client: this.client })
+            }
+            return null
         })()
     }
 
@@ -338,7 +340,7 @@ class Chat extends FreshObject {
      */
     get cover() {
         return (async () => {
-            let Image = require('./Image')
+            let Image = require('./small/Image')
             return new Image(await this.get('cover_url'), { client: this.client })
         })()
     }

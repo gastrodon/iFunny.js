@@ -1,3 +1,12 @@
+### 1.1.5
+- Fix a bug where `Chat.messages` is not fully iterating
+- Add docs for paginated prototype methods
+- TODO: add docs for the remaining undoc `User` methods
+
+### 1.1.4
+- Fix a bug where `Chat.messages` generator is not passing the correct Client
+- Include all important objects in `index.js`
+
 ### 1.1.3
 - Add property `last_message` to the `Chat` class
 

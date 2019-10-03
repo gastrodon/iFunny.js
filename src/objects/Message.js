@@ -6,15 +6,11 @@ const axios = require('axios')
  * @extends {FreshObject}
  */
 class Message extends FreshObject {
-    constructor(id, channel, opts = {}) {
+    constructor(id, chat, opts = {}) {
         super(id, opts)
         this._invoked = null
 
-        if (typeof(channel) == 'object') {
-            channel = channel.url
-        }
-
-        this.url = `${this.sendbird_api}/group_channels/${channel}/messages/${id}`
+        this.url = `${this.sendbird_api}/group_channels/${chat.channel_url || chat}/messages/${id}`
     }
 
     // methods
@@ -111,7 +107,7 @@ class Message extends FreshObject {
         return (async () => {
             let ChatUser = require('./ChatUser')
             let data = await this.get('user')
-            return new ChatUser(data.guest_id, (await this.chat), { client: this.client, data: data })
+            return new ChatUser(data.user_id, (await this.chat), { client: this.client, data: data })
         })()
     }
 

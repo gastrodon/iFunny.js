@@ -163,7 +163,18 @@ class Client extends EventEmitter {
         return methods.paginated_generator(this.notifications_paginated, { instance: this })
     }
 
+    get chats() {
+        return methods.paginated_generator(this.chats_paginated, { instance: this })
+    }
+
     // getters
+
+    get user() {
+        return (async () => {
+            let User = require('./User')
+            return new User(await this.id, { client: this })
+        })()
+    }
 
     get next_req_id() {
         return (this.req_id++)

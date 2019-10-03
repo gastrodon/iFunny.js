@@ -60,6 +60,7 @@ class User extends FreshObject {
             throw error
         }
     }
+
     /**
      * Unblock this user
      * @param  {String}         type   Type of block to use
@@ -271,6 +272,26 @@ class User extends FreshObject {
      */
     get is_deleted() {
         return this.get('is_deleted')
+    }
+
+    get profile_image() {
+        return (async () => {
+            let Image = require('./small/Image')
+            let data = await this.get('photo')
+            if (data) {
+                return new Image(data.url, { client: this, background: data.bg_color, thumbs: data.thumb })
+            }
+        })()
+    }
+
+    get cover_iamge() {
+        return (async () => {
+            let Image = require('./small/Image')
+            let data = await this.get('cover_url')
+            if (data) {
+                return new Image(data, { client: this, background: await this.get('cover_url', undefined) })
+            }
+        })()
     }
 
     // authentication dependent properties
