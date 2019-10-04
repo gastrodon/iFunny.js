@@ -1,3 +1,6 @@
+### 2.2.1
+- async config getter
+
 ### 2.2.0
 - Fix a bug where `Chat.messages` is not getting the next token (why didn't I fix it before?)
 - Move `small/Command.js` -> `ext/Command.js`

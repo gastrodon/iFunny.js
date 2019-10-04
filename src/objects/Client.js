@@ -248,8 +248,10 @@ class Client extends EventEmitter {
      * @type {String}
      */
     get basic_token() {
-        if (this.config.basic_token) {
-            return this.config.basic_token
+      return (async () => {
+
+        if ((await this.config).basic_token) {
+            return (await this.config).basic_token
         }
 
         let hex = ['A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
@@ -270,6 +272,7 @@ class Client extends EventEmitter {
         this.config = this._config
 
         return auth
+      })()
 
     }
 
@@ -282,7 +285,7 @@ class Client extends EventEmitter {
         return (async () => {
             return {
                 'User-Agent': this._user_agent,
-                'Authorization': this._token ? `Bearer ${this._token}` : `Basic ${this.basic_token}`
+                'Authorization': this._token ? `Bearer ${this._token}` : `Basic ${await this.basic_token}`
             }
         })()
     }
@@ -324,6 +327,8 @@ class Client extends EventEmitter {
      * @type {Object}
      */
     get config() {
+      return (async () => {
+
         if (!this._config) {
 
             if (!fs.existsSync(this._config_path)) {
@@ -334,6 +339,7 @@ class Client extends EventEmitter {
         }
 
         return this._config
+      })()
     }
 
     /**

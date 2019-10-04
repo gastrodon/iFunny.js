@@ -24,7 +24,7 @@ Client.prototype.update_nick = async function(nick) {
         url: `${this.api}/account`,
         data: qs.stringify(data),
         headers: await this.headers
-    }).catch(e => { console.log(e); })
+    })
 
     return response
 }
@@ -87,8 +87,10 @@ Client.prototype.login = async function(email, password, opts = { force: false }
         throw 'email is required'
     }
 
-    if (this.config[`bearer ${email}`] && !opts.force) {
-        this._token = this.config[`bearer ${email}`]
+    config = await this.config
+
+    if (config[`bearer ${email}`] && !opts.force) {
+        this._token = config[`bearer ${email}`]
 
         try {
             let response = await axios({
