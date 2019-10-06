@@ -18,7 +18,7 @@ class Image {
 
     /**
      * Raw content of this image
-     * @type {String}
+     * @type {Promise<String>}
      */
     get content() {
         return (async () => {

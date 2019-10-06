@@ -22,7 +22,7 @@ class Chat extends FreshObject {
 
     /**
      * Generator of the messages in this chat
-     * @type {Generator<Message>}
+     * @type {Promise<Generator<Message>>}
      */
     get messages() {
         return methods.paginated_generator(this.client.chat_messages_paginated, { chat: this, instance: this.client })
@@ -30,7 +30,7 @@ class Chat extends FreshObject {
 
     /**
      * Generator of the users in this chat
-     * @type {Generator<ChatUser>}
+     * @type {Promise<Generator<ChatUser>>}
      */
     get members() {
         return methods.paginated_generator(this.client.chat_members_paginated, { chat: this, instance: this.client })
@@ -203,7 +203,7 @@ class Chat extends FreshObject {
 
     /**
      * Most recent message from this chat
-     * @type {Message}
+     * @type {Promise<Message>}
      */
     get last_message() {
         return (async () => {
@@ -218,7 +218,7 @@ class Chat extends FreshObject {
 
     /**
      * Timestamp of when chats client was invited in seconds
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get invited_at() {
         return this.get('invited_at')
@@ -229,7 +229,7 @@ class Chat extends FreshObject {
      * Public groups are `opengroup`
      * Private groups are `group`
      * Direct messages are `chat`
-     * @type {String}
+     * @type {Promise<String>}
      */
     get type() {
         return this.get('custom_type')
@@ -237,7 +237,7 @@ class Chat extends FreshObject {
 
     /**
      * Is this a public group?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_public() {
         return (async () => {
@@ -247,7 +247,7 @@ class Chat extends FreshObject {
 
     /**
      * Is this group private?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_private() {
         return (async () => {
@@ -257,7 +257,7 @@ class Chat extends FreshObject {
 
     /**
      * Is this a direct message?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_direct() {
         return (async () => {
@@ -269,7 +269,7 @@ class Chat extends FreshObject {
      * This clients state in this group
      * Users who have joined are joined
      * Users who have a pending invite are invited
-     * @type {String}
+     * @type {Promise<String>}
      */
     get state() {
         return this.get('member_state')
@@ -277,17 +277,18 @@ class Chat extends FreshObject {
 
     /**
      * Is this group frozen?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_frozen() {
         return (async () => {
-            return (await this.meta).frozen
+            return (await this.meta)
+                .frozen
         })()
     }
 
     /**
      * Is this group hidden?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_hidden() {
         return this.get('is_hidden')
@@ -295,7 +296,7 @@ class Chat extends FreshObject {
 
     /**
      * Are push notifications enabled for this client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_push_enabled() {
         return this.get('is_push_enabled')
@@ -304,7 +305,7 @@ class Chat extends FreshObject {
     /**
      * Number of members who have been invited
      * but have not necessarily joined
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get member_count() {
         return this.get('member_count')
@@ -312,7 +313,7 @@ class Chat extends FreshObject {
 
     /**
      * Number of members who have joined
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get joined_member_count() {
         return this.get('joined_member_count')
@@ -320,7 +321,7 @@ class Chat extends FreshObject {
 
     /**
      * Is this group discoverable?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_discoverable() {
         return this.get('is_discoverable')
@@ -328,7 +329,7 @@ class Chat extends FreshObject {
 
     /**
      * Unread message count
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get unread_count() {
         return this.get('unread_message_count')
@@ -336,7 +337,7 @@ class Chat extends FreshObject {
 
     /**
      * This groups cover images
-     * @type {Image}
+     * @type {Promise<Image>}
      */
     get cover() {
         return (async () => {
@@ -347,40 +348,44 @@ class Chat extends FreshObject {
 
     /**
      * This groups metadata
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get meta() {
         return (async () => {
-            return JSON.parse(await this.get('data')).chatInfo || {}
+            return JSON.parse(await this.get('data'))
+                .chatInfo || {}
         })()
     }
 
     /**
      * The operators of this group
-     * @type {Array<ChatUser>}
+     * @type {Promise<Array<ChatUser>>}
      */
     get operators() {
         return (async () => {
             let ChatUser = require('./ChatUser')
-            return ((await this.meta).operatorsIdList || []).map(
-                id => new ChatUser(id, this, { client: this.client })
-            )
+            return ((await this.meta)
+                    .operatorsIdList || [])
+                .map(
+                    id => new ChatUser(id, this, { client: this.client })
+                )
         })()
     }
 
     /**
      * Permalink to this chat
-     * @type {String}
+     * @type {Promise<String>}
      */
     get link() {
         return (async () => {
-            return (await this.meta).permalink
+            return (await this.meta)
+                .permalink
         })()
     }
 
     /**
      * Channel name
-     * @type {String}
+     * @type {Promise<String>}
      */
     get name() {
         return this.get('name')
@@ -388,7 +393,7 @@ class Chat extends FreshObject {
 
     /**
      * Alias to `this.name`
-     * @type {String}
+     * @type {Promise<String>}
      */
     get title() {
         return this.name
@@ -396,7 +401,7 @@ class Chat extends FreshObject {
 
     /**
      * Timestamp of chat creation in seconds
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get created_at() {
         return this.get('created_at')
@@ -404,7 +409,7 @@ class Chat extends FreshObject {
 
     /**
      * Is this chat muted by the client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_muted() {
         return this.get('muted')
@@ -412,7 +417,7 @@ class Chat extends FreshObject {
 
     /**
      * A ChatUser of this client in this chat
-     * @type {ChatUser}
+     * @type {Promise<ChatUser>}
      */
     get me() {
         return (async () => {
@@ -423,7 +428,7 @@ class Chat extends FreshObject {
 
     /**
      * Total number of messages in this chat
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get message_count() {
         return this.client.chat_message_total(this)

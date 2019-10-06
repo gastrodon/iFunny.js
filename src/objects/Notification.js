@@ -19,7 +19,7 @@ class Notification {
 
     /**
      * The type of Notification
-     * @type {String}
+     * @type {Promise<String>}
      */
     get type() {
         return this.get('type')
@@ -27,7 +27,7 @@ class Notification {
 
     /**
      * Title of this Notification, if achievement get
-     * @type {String|null}
+     * @type {Promise<String|null>}
      */
     get title() {
         return this.get('title')
@@ -35,7 +35,7 @@ class Notification {
 
     /**
      * Description of this Notification, if achievement get
-     * @type {String|null}
+     * @type {Promise<String|null>}
      */
     get description() {
         return this.get('text')
@@ -43,7 +43,7 @@ class Notification {
 
     /**
      * The User of this Notification, usually the one who caused it, if any
-     * @type {User|null}
+     * @type {Promise<User|null>}
      */
     get user() {
         return (async () => {
@@ -61,7 +61,7 @@ class Notification {
 
     /**
      * The Comment attached to this Notification, if any
-     * @type {Comment|null}
+     * @type {Promise<Comment|null>}
      */
     get comment() {
         return (async () => {
@@ -78,7 +78,7 @@ class Notification {
 
     /**
      * The Post that is attached to this Notification, if any
-     * @type {Post|null}
+     * @type {Promise<Post|null>}
      */
     get post() {
         return (async () => {
@@ -96,7 +96,7 @@ class Notification {
 
     /**
      * Timestamp of Notification recieved
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get created_at() {
         return this.get(date)
@@ -104,7 +104,7 @@ class Notification {
 
     /**
      * Smile count, if smile tracker Notification
-     * @type {Number|null}
+     * @type {Promise<Number|null>}
      */
     get smile_count() {
         return this.get(smiles, null)

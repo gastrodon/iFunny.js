@@ -108,8 +108,8 @@ Client.prototype.chat_messages_paginated = async function(opts = {}) {
  * Get a chunk of the members of a chat
  * @param  {Object}  opts={}       optional parameters
  * @param  {Number}  opts.limit=25 Number of items to fetch
- * @param  {Number}  opts.chat    Chat to fetch members from
- * @return {Promise<Object>}         chunk of chat memebrs with paging info
+ * @param  {Number}  opts.chat     Chat to fetch members from
+ * @return {Promise<Object>}       Chunk of chat memebrs with paging info
  */
 Client.prototype.chat_members_paginated = async function(opts = {}) {
     let ChatUser = require('../ChatUser')
@@ -137,5 +137,29 @@ Client.prototype.chat_members_paginated = async function(opts = {}) {
     return { items: members, paging: { prev: null, next: response.data.next } }
 
 }
+
+/**
+ * Get a chunk of posts from the feed of a channel
+ * @param  {Object}  opts={}            optional parameters
+ * @param  {Number}  opts.limit=25      Number of items to fetch
+ * @param  {Number}  opts.channel       Channel to fetch posts from
+ * @return {Promise<Object>}            Chunk of chat memebrs with paging info
+ */
+Client.prototype.channel_feed_paginated = async function(opts = {}) {
+    let Post = require('../Post')
+    let instance = opts.instance || this
+
+    let params = {
+        limit: opts.limit || instance.paginated_size
+    }
+
+    if (opts.next) {
+        params.next = opts.next
+    }
+
+    let data = await methods.paginated_data(`${instance.api}/channels/${opts.channel.id || opts.channel}/items`)
+    data.items = data.items.map((item) => new Post(item.id, { client: instance, data: item }))
+    return data
+};
 
 module.exports = Client

@@ -1,3 +1,8 @@
+### 2.3.0
+- `Channel` class
+- `Digest` class
+- Docs now specify return type of `Promise<*>`
+
 ### 2.2.1
 - async config getter
 

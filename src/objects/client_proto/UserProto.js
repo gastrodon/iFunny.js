@@ -4,7 +4,7 @@ const axios = require('axios')
 /**
  * Find the user with a given nick
  * @param  {String}    nick Nick of this user
- * @return {User|Null}      User that was found, if any
+ * @return {Promise<User|Null>}      User that was found, if any
  */
 Client.prototype.user_by_nick = async function(nick) {
     try {
@@ -29,7 +29,7 @@ Client.prototype.user_by_nick = async function(nick) {
  * Modify the client subscription status of a user
  * @param  {String}         method To `put` or `delete` this subscription
  * @param  {User|String}    user   User to modify the subscription of
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.modify_user_subscription_status = async function(method, user) {
     let response = await axios({
@@ -45,7 +45,7 @@ Client.prototype.modify_user_subscription_status = async function(method, user) 
  * Modify the client updates subscription status of a user
  * @param  {String}         method To `put` or `delete` this subscription
  * @param  {User|String}    user   User to modify the subscription of
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.modify_user_updates_subscription_status = async function(method, user) {
     let response = await axios({
@@ -67,7 +67,7 @@ Client.prototype.modify_user_updates_subscription_status = async function(method
  *
  *`installation`    -> block all accounts owned by a user
  *
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.modify_block_of_user = async function(method, user, type) {
     let params = {
@@ -99,7 +99,7 @@ Client.prototype.modify_block_of_user = async function(method, user, type) {
  *
  * `target` -> targeted harrassment
  *
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.report_user = async function(user, type) {
     let params = {

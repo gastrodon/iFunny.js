@@ -4,5 +4,6 @@ module.exports = {
     UserProto: require('./UserProto'),
     AccountProto: require('./AccountProto'),
     PostProto: require('./PostProto'),
-    PaginatedProto: require('./PaginatedProto')
+    PaginatedProto: require('./PaginatedProto'),
+    DigestProto: require('./DigestProto')
 }

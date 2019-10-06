@@ -79,7 +79,8 @@ class Client extends EventEmitter {
 
         let content = await message.content
         let c_name = content.split(" ")[0].slice(slice)
-        let args = content.split(" ").slice(1)
+        let args = content.split(" ")
+            .slice(1)
 
         if (this._commands.has(c_name)) {
             this.command.emit(c_name, message, args)
@@ -158,7 +159,7 @@ class Client extends EventEmitter {
 
     /**
      * Generator iterating through logged in users notifications
-     * @type {Generator<Notification>}
+     * @type {Promise<Generator<Notification>>}
      */
     get notifications() {
         return methods.paginated_generator(this.notifications_paginated, { instance: this })
@@ -185,7 +186,7 @@ class Client extends EventEmitter {
      * This clients websocket hadnler
      * If none has been created one will be
      * created when this value is requested
-     * @type {Handler}
+     * @type {Promise<Handler>}
      */
     get handler() {
         if (!this._handler) {
@@ -200,7 +201,7 @@ class Client extends EventEmitter {
      * This clients websocket
      * If none has been created one will be
      * created when this value is requested
-     * @type {Socket}
+     * @type {Promise<Socket>}
      */
     get socket() {
         if (!this._socket) {
@@ -215,7 +216,7 @@ class Client extends EventEmitter {
      * This clients command emitter
      * If none has been created one will be
      * created when this value is requested
-     * @type {EventEmitter}
+     * @type {Promise<EventEmitter>}
      */
     get command() {
         if (!this._command) {
@@ -228,7 +229,7 @@ class Client extends EventEmitter {
 
     /**
      * iFunny api url
-     * @type {String}
+     * @type {Promise<String>}
      */
     get api() {
         return 'https://api.ifunny.mobi/v4'
@@ -236,7 +237,7 @@ class Client extends EventEmitter {
 
     /**
      * sendbird api url
-     * @type {String}
+     * @type {Promise<String>}
      */
     get sendbird_api() {
         return 'https://api-us-1.sendbird.com/v3'
@@ -245,41 +246,44 @@ class Client extends EventEmitter {
     /**
      * iFunny basic auth token
      * If none is stored in this client's config, one will be generated
-     * @type {String}
+     * @type {Promise<String>}
      */
     get basic_token() {
-      return (async () => {
+        return (async () => {
 
-        if ((await this.config).basic_token) {
-            return (await this.config).basic_token
-        }
+            if ((await this.config)
+                .basic_token) {
+                return (await this.config)
+                    .basic_token
+            }
 
-        let hex = ['A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-        let hex_array = []
-        let range = hex.length
+            let hex = ['A', 'B', 'C', 'D', 'E', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+            let hex_array = []
+            let range = hex.length
 
-        for (let _ of Array(64)) {
-            hex_array.push(hex[Math.floor(Math.random() * range)])
-        }
+            for (let _ of Array(64)) {
+                hex_array.push(hex[Math.floor(Math.random() * range)])
+            }
 
-        const hex_String = hex_array.join('')
-        const hex_id = `${hex_String}_${this._client_id}`
-        const hash_decoded = `${hex_String}:${this._client_id}:${this._client_secret}`
-        const hash_encoded = sha1(hash_decoded)
-        const auth = Buffer.from(`${hex_id}:${hash_encoded}`).toString('base64')
+            const hex_String = hex_array.join('')
+            const hex_id = `${hex_String}_${this._client_id}`
+            const hash_decoded = `${hex_String}:${this._client_id}:${this._client_secret}`
+            const hash_encoded = sha1(hash_decoded)
+            const auth = Buffer.from(`${hex_id}:${hash_encoded}`)
+                .toString('base64')
 
-        this._config.basic_token = auth
-        this.config = this._config
+            this._config.basic_token = auth
+            this.config = this._config
 
-        return auth
-      })()
+            return auth
+        })()
 
     }
 
     /**
      * iFunny headers, needed for all requests
      * Will use which appropriate authentication is available
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get headers() {
         return (async () => {
@@ -292,7 +296,7 @@ class Client extends EventEmitter {
 
     /**
      * Sendbird headers, needed for all sendbird requests
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get sendbird_headers() {
         return (async () => {
@@ -306,7 +310,7 @@ class Client extends EventEmitter {
     /**
      * Sendbird session key, needed
      * to talk to iFunny's websocket
-     * @type {String}
+     * @type {Promise<String>}
      */
     get sendbird_session_key() {
         return (async () => {
@@ -316,7 +320,7 @@ class Client extends EventEmitter {
 
     /**
      * Update this clients session key
-     * @type {String}
+     * @type {Promise<String>}
      */
     set sendbird_session_key(value) {
         this._sendbird_session_key = value
@@ -324,28 +328,28 @@ class Client extends EventEmitter {
 
     /**
      * This objects config, loaded from and written to a json file
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get config() {
-      return (async () => {
+        return (async () => {
 
-        if (!this._config) {
+            if (!this._config) {
 
-            if (!fs.existsSync(this._config_path)) {
-                fs.writeFileSync(this._config_path, '{}')
+                if (!fs.existsSync(this._config_path)) {
+                    fs.writeFileSync(this._config_path, '{}')
+                }
+
+                this._config = JSON.parse(fs.readFileSync(this._config_path))
             }
 
-            this._config = JSON.parse(fs.readFileSync(this._config_path))
-        }
-
-        return this._config
-      })()
+            return this._config
+        })()
     }
 
     /**
      * Update this clients config
      * and write it to the config file
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     set config(value) {
         if (typeof(value) !== 'object') {
@@ -358,7 +362,7 @@ class Client extends EventEmitter {
 
     /**
      * Set the update flag and return this object for fetching new data
-     * @type {Client}
+     * @type {Promise<Client>}
      */
     get fresh() {
         this._update = true
@@ -367,7 +371,7 @@ class Client extends EventEmitter {
 
     /**
      * This clients phone number
-     * @type {String}
+     * @type {Promise<String>}
      */
     get phone_number() {
         return this.get('phone')
@@ -381,7 +385,7 @@ class Client extends EventEmitter {
      * This clients messenger token
      * Used to start a sendbird connection, but should be replaced
      * when a new one is given by the connection
-     * @type {String}
+     * @type {Promise<String>}
      */
     get messenger_token() {
         return (async () => {
@@ -397,7 +401,7 @@ class Client extends EventEmitter {
      * This clients messenger token
      * Used to start a sendbird connection, but should be replaced
      * when a new one is given by the connection
-     * @type {String}
+     * @type {Promise<String>}
      */
     get id() {
         return (async () => {
@@ -407,7 +411,7 @@ class Client extends EventEmitter {
 
     /**
      * Has this client started using chat before?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_chat_active() {
         return this.get('messenger_active')
@@ -415,7 +419,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client blocked from using chat?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_blocked_in_chat() {
         return this.get('is_blocked_in_messenger')
@@ -423,7 +427,7 @@ class Client extends EventEmitter {
 
     /**
      * Is safe mode enabled for this client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_safe_mode_enabled() {
         return this.get('safe_mode')
@@ -431,7 +435,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client an iFunny moderator?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_moderator() {
         return this.get('is_moderator')
@@ -439,7 +443,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client an iFunny team member?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_ifunny_team_member() {
         return this.get('is_ifunny_team_member')
@@ -447,7 +451,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client a verified user?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_verified() {
         return this.get('is_verified')
@@ -455,7 +459,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client banned?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_banned() {
         return this.get('is_banned')
@@ -463,7 +467,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client deactivated?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_deactivated() {
         return this.get('is_deleted')
@@ -471,7 +475,7 @@ class Client extends EventEmitter {
 
     /**
      * Is this client private?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_private() {
         return this.get('is_private')
@@ -485,7 +489,7 @@ class Client extends EventEmitter {
      * `subscribers` allows new messages from users who a subscription of this user
      *
      * `closed` allows no messaging initiation on this user
-     * @type {String}
+     * @type {Promise<String>}
      */
     get chat_privacy() {
         return this.get('messaging_privacy_status') === 1
@@ -493,7 +497,7 @@ class Client extends EventEmitter {
 
     /**
      * Does this client have unnotified bans?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get has_unnotified_bans() {
         return this.get('have_unnotified_bans')
@@ -501,7 +505,7 @@ class Client extends EventEmitter {
 
     /**
      * Does this client have unnotified strikes?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get has_unnotified_strikes() {
         return this.get('have_unnotified_strikes')
@@ -509,7 +513,7 @@ class Client extends EventEmitter {
 
     /**
      * Does this client have unnotified achievements?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get has_unnotified_achievements() {
         return this.get('have_unnotified_achievements')
@@ -517,7 +521,7 @@ class Client extends EventEmitter {
 
     /**
      * Does this client have notifications of another category?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get has_unnotifieds() {
         return this.get('have_unnotifieds')
@@ -525,7 +529,7 @@ class Client extends EventEmitter {
 
     /**
      * Does this client need to go through account setup?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get needs_account_setup() {
         return this.get('need_account_setup')
@@ -533,7 +537,7 @@ class Client extends EventEmitter {
 
     /**
      * Sharable web url to this clients account
-     * @type {String}
+     * @type {Promise<String>}
      */
     get web_url() {
         return this.get('web_url')
@@ -541,7 +545,7 @@ class Client extends EventEmitter {
 
     /**
      * This clients registered email address
-     * @type {String}
+     * @type {Promise<String>}
      */
     get email() {
         return this.get('email')
@@ -549,7 +553,7 @@ class Client extends EventEmitter {
 
     /**
      * This clients nick
-     * @type {String}
+     * @type {Promise<String>}
      */
     get nick() {
         return this.get('nick')
@@ -557,7 +561,7 @@ class Client extends EventEmitter {
 
     /**
      * This clients about
-     * @type {String}
+     * @type {Promise<String>}
      */
     get about() {
         return this.get('about')

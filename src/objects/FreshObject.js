@@ -85,7 +85,7 @@ class FreshObject extends EventEmitter {
 
     /**
      * Shortcut for `this.client.headers`
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get headers() {
         return this.client.headers
@@ -93,7 +93,7 @@ class FreshObject extends EventEmitter {
 
     /**
      * Shortcut for `this.client.sendbird_headers`
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get sendbird_headers() {
         return this.client.sendbird_headers

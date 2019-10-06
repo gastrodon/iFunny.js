@@ -10,7 +10,7 @@ const { compose_comment } = require('../../utils/methods')
  * @param  {String} text=null                           Text of this reply
  * @param  {Post|String} attachment=null                Post to attach to the reply
  * @param  {Array<User>|Array<String>} mentions=null    Users to mention in this reply
- * @return {Object}                                     API response
+ * @return {Promise<Object>}                                     API response
  */
 Client.prototype.add_reply_to_comment = async function(comment, post, text, attachment, mentions) {
     let data = compose_comment(text, attachment, mentions)
@@ -29,7 +29,7 @@ Client.prototype.add_reply_to_comment = async function(comment, post, text, atta
  * Delete a comment
  * @param  {Comment|String} comment Comment that should be deleted
  * @param  {Post|String}       post Post where the comment exists
- * @return {Object}                 API response
+ * @return {Promise<Object>}                 API response
  */
 Client.prototype.delete_comment = async function(comment, post) {
     let response = await axios({
@@ -45,7 +45,7 @@ Client.prototype.delete_comment = async function(comment, post) {
  * @param  {Comment|String}    comment   Post to modify the smile on
  * @param  {Post|String}       post      Post where the comment exists
  * @param  {String}            method    To `put` or `delete` a smile on this post
- * @return {Object}                      API response
+ * @return {Promise<Object>}                      API response
  */
 Client.prototype.modify_comment_smile = async function(comment, post, method) {
     let response = await axios({
@@ -60,7 +60,7 @@ Client.prototype.modify_comment_smile = async function(comment, post, method) {
  * @param  {Comment|String}    comment   Post to modify the unsmile on
  * @param  {Post|String}       post      Post where the comment exists
  * @param  {String}            method    To `put` or `delete` a unsmile on this post
- * @return {Object}                      API response
+ * @return {Promise<Object>}                      API response
  */
 Client.prototype.modify_comment_unsmile = async function(comment, post, method) {
     let response = await axios({
@@ -86,7 +86,7 @@ Client.prototype.modify_comment_unsmile = async function(comment, post, method) 
  *
  * `target` -> targeted harrassment
  *
- * @return {Object}              API response
+ * @return {Promise<Object>}              API response
  */
 Client.prototype.report_comment = async function(comment, post, type) {
     let params = {

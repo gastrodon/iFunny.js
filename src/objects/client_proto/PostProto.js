@@ -9,7 +9,7 @@ const { compose_comment } = require('../../utils/methods')
  * @param  {String} text=null                           Text of this comment
  * @param  {Post|String} attachment=null                Post to attach to the comment
  * @param  {Array<User>|Array<String>} mentions=null    Users to mention in this comment
- * @return {Object}                                     API response
+ * @return {Promise<Object>}                                     API response
  */
 Client.prototype.add_comment_to_post = async function(post, text, attachment, mentions) {
     let data = compose_comment(text, attachment, mentions)
@@ -28,7 +28,7 @@ Client.prototype.add_comment_to_post = async function(post, text, attachment, me
  * Modify the smile status of this client on a post
  * @param  {Post|String}    post   Post to modify the smile on
  * @param  {String}         method To `put` or `delete` a smile on this post
- * @return {Object}                API response
+ * @return {Promise<Object>}                API response
  */
 Client.prototype.modify_post_smile = async function(post, method) {
     let response = await axios({
@@ -44,7 +44,7 @@ Client.prototype.modify_post_smile = async function(post, method) {
  * Modify the unsmile status of this client on a post
  * @param  {Post|String}    post   Post to modify the unsmile on
  * @param  {String}         method To `put` or `delete` a unsmile on this post
- * @return {Object}                API response
+ * @return {Promise<Object>}                API response
  */
 Client.prototype.modify_post_unsmile = async function(post, method) {
     let response = await axios({
@@ -60,7 +60,7 @@ Client.prototype.modify_post_unsmile = async function(post, method) {
  * Modify the republish status of this client on a post
  * @param  {Post|String}    post   Post to modify the republish status on
  * @param  {String}         method To `put` or `delete` a republish on this post
- * @return {Object}                API response
+ * @return {Promise<Object>}                API response
  */
 Client.prototype.modify_post_republish = async function(post, method) {
     let response = await axios({
@@ -85,7 +85,7 @@ Client.prototype.modify_post_republish = async function(post, method) {
  *
  * `target` -> targeted harrassment
  *
- * @return {Object}              API response
+ * @return {Promise<Object>}              API response
  */
 Client.prototype.report_post = async function(post, type) {
     let params = {
@@ -106,7 +106,7 @@ Client.prototype.report_post = async function(post, type) {
  * Modify the tags on a post
  * @param  {Post|String}    post Post to modify the tags of
  * @param  {Array<String>}  tags Tags to use on this post
- * @return {Object}              API response
+ * @return {Promise<Object>}              API response
  */
 Client.prototype.modify_post_tags = async function(post, tags) {
     let data = {
@@ -128,7 +128,7 @@ Client.prototype.modify_post_tags = async function(post, tags) {
 /**
  * Delete a post
  * @param  {Post|String} post Post to delete
- * @return {Object}           API response
+ * @return {Promise<Object>}           API response
  */
 Client.prototype.delete_post = async function(post) {
     let response = axios({
@@ -144,7 +144,7 @@ Client.prototype.delete_post = async function(post) {
  * Modify the pinned status of a post
  * @param  {Post|String}    post   Post to pin or unpin
  * @param  {String}         method To `put` or `delete` a pin on a post
- * @return {Object}                API response
+ * @return {Promise<Object>}                API response
  */
 Client.prototype.modify_post_pinned_status = async function(post, method) {
     let response = await axios({
@@ -160,7 +160,7 @@ Client.prototype.modify_post_pinned_status = async function(post, method) {
  * Modify the scheduled post time of a pending delayed post
  * @param  {Post|String}    post Post to modify the schedule of
  * @param  {Number}         time Timestamp in seconds to publish this post at
- * @return {Object}              API response
+ * @return {Promise<Object>}              API response
  */
 Client.prototype.modify_delayed_post_schedule = async function(post, time) {
     let data = {
@@ -186,7 +186,7 @@ Client.prototype.modify_delayed_post_schedule = async function(post, time) {
  *
  * `subscribers` -> appear only in subscriber and timeline feeds
  *
- * @return {Object}                    API response
+ * @return {Promise<Object>}                    API response
  */
 Client.prototype.modify_delayed_post_visibility = async function(post, visibility) {
     let data = {
@@ -206,7 +206,7 @@ Client.prototype.modify_delayed_post_visibility = async function(post, visibilit
 /**
  * Mark a post as read by this client
  * @param  {Post|String} post Post to mark as read
- * @return {Object}           API response
+ * @return {Promise<Object>}           API response
  */
 Client.prototype.read_post = async function(post) {
     let response = await axios({

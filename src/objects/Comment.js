@@ -17,8 +17,7 @@ class Comment extends FreshObject {
         super(id, opts)
         this.url = `${this.api}/content/${post}/comments/${this.id}`
         this._object_payload = opts.data || {}
-        post = post.id || post
-        this._post_id = post
+        this._post_id = post.id || post
     }
 
     async get(key, fallback = null) {
@@ -41,7 +40,7 @@ class Comment extends FreshObject {
 
     /**
      * The Post that this comment is on
-     * @type {Post}
+     * @type {Promise<Post>}
      */
     get post() {
         return (async () => {
@@ -53,7 +52,7 @@ class Comment extends FreshObject {
 
     /**
      * The User who authored this comment
-     * @type {User}
+     * @type {Promise<User>}
      */
     get author() {
         return (async () => {
@@ -65,7 +64,7 @@ class Comment extends FreshObject {
 
     /**
      * The most recent reply to this Comment
-     * @type {Comment}
+     * @type {Promise<Comment>}
      */
     get last_reply() {
         return (async () => {
@@ -76,11 +75,12 @@ class Comment extends FreshObject {
 
     /**
      * The post in this comment, if any
-     * @type {Post|None}
+     * @type {Promise<Post|None>}
      */
     get attached_post() {
         return (async () => {
-            let data = await this.get(attachments).content
+            let data = await this.get(attachments)
+                .content
 
             if (!data) {
                 return null
@@ -97,7 +97,7 @@ class Comment extends FreshObject {
      * Top comments are top.
      * Deleted comments are deleted
      * Other comments are normal
-     * @type {String}
+     * @type {Promise<String>}
      */
     get state() {
         return this.get('state')
@@ -105,7 +105,7 @@ class Comment extends FreshObject {
 
     /**
      * Comment creation timestamp
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get created_at() {
         return this.get('date')
@@ -113,7 +113,7 @@ class Comment extends FreshObject {
 
     /**
      * Text content of this comment
-     * @type {String|null}
+     * @type {Promise<String|null>}
      */
     get text() {
         return this.get('text')
@@ -121,7 +121,7 @@ class Comment extends FreshObject {
 
     /**
      * Is this comment a reply?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_reply() {
         return this.get('is_reply')
@@ -129,7 +129,7 @@ class Comment extends FreshObject {
 
     /**
      * Was this comment smiled by the bound Client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_smiled() {
         return this.get('is_smiled')
@@ -137,7 +137,7 @@ class Comment extends FreshObject {
 
     /**
      * Was this comment unsmiled by the bound Client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_unsmiled() {
         return this.get('is_unsmiled')
@@ -145,7 +145,7 @@ class Comment extends FreshObject {
 
     /**
      * Has this comment been edited?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_edited() {
         return this.get('is_edited')
@@ -153,31 +153,34 @@ class Comment extends FreshObject {
 
     /**
      * Number of smiles that this comment has
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get smile_count() {
         return (async () => {
-            return await this.get('num').smiles
+            return await this.get('num')
+                .smiles
         })()
     }
 
     /**
      * Number of unsmiles that this comment has
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get unsmile_count() {
         return (async () => {
-            return await this.get('num').unsmiles
+            return await this.get('num')
+                .unsmiles
         })()
     }
 
     /**
      * Number of replies to this comment
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get reply_count() {
         return (async () => {
-            return await this.get('num').replies
+            return await this.get('num')
+                .replies
         })()
     }
 

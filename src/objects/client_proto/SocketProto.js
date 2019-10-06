@@ -44,12 +44,12 @@ Client.prototype.send_image_message = async function(url, chat, opts = {}) {
         }],
         'channel_url': chat.channel_url || chat,
         'url': url,
-        'name': opts.file_name || url.split('/')[url.split('/').length - 1],
+        'name': opts.file_name || url.split('/')[url.split('/')
+            .length - 1],
         'type': opts.file_type || await methods.determine_mime(url)
     }
 
     this.send_to_socket(`FILE${JSON.stringify(data)}\n`)
-
 }
 
 /**

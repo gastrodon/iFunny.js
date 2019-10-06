@@ -29,7 +29,7 @@ class Invite {
 
     /**
      * Accept this invite
-     * @return {Chat} The chat that this user did join
+     * @return {Promise<Chat>} The chat that this user did join
      */
     async accept() {
         await this.client.modify_pending_invite('accept', await this.chat)
@@ -38,7 +38,7 @@ class Invite {
 
     /**
      * Decline this invite
-     * @return {Chat} The chat that this user did not join
+     * @return {Promise<Chat>} The chat that this user did not join
      */
     async decline() {
         await this.client.modify_pending_invite('decline', await this.chat)
@@ -49,7 +49,7 @@ class Invite {
 
     /**
      * The user who did send this invite
-     * @type {ChatUser}
+     * @type {Promise<ChatUser>}
      */
     get inviter() {
         return (async () => {
@@ -58,7 +58,8 @@ class Invite {
             }
 
             let ChatUser = require('./ChatUser')
-            let inviter = (await this.get('data')).inviter
+            let inviter = (await this.get('data'))
+                .inviter
             this._inviter = new ChatUser(inviter.user_id, (await this.chat), { client: this.client })
             return this._inviter
         })()
@@ -66,7 +67,7 @@ class Invite {
 
     /**
      * The users who were invtied
-     * @type {Array<ChatUser>}
+     * @type {Promise<Array<ChatUser>>}
      */
     get invited() {
         return (async () => {
@@ -75,7 +76,8 @@ class Invite {
             }
 
             let ChatUser = require('./ChatUser')
-            let invited = (await this.get('data')).invitees
+            let invited = (await this.get('data'))
+                .invitees
             let chat = await this.chat
             this._invited = invited.map(it => new ChatUser(it.user_id, chat, { client: this.client }))
             return this._invited
@@ -84,17 +86,18 @@ class Invite {
 
     /**
      * Was this invite inviting the clinet?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_inviting_me() {
         return (async () => {
-            return (await this.get('data')).invitees.contains(this.client.id)
+            return (await this.get('data'))
+                .invitees.contains(this.client.id)
         })
     }
 
     /**
      * The type of invite
-     * @type {String}
+     * @type {Promise<String>}
      */
     get type() {
         return (async () => {

@@ -26,11 +26,12 @@ class Post extends FreshObject {
      * @param  {String} text=null                           Text of this comment
      * @param  {Post|String} attachment=null                Post to attach to the comment
      * @param  {Array<User>|Array<String>} mentions=null    Users to mention in this comment
-     * @return {Comment}                                    Posted comment
+     * @return {Promise<Comment>}                                    Posted comment
      * @throws                                              Throws error if bad api response, or if the comment is not posted
      */
     async add_comment(text, attachment, mentions) {
-        let data = await this.client.add_comment_to_post(this, text, attachment, mentions).data
+        let data = await this.client.add_comment_to_post(this, text, attachment, mentions)
+            .data
 
         if (data.id === '000000000000000000000000') {
             throw data.toString()
@@ -42,7 +43,7 @@ class Post extends FreshObject {
 
     /**
      * Add a smile to this post
-     * @return {Post}   This post
+     * @return {Promise<Post>}   This post
      * @throws          Throws an error if bad api response
      */
     async smile() {
@@ -59,7 +60,7 @@ class Post extends FreshObject {
 
     /**
      * Remove a smile from this post
-     * @return {Post}   This post
+     * @return {Promise<Post>}   This post
      * @throws          Throws an error if bad api response
      */
     async remove_smile() {
@@ -76,7 +77,7 @@ class Post extends FreshObject {
 
     /**
      * Add an unsmile to this post
-     * @return {Post}   This post
+     * @return {Promise<Post>}   This post
      * @throws          Throws an error if bad api response
      */
     async unsmile() {
@@ -93,7 +94,7 @@ class Post extends FreshObject {
 
     /**
      * Remove an unsmile from this post
-     * @return {Post}   This post
+     * @return {Promise<Post>}   This post
      * @throws          Throws an error if bad api response
      */
     async remove_unsmile() {
@@ -111,17 +112,19 @@ class Post extends FreshObject {
     /**
      * Republish this post
      * @param  {Boolean}  force Remove republish and republish if already republished?
-     * @return {Post}           Instance of this republished post in the timeline of the client, if successful
+     * @return {Promise<Post>}           Instance of this republished post in the timeline of the client, if successful
      * @throws                  Throws an error if bad api response
      */
     async republish(force) {
         try {
-            let data = await this.client.modify_post_republish(this, 'post').data
+            let data = await this.client.modify_post_republish(this, 'post')
+                .data
             return new Post(data.id, { client: this.client })
         } catch (error) {
             if (error.response && error.response.data.error === 'already_republished') {
                 if (force) {
-                    return this.remove_republish().republish()
+                    return this.remove_republish()
+                        .republish()
                 } else {
                     return null
                 }
@@ -132,12 +135,13 @@ class Post extends FreshObject {
 
     /**
      * Republish this post
-     * @return {Post}           Instance of this republished post in the timeline of the client, if successful
+     * @return {Promise<Post>}           Instance of this republished post in the timeline of the client, if successful
      * @throws                  Throws an error if bad api response
      */
     async remove_republish() {
         try {
-            let data = await this.client.modify_post_republish(this, 'delete').data
+            let data = await this.client.modify_post_republish(this, 'delete')
+                .data
             return this.fresh
         } catch (error) {
             if (error.response && error.response.data.error === 'not_republished') {
@@ -161,7 +165,7 @@ class Post extends FreshObject {
      *
      * `target` -> targeted harrassment
      *
-     * @return {Post}                Post that was reported
+     * @return {Promise<Post>}                Post that was reported
      * @throws                       Throws an error if bad api response, or if the report type is invalid
      */
     async report(type) {
@@ -171,7 +175,7 @@ class Post extends FreshObject {
 
     /**
      * Mark this post as read
-     * @return {Post} This post
+     * @return {Promise<Post>} This post
      */
     async read() {
         await this.client.read_post(this)
@@ -183,7 +187,7 @@ class Post extends FreshObject {
     /**
      * Update the tags on this post
      * @param  {Array<String>}  tags Tags to tag this post with
-     * @return {Post}                This post
+     * @return {Promise<Post>}                This post
      * @throws                       Throws an error if bad api response, or not own content
      */
     async set_tags(tags) {
@@ -193,7 +197,7 @@ class Post extends FreshObject {
 
     /**
      * Delete this post
-     * @return {Post} This post (but it has been deleted!)
+     * @return {Promise<Post>} This post (but it has been deleted!)
      * @throws                       Throws an error if bad api response, or not own content
      */
     async delete() {
@@ -203,7 +207,7 @@ class Post extends FreshObject {
 
     /**
      * Pin this post to the timeline of the client
-     * @return {Post} This post
+     * @return {Promise<Post>} This post
      * @throws                       Throws an error if bad api response, or not own content
      */
     async pin() {
@@ -213,7 +217,7 @@ class Post extends FreshObject {
 
     /**
      * Unpin this post from the timeline of the client
-     * @return {Post} This post
+     * @return {Promise<Post>} This post
      * @throws                       Throws an error if bad api response, or not own content
      */
     async unpin() {
@@ -226,7 +230,7 @@ class Post extends FreshObject {
     /**
      * Update the scheduled post time of a pending post
      * @param  {Number}  time Timestamp in seconds to publish this post
-     * @return {Post}         This post
+     * @return {Promise<Post>}         This post
      * @throws                       Throws an error if bad api response, not pending post, or not own content
      */
     async set_schedule(time) {
@@ -242,7 +246,7 @@ class Post extends FreshObject {
      *
      * `subscribers` -> appear only in subscriber and timeline feeds
      *
-     * @return {Post}              This post
+     * @return {Promise<Post>}              This post
      * @throws                       Throws an error if bad api response, not pending post, or not own content
      */
     async set_visibility(visibility) {
@@ -254,7 +258,7 @@ class Post extends FreshObject {
 
     /**
      * The author of this Post
-     * @type {User}
+     * @type {Promise<User>}
      */
     get author() {
         return (async () => {
@@ -266,77 +270,84 @@ class Post extends FreshObject {
 
     /**
      * Number of smiles on this Post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get smile_count() {
         return (async () => {
-            return await this.get('num').smiles
+            return await this.get('num')
+                .smiles
         })()
     }
 
     /**
      * Number of unsmiles on this Post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get unsmile_count() {
         return (async () => {
-            return await this.get('num').unsmiles
+            return await this.get('num')
+                .unsmiles
         })()
     }
 
     /**
      * Number of guest smiles on this Post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get guest_smile_count() {
         return (async () => {
-            return await this.get('num').guest_smiles
+            return await this.get('num')
+                .guest_smiles
         })()
     }
 
     /**
      * Number of comments on this Post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get comment_count() {
         return (async () => {
-            return await this.get('num').comments
+            return await this.get('num')
+                .comments
         })()
     }
 
     /**
      * Number of views on this Post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get view_count() {
         return (async () => {
-            return await this.get('num').views
+            return await this.get('num')
+                .views
         })()
     }
 
     /**
      * Number of republications of this post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get republish_count() {
         return (async () => {
-            return await this.get('num').republished
+            return await this.get('num')
+                .republished
         })()
     }
 
     /**
      * Number of shares of this Post
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get share_count() {
         return (async () => {
-            return await this.get('num').shares
+            return await this.get('num')
+                .shares
         })()
     }
 
     /**
      * Type of post
-     * @type {String}
+     * @type {Promise<String>}
      */
     get type() {
         return this.get('type')
@@ -344,7 +355,7 @@ class Post extends FreshObject {
 
     /**
      * Background color of this image
-     * @type {String}
+     * @type {Promise<String>}
      */
     get bg_color() {
         return this.get('bg_color')
@@ -353,7 +364,7 @@ class Post extends FreshObject {
     /**
      * Title of this Post
      * Published posts are published
-     * @type {String}
+     * @type {Promise<String>}
      */
     get title() {
         return this.get('title')
@@ -361,7 +372,7 @@ class Post extends FreshObject {
 
     /**
      * Dynamic title of this Post
-     * @type {String}
+     * @type {Promise<String>}
      */
     get dynamic_title() {
         return this.get('fixed_title')
@@ -371,7 +382,7 @@ class Post extends FreshObject {
      * State of this Post
      * Regular posts appear as published
      * Posts scheduled to be posted appear as delayed
-     * @type {String}
+     * @type {Promise<String>}
      */
     get state() {
         return this.get('state')
@@ -379,7 +390,7 @@ class Post extends FreshObject {
 
     /**
      * Timestamp of post creation
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get created_at() {
         return this.get('date_create')
@@ -387,7 +398,7 @@ class Post extends FreshObject {
 
     /**
      * Timestamp of post publication
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get publish_at() {
         return this.get('publish_at')
@@ -395,7 +406,7 @@ class Post extends FreshObject {
 
     /**
      * Was this Post smiled by the bound Client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_smiled() {
         return this.get('is_smiled')
@@ -403,7 +414,7 @@ class Post extends FreshObject {
 
     /**
      * Was this Post unsmiled by the bound Client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_unsmiled() {
         return this.get('is_unsmiled')
@@ -411,7 +422,7 @@ class Post extends FreshObject {
 
     /**
      * Was this Post removed by moderators?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_abused() {
         return this.get('is_abused')
@@ -419,7 +430,7 @@ class Post extends FreshObject {
 
     /**
      * Was this Post featured?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_featured() {
         return this.get('is_featured')
@@ -427,7 +438,7 @@ class Post extends FreshObject {
 
     /**
      * Was this Post republished by the bound Client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_republished() {
         return this.get('is_republished')
@@ -435,7 +446,7 @@ class Post extends FreshObject {
 
     /**
      * Was this Post pinned by it's author?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_pinned() {
         return this.get('is_pinned')
@@ -443,7 +454,7 @@ class Post extends FreshObject {
 
     /**
      * Is this Post using the old iFunny watermark?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_old_watermark() {
         return this.get('old_watermark')
@@ -451,7 +462,7 @@ class Post extends FreshObject {
 
     /**
      * Is this Post able to be boosted?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_boostable() {
         return this.get('can_be_boosted')
@@ -459,7 +470,7 @@ class Post extends FreshObject {
 
     /**
      * Tags attached to this Post
-     * @type {Array<String>}
+     * @type {Promise<Array<String>>}
      */
     get tags() {
         return this.get('tags')
@@ -467,17 +478,19 @@ class Post extends FreshObject {
 
     /**
      * Original source of this content, if from another site
-     * @type {string}
+     * @type {Promise<string>}
      */
     get copyright_source() {
         return (async () => {
-            return (await this.get('copyright')).url || await (this.fresh.get('copyright')).url
+            return (await this.get('copyright'))
+                .url || await (this.fresh.get('copyright'))
+                .url
         })()
     }
 
     /**
      * Timestamp of when this post was featured, if featured
-     * @type {Number|null}
+     * @type {Promise<Number|null>}
      */
     get issue_at() {
         return this.get('issue_at')
@@ -488,7 +501,7 @@ class Post extends FreshObject {
      * Posts with public visibility will appear in collective and can be featured
      * Posts with subscribers visibility will only appear in home feeds,
      * linking to the post directly, or by viewing the authors timeline
-     * @type {String}
+     * @type {Promise<String>}
      */
     get visibility() {
         return this.get('visibility')
@@ -496,7 +509,7 @@ class Post extends FreshObject {
 
     /**
      * Text detected in this post by iFunny ocr, if any
-     * @type {String|null}
+     * @type {Promise<String|null>}
      */
     get detected_text() {
         return this.get('ocr_text')
@@ -504,7 +517,7 @@ class Post extends FreshObject {
 
     /**
      * Sharable link to this post
-     * @type {String}
+     * @type {Promise<String>}
      */
     get link() {
         return this.get('link')
@@ -513,7 +526,7 @@ class Post extends FreshObject {
     /**
      * Same as `this.link`, but with a url
      * that indicates the type of content
-     * @type {String}
+     * @type {Promise<String>}
      */
     get canonical_link() {
         return this.get('canonical_url')
@@ -522,7 +535,7 @@ class Post extends FreshObject {
     /**
      * Link to the content of this post,
      * with the old style ifunny.co banner watermark
-     * @type {String}
+     * @type {Promise<String>}
      */
     get content_link() {
         return this.get('url')

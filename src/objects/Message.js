@@ -46,7 +46,8 @@ class Message extends FreshObject {
      * @return {Promise<Message>}   This message instance
      */
     async send_text_message(content) {
-        await (await this.chat).send_text_message(content)
+        await (await this.chat)
+        .send_text_message(content)
         return this
     }
 
@@ -62,22 +63,24 @@ class Message extends FreshObject {
      * @return {Promise<Message>}       This message instance
      */
     async send_image_message(url, opts = {}) {
-        await (await this.chat).send_image_message(url, opts)
+        await (await this.chat)
+        .send_image_message(url, opts)
         return this
     }
 
     /**
      * Mark this message as read
-     * @return {Message} This message instance
+     * @return {Promise<Message>} This message instance
      */
     async read() {
-        await (await this.chat).read()
+        await (await this.chat)
+        .read()
         return this
     }
 
     /**
      * Delete this chat message
-     * @return {Message} This message instance
+     * @return {Promise<Message>} This message instance
      */
     async delete() {
         await this.client.delete_chat_message(await this.chat, this)
@@ -93,7 +96,7 @@ class Message extends FreshObject {
 
     /**
      * Content of this message
-     * @type {String}
+     * @type {Promise<String>}
      */
     get content() {
         return this.get('message') || ''
@@ -101,7 +104,7 @@ class Message extends FreshObject {
 
     /**
      * The author of this message
-     * @type {ChatUser}
+     * @type {Promise<ChatUser>}
      */
     get author() {
         return (async () => {
@@ -118,7 +121,7 @@ class Message extends FreshObject {
 
     /**
      * The chat that this message was sent in
-     * @type {Chat}
+     * @type {Promise<Chat>}
      */
     get chat() {
         return (async () => {
@@ -129,7 +132,7 @@ class Message extends FreshObject {
 
     /**
      * Timestamp of message recieved in seconds
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get recieved_at() {
         return (async () => {
@@ -139,7 +142,7 @@ class Message extends FreshObject {
 
     /**
      * Alias to `Message.send_text_message`
-     * @type {Method}
+     * @type {Promise<Method>}
      */
     get reply() {
         return this.send_text_message
@@ -150,7 +153,7 @@ class Message extends FreshObject {
      * Normal text messages will return `MESG`
      * Messages with files attached will return `FILE`
      * Info messages will return `ADMM`
-     * @type {String}
+     * @type {Promise<String>}
      */
     get type() {
         return (async () => {
@@ -161,7 +164,7 @@ class Message extends FreshObject {
 
     /**
      * mimetype of this messages file, if any
-     * @type {String|Null}
+     * @type {Promise<String|Null>}
      */
     get file_mime() {
         // fresh data and local data are not consistent
@@ -175,7 +178,7 @@ class Message extends FreshObject {
 
     /**
      * Metadata about the file in this message
-     * @type {Object}
+     * @type {Promise<Object>}
      */
     get file_meta() {
         return this.get('file', {})
@@ -183,21 +186,23 @@ class Message extends FreshObject {
 
     /**
      * Ulr to the file in this message, if any
-     * @type {String|Null}
+     * @type {Promise<String|Null>}
      */
     get file_url() {
         return (async () => {
-            return (await this.file_meta).url || null
+            return (await this.file_meta)
+                .url || null
         })()
     }
 
     /**
      * Name of the file in this image, if any
-     * @type {String|Null}
+     * @type {Promise<String|Null>}
      */
     get file_name() {
         return (async () => {
-            return (await this.file_meta).name || null
+            return (await this.file_meta)
+                .name || null
         })()
     }
 
@@ -213,7 +218,7 @@ class Message extends FreshObject {
 
     /**
      * Message creation timestamp in ms
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get created_at() {
         return this.get('created_at')

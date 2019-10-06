@@ -12,7 +12,7 @@ function sleep(ms) {
 /**
  * Update the nick of the client
  * @param  {String} nick Updated nickname
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.update_nick = async function(nick) {
     let data = {
@@ -32,7 +32,7 @@ Client.prototype.update_nick = async function(nick) {
 /**
  * Update the about of the client
  * @param  {String} about Updated about content
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.update_about = async function(about) {
     let data = {
@@ -52,7 +52,7 @@ Client.prototype.update_about = async function(about) {
 /**
  * Update the privacy flag of the client
  * @param  {Boolean} is_private Is this client private?
- * @return {Object} API response
+ * @return {Promise<Object>} API response
  */
 Client.prototype.update_is_private = async function(is_private) {
     let data = {
@@ -115,7 +115,9 @@ Client.prototype.login = async function(email, password, opts = { force: false }
         'password': password
     }
 
-    data = Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
+    data = Object.keys(data)
+        .map(key => `${key}=${data[key]}`)
+        .join('&')
 
     let response = await axios({
         method: 'post',
@@ -149,7 +151,7 @@ Client.prototype.login = async function(email, password, opts = { force: false }
  * @param  {Array<String>}  opts.tags=[]                Post tags. See Post#tags
  * @param  {Boolean}        opts.wait=false             Wait for this image to post, and return that post?
  * @param  {Number}         opts.timeout=15             Time in seconds to wait for the posted image. This method will check for the posted image every 500 ms
- * @return {Post|String}                                Posted image if `opts.wait`, else the pending post id
+ * @return {Promise<Post|String>}                                Posted image if `opts.wait`, else the pending post id
  */
 Client.prototype.post_image = async function(image_data, opts = {}) {
     let form = {
@@ -178,10 +180,11 @@ Client.prototype.post_image = async function(image_data, opts = {}) {
     let timeout = opts.timeout * 2 || 15
     while (timeout-- >= 0) {
         let result = (await axios({
-            method: 'get',
-            url: `${this.api}/tasks/${body.data.id}`,
-            headers: await this.headers
-        })).data.data.result
+                method: 'get',
+                url: `${this.api}/tasks/${body.data.id}`,
+                headers: await this.headers
+            }))
+            .data.data.result
 
         if (result) {
             let Post = require('../Post')

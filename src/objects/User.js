@@ -19,21 +19,37 @@ class User extends FreshObject {
 
     // methods
 
+    /**
+     * Subscribe to this user
+     * @return {Promise<User>} The user that this client did subscribe to
+     */
     async subscribe() {
         await this.client.modify_user_subscription_status('put', this)
         return this.fresh
     }
 
+    /**
+     * Unsubscribe to this user
+     * @return {Promise<User>} The user that this client did unsubscribe to
+     */
     async unsubscribe() {
         await this.client.modify_user_subscription_status('delete', this)
         return this.fresh
     }
 
+    /**
+     * Subscribe to updates from this user
+     * @return {Promise<User>} The user that this client did subscribe to updates from
+     */
     async subscribe_to_updates() {
         await this.client.modify_user_updates_subscription_status('put', this)
         return this.fresh
     }
 
+    /**
+     * Unsubscribe to updates from this user
+     * @return {Promise<User>} The user that this client did unsubscribe to updates from
+     */
     async unsubscribe_to_updates() {
         await this.client.modify_user_updates_subscription_status('delete', this)
         return this.fresh
@@ -47,7 +63,7 @@ class User extends FreshObject {
      *
      *`installation`    -> block all accounts owned by a user
      *
-     * @return {User}                  This user
+     * @return {Promise<User>}                  This user
      */
     async block(type) {
         try {
@@ -69,7 +85,7 @@ class User extends FreshObject {
      *
      *`installation`    -> block all accounts owned by a user
      *
-     * @return {User}                  This user
+     * @return {Promise<User>}                  This user
      */
     async unblock() {
         try {
@@ -90,7 +106,7 @@ class User extends FreshObject {
 
     /**
      * This user's nickname (or, username)
-     * @type {String}
+     * @type {Promise<String>}
      */
     get nick() {
         return this.get('nick')
@@ -98,7 +114,7 @@ class User extends FreshObject {
 
     /**
      * This user's original nickname
-     * @type {String}
+     * @type {Promise<String>}
      */
     get original_nick() {
         return this.get('original_nick')
@@ -106,7 +122,7 @@ class User extends FreshObject {
 
     /**
      * This user's about section (or, bio)
-     * @type {String}
+     * @type {Promise<String>}
      */
     get about() {
         return this.get('about')
@@ -114,7 +130,7 @@ class User extends FreshObject {
 
     /**
      * Number of subscribers to this user
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get subscriber_count() {
         return (async () => {
@@ -124,7 +140,7 @@ class User extends FreshObject {
 
     /**
      * Number of users this user is subscribed to
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get subscription_count() {
         return (async () => {
@@ -134,7 +150,7 @@ class User extends FreshObject {
 
     /**
      * Number of posts in this user's timeline
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get post_count() {
         return (async () => {
@@ -144,7 +160,7 @@ class User extends FreshObject {
 
     /**
      * Number of posts that are original in this user's timeline
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get original_post_count() {
         return (async () => {
@@ -154,7 +170,7 @@ class User extends FreshObject {
 
     /**
      * Number of posts that are republications in this user's timeline
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get republication_count() {
         return (async () => {
@@ -164,7 +180,7 @@ class User extends FreshObject {
 
     /**
      * Number of featured posts in this user's timeline
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get feature_count() {
         return (async () => {
@@ -174,7 +190,7 @@ class User extends FreshObject {
 
     /**
      * Total number of smiles accross all comments and posts by this user
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get smile_count() {
         return (async () => {
@@ -184,7 +200,7 @@ class User extends FreshObject {
 
     /**
      * Number of achievements obtained by this user
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get achievement_count() {
         return (async () => {
@@ -198,27 +214,31 @@ class User extends FreshObject {
 
     /**
      * This user's rating (or, exp score)
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get points() {
         return (async () => {
-            return await this.get('rating').points || await this.fresh.get('rating').points
+            return await this.get('rating')
+                .points || await this.fresh.get('rating')
+                .points
         })()
     }
 
     /**
      * Is this user's level visible to other users?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_level_visible() {
         return (async () => {
-            return await this.get('rating').is_show_level || await this.fresh.get('rating').is_show_level
+            return await this.get('rating')
+                .is_show_level || await this.fresh.get('rating')
+                .is_show_level
         })()
     }
 
     /**
      * This user's level
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get level() {
         return this.get('current_level')
@@ -226,21 +246,23 @@ class User extends FreshObject {
 
     /**
      * This user's active day count
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get days() {
         return (async () => {
-            return await this.get('meme_experience').days
+            return await this.get('meme_experience')
+                .days
         })()
     }
 
     /**
      * This user's meme experience rank
-     * @type {String}
+     * @type {Promise<String>}
      */
     get rank() {
         return (async () => {
-            return await this.get('meme_experience').rank
+            return await this.get('meme_experience')
+                .rank
         })()
     }
 
@@ -252,7 +274,7 @@ class User extends FreshObject {
      * `subscribers` allows new messages from users who a subscription of this user
      *
      * `closed` allows no messaging initiation on this user
-     * @type {String}
+     * @type {Promise<String>}
      */
     get chat_privacy() {
         return this.get('messaging_privacy_status') === 1
@@ -260,7 +282,7 @@ class User extends FreshObject {
 
     /**
      * Is this user banned?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_banned() {
         return this.get('is_banned')
@@ -268,7 +290,7 @@ class User extends FreshObject {
 
     /**
      * Is this user deleted?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_deleted() {
         return this.get('is_deleted')
@@ -298,7 +320,7 @@ class User extends FreshObject {
 
     /**
      * Can this user chat with it's client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get can_chat() {
         return this.get('is_available_for_chat')
@@ -306,7 +328,7 @@ class User extends FreshObject {
 
     /**
      * Has this user enabled private mode?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_private() {
         return this.get('is_private')
@@ -314,7 +336,7 @@ class User extends FreshObject {
 
     /**
      * Has the client blocked this user?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_blocked() {
         return this.get('is_blocked')
@@ -322,7 +344,7 @@ class User extends FreshObject {
 
     /**
      * Has this user blocked the client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_blocking_me() {
         return this.get('are_you_blocked')
@@ -330,7 +352,7 @@ class User extends FreshObject {
 
     /**
      * Is this user verified?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_verified() {
         return this.get('is_verified')
@@ -338,7 +360,7 @@ class User extends FreshObject {
 
     /**
      * Is this user subscribed to the client?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_subscriber() {
         return this.get('is_in_subscriptions')
@@ -346,7 +368,7 @@ class User extends FreshObject {
 
     /**
      * Is the client subscribed to this user?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_subscription() {
         return this.get('is_in_subscribers')
@@ -354,7 +376,7 @@ class User extends FreshObject {
 
     /**
      * Is the client subscribed to updates?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_updates_subscription() {
         return this.get('is_subscribed_to_updates')

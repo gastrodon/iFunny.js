@@ -53,7 +53,7 @@ class ChatUser extends User {
      * State of the presence of this user in this chat
      * Pending users have been invited
      * Join users have joined or accepted an invite
-     * @type {String}
+     * @type {Promise<String>}
      */
     get state() {
         return this.chat_get('state')
@@ -61,7 +61,7 @@ class ChatUser extends User {
 
     /**
      * Timestamp of when this user was last seen online
-     * @type {Number}
+     * @type {Promise<Number>}
      */
     get last_online() {
         return this.chat_get('last_seen_at')
@@ -69,7 +69,7 @@ class ChatUser extends User {
 
     /**
      * Is this user online in this chat?
-     * @type {Boolean}
+     * @type {Promise<Boolean>}
      */
     get is_online() {
         return this.chat_get('is_online')
@@ -77,7 +77,7 @@ class ChatUser extends User {
 
     /**
      * The chat that this user is in
-     * @type {Chat}
+     * @type {Promise<Chat>}
      */
     get chat() {
         return (async () => {
