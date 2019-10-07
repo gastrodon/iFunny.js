@@ -165,6 +165,71 @@ class Client extends EventEmitter {
         return methods.paginated_generator(this.notifications_paginated, { instance: this })
     }
 
+    /**
+     * Generator iterating through logged in users read posts
+     * @type {Promise<Generator<Post>>}
+     */
+    get reads() {
+        return methods.paginated_generator(this.reads_paginated, { instance: this })
+    }
+
+    /**
+     * Alias for `Client.reads`
+     * @type {Promise<Generator<Post>>}
+     */
+    get views() {
+        return this.reads
+    }
+
+    /**
+     * Generator iterating through collective posts
+     * @type {Promise<Generator<Post>>}
+     */
+    get collective() {
+        return methods.paginated_generator(this.collective_paginated, { instance: this })
+    }
+
+    /**
+     * Generator iterating through featured posts
+     * @type {Promise<Generator<Post>>}
+     */
+    get features() {
+        return methods.paginated_generator(this.features_paginated, { instance: this })
+    }
+
+    /**
+     * Generator iterating through weekly digests
+     * @type {Promise<Generator<Digest>>}
+     */
+    get digests() {
+        return methods.paginated_generator(this.digests_paginated, { instance: this })
+    }
+
+    /**
+     * Generator iterating through featured channels
+     * @type {Promise<Generator<Channel>>}
+     */
+    get channels() {
+        return (async function*(instance) {
+            let Channel = require('./Channel')
+            let response = await axios({
+                method: 'get',
+                url: `${instance.api}/channels`,
+                headers: await instance.headers
+            })
+
+            for (let item of response.data.data.channels.items) {
+                if (item.id != 'latest_digest') {
+                    yield new Channel(item.id, { client: instance, data: item })
+                }
+            }
+        })(this)
+    }
+
+    /**
+     * Generator iterating through chats this logged in client is in
+     * @type {Promise<Generator<Chat>>}
+     */
     get chats() {
         return methods.paginated_generator(this.chats_paginated, { instance: this })
     }

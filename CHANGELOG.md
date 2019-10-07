@@ -1,6 +1,7 @@
 ### 2.3.0
 - `Channel` class
 - `Digest` class
+- `Client` getters for generators `reads`, `collective`, `features`, `digests`, `channels`, `chats`
 - `Client` explore methods `digests_paginated`
 - `Client` feed methods `reads_paginated`, `collective_paginated`, `features_paginated`
 - `Client` paginated seaerch methods `search_chats_paginated`, `search_users_paginated`, `search_tags_paginated`

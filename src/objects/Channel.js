@@ -23,3 +23,5 @@ class Channel extends FreshObject {
         return methods.paginated_generator(this.client.channel_feed_paginated, { instance: this.client, channel: this.id })
     }
 }
+
+module.exports = Channel
