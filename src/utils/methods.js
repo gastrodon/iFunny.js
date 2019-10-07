@@ -48,7 +48,7 @@ async function paginated_data(url, opts = {}) {
         prev: opts.prev || null,
         next: opts.next || null
     }
-    ex_params = opts.ex_params || {}
+    ex_params = opts.params || {}
 
     response = await axios({
         method: opts.method || 'get',

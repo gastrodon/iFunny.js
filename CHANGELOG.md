@@ -1,6 +1,10 @@
 ### 2.3.0
 - `Channel` class
 - `Digest` class
+- `Client` explore methods `digests_paginated`
+- `Client` feed methods `reads_paginated`, `collective_paginated`, `features_paginated`
+- `Client` paginated seaerch methods `search_chats_paginated`, `search_users_paginated`, `search_tags_paginated`
+- `Client.login` does now check for passwords where no stored token exists
 - Docs now specify return type of `Promise<*>`
 
 ### 2.2.1

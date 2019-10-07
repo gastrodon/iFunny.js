@@ -109,6 +109,10 @@ Client.prototype.login = async function(email, password, opts = { force: false }
         }
     }
 
+    if (!password) {
+        throw 'no stored, token, password is required'
+    }
+
     let data = {
         'grant_type': 'password',
         'username': email,
