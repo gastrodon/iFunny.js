@@ -10,13 +10,14 @@ const { homedir } = require('os')
 /**
  * iFunny Client object, representing a logged in or guest user
  * @extends {EventEmitter}
- * @param {Object}                                      opts                   Optional parameters
- * @param {Number}                                      opts.paginated_size=25 Size of each paginated request
+ * @param {Object}                                      opts                            Optional parameters
+ * @param {Number}                                      opts.paginated_size=25          Size of each paginated request
+ * @param {Number}                                      opts.notification_interval=5000 Time in milliseconds between checking for notifications
  * @param {String|Set<String>|Array<String>|Function}   opts.prefix=null
  * Prefix that this bot should use for commands
  * Prefix can be a single String, Set/Array of strings, or a function that returns and of those.
  * If the prefix is a callable function, it will be called with the single argument of the message that is being evauluated
- * @param {Boolean}                                     opts.reconnect=false   Reconnect to the websocket after it's closed?
+ * @param {Boolean}                                     opts.reconnect=false            Reconnect to the websocket after it's closed?
  */
 class Client extends EventEmitter {
     constructor(opts = {}) {
@@ -44,6 +45,7 @@ class Client extends EventEmitter {
         this._prefix = opts.prefix || null
         this._reconnect = opts.reconnect || false
         this.paginated_size = opts.paginated_size || 25
+        this.notification_interval = opts.notification_interval || 5000
         this.socket_connected = false
 
         // public values
@@ -123,9 +125,9 @@ class Client extends EventEmitter {
 
     /**
      * Clear this client's config and wipe the config file
-     * @return {Object} this Clients config
+     * @return {Promise<Object>} this Clients config
      */
-    clear_config() {
+    async clear_config() {
         this._config = this.config = {}
         return this.config
     }
@@ -155,6 +157,31 @@ class Client extends EventEmitter {
         return this._object_payload[key] || fallback
     }
 
+    on(type, callback) {
+        super.on(type, callback)
+
+        switch (type) {
+            case 'notification':
+                this.listen_for_notifications()
+                break
+            default:
+                return
+        }
+    }
+
+    /**
+     * Event emitted when an unread notification is present
+     * @event Client#notification
+     */
+    async listen_for_notifications(interval) {
+        setInterval(async () => {
+            for await (let note of this.unread_notifications) {
+                this.emit('notification', note.value)
+            }
+
+        }, interval || this.notification_interval)
+    }
+
     // generators
 
     /**
@@ -163,6 +190,16 @@ class Client extends EventEmitter {
      */
     get notifications() {
         return methods.paginated_generator(this.notifications_paginated, { instance: this })
+    }
+
+    get unread_notifications() {
+        return (async function*(instance) {
+            let gen = instance.notifications
+
+            for (let count = await instance.unread_notification_count; count > 0; count--) {
+                yield gen.next()
+            }
+        })(this)
     }
 
     /**
@@ -630,6 +667,21 @@ class Client extends EventEmitter {
      */
     get about() {
         return this.get('about')
+    }
+
+    /**
+     * Number of unread notifications
+     * @type {Number}
+     */
+    get unread_notification_count() {
+        return (async () => {
+            let response = await axios({
+                method: 'get',
+                url: `${this.api}/counters`,
+                headers: await this.headers
+            })
+            return response.data.data.news
+        })()
     }
 }
 

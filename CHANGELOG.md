@@ -1,9 +1,11 @@
 ### 2.3.0
 - `Channel` class
 - `Digest` class
-- `Client` getters for generators `reads`, `collective`, `features`, `digests`, `channels`, `chats`
+- `Client` can now listen for notifications with `Client.on('notification')` every `Client.notification_interval` ms. `notification_interval` is a new optional parameter when constructing the client
+- `Client` getters for generators `reads`, `collective`, `features`, `digests`, `channels`, `chats`, `home`, `unread_notifications`
+- `Client` property for `unread_notification_count`
 - `Client` explore methods `digests_paginated`
-- `Client` feed methods `reads_paginated`, `collective_paginated`, `features_paginated`
+- `Client` feed methods `reads_paginated`, `collective_paginated`, `features_paginated`, `home_paginated`
 - `Client` paginated seaerch methods `search_chats_paginated`, `search_users_paginated`, `search_tags_paginated`
 - `Client.login` does now check for passwords where no stored token exists
 - Docs now specify return type of `Promise<*>`
