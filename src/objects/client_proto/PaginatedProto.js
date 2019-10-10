@@ -170,7 +170,7 @@ Client.prototype.chat_members_paginated = async function(opts = {}) {
  * @param  {Object}  opts={}        Optional parameters
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Post>}          Chunk of posts with paging info
+ * @return {Promise<Object>}          Chunk of posts with paging info
  */
 Client.prototype.reads_paginated = async function(opts = {}) {
     let Post = require('../Post')
@@ -191,11 +191,86 @@ Client.prototype.reads_paginated = async function(opts = {}) {
 }
 
 /**
+ * Get a Chunk of the posts by the subscriptions of this logged in client
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of posts with paging info
+ */
+Client.prototype.home_paginated = async function(opts = {}) {
+    let Post = require('../Post')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/timelines/home`, {
+            limit: opts.limit || instance.paginated_size,
+            key: 'content',
+            next: opts.next,
+            headers: await instance.headers
+        })
+        .catch(e => console.log(e.response.data))
+
+    data.items = data.items
+        .map(item => new Post(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
+ * Get a Chunk of the posts smiled by this logged in client
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of posts with paging info
+ */
+Client.prototype.smiles_paginated = async function(opts = {}) {
+    let Post = require('../Post')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/my/content_smiles`, {
+            limit: opts.limit || instance.paginated_size,
+            key: 'content',
+            next: opts.next,
+            headers: await instance.headers
+        })
+        .catch(e => console.log(e.response.data))
+
+    data.items = data.items
+        .map(item => new Post(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
+ * Get a Chunk of the comments made by this logged in client
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of comments with paging info
+ */
+Client.prototype.comments_paginated = async function(opts = {}) {
+    let Comment = require('../Comment')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/my/comments`, {
+            limit: opts.limit || instance.paginated_size,
+            key: 'comments',
+            next: opts.next,
+            headers: await instance.headers
+        })
+        .catch(e => console.log(e.response.data))
+
+    data.items = data.items
+        .map(item => new Comment(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
  * Get a Chunk of posts from collective
  * @param  {Object}  opts={}        Optional parameters
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Post>}          Chunk of posts with paging info
+ * @return {Promise<Object>}          Chunk of posts with paging info
  */
 Client.prototype.collective_paginated = async function(opts = {}) {
     let Post = require('../Post')
@@ -220,7 +295,7 @@ Client.prototype.collective_paginated = async function(opts = {}) {
  * @param  {Object}  opts={}        Optional parameters
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Post>}          Chunk of posts with paging info
+ * @return {Promise<Object>}          Chunk of posts with paging info
  */
 Client.prototype.features_paginated = async function(opts = {}) {
     let Post = require('../Post')
@@ -246,7 +321,7 @@ Client.prototype.features_paginated = async function(opts = {}) {
  * @param  {Number}  opts.next=null      Nextpage token
  * @param  {Boolean} opts.comments=false Get comment data from each digest?
  * @param  {Boolean} opts.contents=false Get content data from each digest?
- * @return {Promise<Post>}               Chunk of posts with paging info
+ * @return {Promise<Object>}               Chunk of posts with paging info
  */
 Client.prototype.digests_paginated = async function(opts = {}) {
     let Digest = require('../Digest')
@@ -276,7 +351,7 @@ Client.prototype.digests_paginated = async function(opts = {}) {
  * @param  {String}  opts.query     Search query
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Post>}          Chunk of posts with paging info
+ * @return {Promise<Object>}          Chunk of posts with paging info
  */
 Client.prototype.search_tags_paginated = async function(opts = {}) {
     let Post = require('../Post')
@@ -303,7 +378,7 @@ Client.prototype.search_tags_paginated = async function(opts = {}) {
  * @param  {String}  opts.query     Search query
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<User>}          Chunk of posts with paging info
+ * @return {Promise<Object>}          Chunk of posts with paging info
  */
 Client.prototype.search_users_paginated = async function(opts = {}) {
     let User = require('../User')
@@ -329,7 +404,7 @@ Client.prototype.search_users_paginated = async function(opts = {}) {
  * @param  {String}  opts.query     Search query
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Chat>}          chunk of posts with paging info
+ * @return {Promise<Object>}          chunk of posts with paging info
  */
 Client.prototype.search_chats_paginated = async function(opts = {}) {
     let Chat = require('../Chat')
