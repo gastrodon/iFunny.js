@@ -340,7 +340,7 @@ Client.prototype.digests_paginated = async function(opts = {}) {
     })
 
     data.items = data.items
-        .map(item => new Digest(item.id, { client: this, data: item }))
+        .map(item => new Digest(item.id, { client: instance, data: item }))
 
     return data
 }
@@ -367,7 +367,7 @@ Client.prototype.search_tags_paginated = async function(opts = {}) {
         .catch(error => console.log(error.response))
 
     data.items = data.items
-        .map(item => new Post(item.id, { client: this, data: item }))
+        .map(item => new Post(item.id, { client: instance, data: item }))
 
     return data
 }
@@ -393,7 +393,7 @@ Client.prototype.search_users_paginated = async function(opts = {}) {
     })
 
     data.items = data.items
-        .map(item => new User(item.id, { client: this, data: item }))
+        .map(item => new User(item.id, { client: instance, data: item }))
 
     return data
 }
@@ -419,7 +419,7 @@ Client.prototype.search_chats_paginated = async function(opts = {}) {
     })
 
     data.items = data.items
-        .map(item => new Chat(item.channel_url, { client: this, data: item }))
+        .map(item => new Chat(item.channel_url, { client: instance, data: item }))
 
     return data
 }
