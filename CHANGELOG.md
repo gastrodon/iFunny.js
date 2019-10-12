@@ -1,3 +1,6 @@
+### 2.3.1
+- Fix a bug where paginated mehtods are not passing the correct `Client` instance to new objects
+
 ### 2.3.0
 - `Channel` class
 - `Digest` class
