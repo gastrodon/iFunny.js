@@ -27,6 +27,38 @@ Client.prototype.notifications_paginated = async function(opts = {}) {
 }
 
 /**
+ * Get a chunk of guests for some user. For non-admins, only their own guests are visible.
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}        Chunk of posts with paging info
+ */
+Client.prototype.user_guests_paginated = async function(opts = {}) {
+    let User = require('../User')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}/guests`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'guests',
+        next: opts.next,
+        headers: await instance.headers
+    })
+
+    data.items = data.items
+        .map(item => ({
+            user: new User(item.guest.id, {
+                client: instance,
+                data: item.guest
+            }),
+
+            visit_at: item.visit_timestamp
+        }))
+
+    return data
+}
+
+/**
  * Get a Chunk of posts from the feed of a channel
  * @param  {Object}  opts={}            Optional parameters
  * @param  {Number}  opts.limit=25      Number of items to fetch

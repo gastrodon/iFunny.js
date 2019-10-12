@@ -99,9 +99,36 @@ class User extends FreshObject {
         }
     }
 
+    /**
+     * Report this user
+     * @param  {String}         type Type of report to send
+     *
+     * `hate`   -> hate speech
+     *
+     * `nude`   -> nudity
+     *
+     * `spam`   -> spam posting
+     *
+     * `harm`   -> encouragement of harm or violence
+     *
+     * `target` -> targeted harrassment
+     *
+     * @return {Promise<Object>} API response
+     */
     async report(type) {
         await this.client.report_user(this, type)
         return this
+    }
+
+    // generators
+
+    /**
+     * Generator iterating the guests of this user
+     * Non-self user guests are forbidden to non-admin accounts
+     * @type {Promise<Generator<user: User, visit_at: Number>>}
+     */
+    get guests() {
+        return methods.paginated_generator(this.user_guests_paginated, { instance: this.client, user: this.id })
     }
 
     /**
