@@ -1,5 +1,6 @@
 const axios = require('axios')
 const FreshObject = require('./FreshObject')
+const methods = require('../utils/methods')
 
 /**
  * iFunny Post object, representing a Post
@@ -17,6 +18,24 @@ class Post extends FreshObject {
         */
         super(id, opts)
         this.url = `${this.api}/content/${id}`
+    }
+
+    // generators
+
+    /**
+     * Generator iterating the smiles of this post
+     * @type {Promise<Generator<User>>}
+     */
+    get smiles() {
+        return methods.paginated_generator(this.client.post_smiles_paginated, { instance: this.client, post: this.id })
+    }
+
+    /**
+     * Generator iterating the comments of this post
+     * @type {Promise<Generator<Comment>>}
+     */
+    get comments() {
+        return methods.paginated_generator(this.client.post_comments_paginated, { instance: this.client, post: this.id })
     }
 
     // methods for any post
