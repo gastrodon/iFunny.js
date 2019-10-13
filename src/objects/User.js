@@ -1,4 +1,5 @@
 const FreshObject = require('./FreshObject')
+const methods = require('../utils/methods')
 const axios = require('axios')
 
 /**
@@ -128,8 +129,35 @@ class User extends FreshObject {
      * @type {Promise<Generator<user: User, visit_at: Number>>}
      */
     get guests() {
-        return methods.paginated_generator(this.user_guests_paginated, { instance: this.client, user: this.id })
+        return methods.paginated_generator(this.client.user_guests_paginated, { instance: this.client, user: this.id })
     }
+
+    /**
+     * Generator iterating through the subscribers of this client
+     * @type {Promise<Generator<User>>}
+     */
+    get subscribers() {
+        return methods.paginated_generator(this.client.user_subscribers_paginated, { instance: this.client, user: this.id })
+    }
+
+    /**
+     * Generator iterating through the subscriptions of this client
+     * @type {Promise<Generator<User>>}
+     */
+    get subscriptions() {
+        return methods.paginated_generator(this.client.user_subscriptions_paginated, { instance: this.client, user: this.id })
+    }
+
+    /**
+     * Generator iterating through the active bans of this client
+     * Non-self user bans are forbidden to non-admin accounts
+     * @type {Promise<Generator<Ban>>}
+     */
+    get bans() {
+        return methods.paginated_generator(this.client.user_bans_paginated, { instance: this.client, user: this.id })
+    }
+
+    // getters
 
     /**
      * This user's nickname (or, username)
