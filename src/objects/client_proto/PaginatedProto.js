@@ -29,10 +29,11 @@ Client.prototype.notifications_paginated = async function(opts = {}) {
 /**
  * Get a chunk of guests for some user. For non-admins, only their own guests are visible.
  * @param  {Object}  opts={}        Optional parameters
+ * @param  {User|String}  opts.user User to get the guests of
  * @param  {String}  opts.query     Search query
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Object>}        Chunk of posts with paging info
+ * @return {Promise<Object>}        Chunk of users with paging and info and visit_at timestamps
  */
 Client.prototype.user_guests_paginated = async function(opts = {}) {
     let User = require('../User')
@@ -436,7 +437,7 @@ Client.prototype.search_users_paginated = async function(opts = {}) {
  * @param  {String}  opts.query     Search query
  * @param  {Number}  opts.limit=25  Number of items to fetch
  * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Object>}          chunk of posts with paging info
+ * @return {Promise<Object>}          Chunk of posts with paging info
  */
 Client.prototype.search_chats_paginated = async function(opts = {}) {
     let Chat = require('../Chat')
@@ -452,6 +453,131 @@ Client.prototype.search_chats_paginated = async function(opts = {}) {
 
     data.items = data.items
         .map(item => new Chat(item.channel_url, { client: instance, data: item }))
+
+    return data
+}
+
+/**
+ * Get a chunk of subscribers of a user
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {User|String}  opts.user User to get the subscribers of
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}        Chunk of users with paging info
+ */
+Client.prototype.user_subscribers_paginated = async function(opts = {}) {
+    let User = require('../User')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}/subscribers`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'users',
+        next: opts.next,
+        headers: await instance.headers
+    })
+    data.items = data.items
+        .map(item => new User(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
+ * Get a chunk of subscriptions of a user
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {User|String}  opts.user User to get the subscriptions of
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of users with paging info
+ */
+Client.prototype.user_subscriptions_paginated = async function(opts = {}) {
+    let User = require('../User')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}/subscriptions`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'users',
+        next: opts.next,
+        headers: await instance.headers
+    })
+    data.items = data.items
+        .map(item => new User(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
+ * Get a chunk of bans of a user
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {User|String}  opts.user User to get the bans of
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of users with paging info
+ */
+Client.prototype.user_bans_paginated = async function(opts = {}) {
+    let Bans = require('../small/Bans')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'bans',
+        next: opts.next,
+        headers: await instance.headers
+    })
+    data.items = data.items
+        .map(item => new Ban(item.id, { client: instance, user: opts.user, data: item }))
+
+    return data
+}
+
+/**
+ * Get a chunk of smiles of a post
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {Post|String}  opts.post Post to get the smiles of
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of users with paging info
+ */
+Client.prototype.post_smiles_paginated = async function(opts = {}) {
+    let User = require('../User')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/content/${opts.post.id || opts.post}/smiles`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'users',
+        next: opts.next,
+        headers: await instance.headers
+    })
+    data.items = data.items
+        .map(item => new User(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
+ * Get a chunk of comments of a post
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {Post|String}  opts.post Post to get the comments of
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of users with paging info
+ */
+Client.prototype.post_comments_paginated = async function(opts = {}) {
+    let Comment = require('../Comment')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/content/${opts.post.id || opts.post}/comments`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'comments',
+        next: opts.next,
+        headers: await instance.headers
+    })
+    data.items = data.items
+        .map(item => new Comment(item.id, item.cid, { client: instance, data: item }))
 
     return data
 }
