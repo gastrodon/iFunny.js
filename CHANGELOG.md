@@ -1,3 +1,10 @@
+### 2.4.0
+- `User` generators `guests`, `subscriptions`, `subscribers`, `bans`
+- `Post` generators `smiles`, `comments`
+- `Client` generators `guests`, `subscriptions`, `subscribers`, `bans`
+- `Client` paginated methods `guests`, `user_subscribers_paginated`, `user_subscriptions_paginated`, `user_bans_paginated`, `post_smiles_paginated`, `post_comments_paginated`
+- Some documentation fixes
+
 ### 2.3.1
 - Fix a bug where paginated mehtods are not passing the correct `Client` instance to new objects
 
@@ -9,7 +16,7 @@
 - `Client` property for `unread_notification_count`
 - `Client` explore methods `digests_paginated`
 - `Client` feed methods `reads_paginated`, `collective_paginated`, `features_paginated`, `home_paginated`
-- `Client` paginated seaerch methods `search_chats_paginated`, `search_users_paginated`, `search_tags_paginated`
+- `Client` paginated search methods `search_chats_paginated`, `search_users_paginated`, `search_tags_paginated`
 - `Client.login` does now check for passwords where no stored token exists
 - Docs now specify return type of `Promise<*>`
 
