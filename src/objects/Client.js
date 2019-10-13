@@ -185,7 +185,7 @@ class Client extends EventEmitter {
     // generators
 
     /**
-     * Generator iterating this logged in users notifications
+     * Generator iterating this logged in user's notifications
      * @type {Promise<Generator<Notification>>}
      */
     get notifications() {
@@ -200,6 +200,10 @@ class Client extends EventEmitter {
         return methods.paginated_generator(this.user_guests_paginated, { instance: this, user: this.id_sync })
     }
 
+    /**
+     * Generator iterating this logged un user's unread notifications
+     * @type {[type]}
+     */
     get unread_notifications() {
         return (async function*(instance) {
             let gen = instance.notifications
@@ -208,6 +212,30 @@ class Client extends EventEmitter {
                 yield gen.next()
             }
         })(this)
+    }
+
+    /**
+     * Generator iterating through the subscribers of this client
+     * @type {Promise<Generator<User>>}
+     */
+    get subscribers() {
+        return methods.paginated_generator(this.user_subscribers_paginated, { instance: this, user: this.id_sync })
+    }
+
+    /**
+     * Generator iterating through the subscriptions of this client
+     * @type {Promise<Generator<User>>}
+     */
+    get subscriptions() {
+        return methods.paginated_generator(this.user_subscriptions_paginated, { instance: this, user: this.id_sync })
+    }
+
+    /**
+     * Generator iterating through the active bans of this client
+     * @type {Promise<Generator<Ban>>}
+     */
+    get bans() {
+        return methods.paginated_generator(this.user_bans_paginated, { instance: this, user: this.id_sync })
     }
 
     /**
