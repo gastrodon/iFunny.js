@@ -413,7 +413,6 @@ class Client extends EventEmitter {
             this._config.basic_token = auth
             this.config = this._config
 
-            // await methods.sleep(10000)
             return auth
         })()
 

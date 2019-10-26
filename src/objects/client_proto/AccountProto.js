@@ -68,10 +68,10 @@ Client.prototype.update_is_private = async function(is_private) {
 
 /**
  * Log into an iFunny account and authenticate this
- * @param  {String}  email      description
- * @param  {String}  password   password to the account being logged into, optional for accounts with stored bearer tokens
- * @param  {Object}  opts={}  Optional parameters
- * @param  {Boolean} opts.force bypass stored tokens?
+ * @param  {String}  email          description
+ * @param  {String}  password       password to the account being logged into, optional for accounts with stored bearer tokens
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {Boolean} opts.force     bypass stored tokens?
  * @return {Promise<Client>}    this client
  */
 /**
@@ -195,5 +195,20 @@ Client.prototype.post_image = async function(image_data, opts = {}) {
     }
 }
 
+/**
+ * Set the newbie status of a Basic token
+ * @param  {Boolean}            value has this token held an accout before?
+ * @return {Promise<Object>}          API response
+ */
+Client.prototype.set_newbie = async function(value) {
+    let response = await axios({
+        method: 'PUT',
+        url: `${this.api}/clients/me`,
+        data: `newbie=${value == true}`,
+        headers: await this.headers
+    })
+
+    return response
+}
 
 module.exports = Client
