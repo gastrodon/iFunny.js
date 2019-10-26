@@ -195,7 +195,7 @@ Client.prototype.add_chat_admins = async function(users, chat) {
         chat = new Chat(chat, { client: this })
     }
 
-    if (users[0] and users[0].id) {
+    if (users[0] && users[0].id) {
         users = users.map(it => it.id)
     }
 
@@ -227,7 +227,7 @@ Client.prototype.remove_chat_admins = async function(users, chat) {
         chat = new Chat(chat, { client: this })
     }
 
-    if (users[0] and users[0].id) {
+    if (users[0] && users[0].id) {
         users = users.map(it => it.id)
     }
 
