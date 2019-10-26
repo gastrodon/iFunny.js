@@ -1,13 +1,10 @@
 const Client = require('../Client')
 const FormData = require('form-data')
+const methods = require('../../utils/methods')
 const request = require('request')
 const axios = require('axios')
 const util = require('util')
 const qs = require('qs')
-
-function sleep(ms) {
-    return new Promise((resolve) => { setTimeout(resolve, ms) })
-}
 
 /**
  * Update the nick of the client
@@ -110,7 +107,7 @@ Client.prototype.login = async function(email, password, opts = { force: false }
     }
 
     if (!password) {
-        throw 'no stored, token, password is required'
+        throw 'no stored token, password is required'
     }
 
     let data = {
@@ -124,9 +121,9 @@ Client.prototype.login = async function(email, password, opts = { force: false }
         .join('&')
 
     let response = await axios({
-        method: 'post',
+        method: 'POST',
         url: `${this.api}/oauth2/token`,
-        headers: (await this.headers),
+        headers: await this.headers,
         data: data
     })
 
@@ -135,7 +132,7 @@ Client.prototype.login = async function(email, password, opts = { force: false }
     this.config = this._config
 
     response = await axios({
-        method: 'get',
+        method: 'GET',
         url: `${this.api}/account`,
         headers: await this.headers
     })
@@ -194,7 +191,7 @@ Client.prototype.post_image = async function(image_data, opts = {}) {
             let Post = require('../Post')
             return new Post(result.cid, { client: this })
         }
-        await sleep(500)
+        await methods.sleep(500)
     }
 }
 

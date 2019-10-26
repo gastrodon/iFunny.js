@@ -1,3 +1,7 @@
+### 2.5.1
+- Fix `Client.basic_token` length
+- Move `sleep` to `utils/methods` namespace
+
 ### 2.5.0
 - `Client` methods `add_chat_admin` and `remove_chat_admin`
 - `Chat` methods `add_admin` and `remove_admin`

@@ -399,20 +399,21 @@ class Client extends EventEmitter {
             let hex_array = []
             let range = hex.length
 
-            for (let _ of Array(64)) {
+            for (let _ of Array(72)) {
                 hex_array.push(hex[Math.floor(Math.random() * range)])
             }
 
-            const hex_String = hex_array.join('')
-            const hex_id = `${hex_String}_${this._client_id}`
-            const hash_decoded = `${hex_String}:${this._client_id}:${this._client_secret}`
-            const hash_encoded = sha1(hash_decoded)
-            const auth = Buffer.from(`${hex_id}:${hash_encoded}`)
+            let hex_String = hex_array.join('')
+            let hex_id = `${hex_String}_${this._client_id}`
+            let hash_decoded = `${hex_String}:${this._client_id}:${this._client_secret}`
+            let hash_encoded = sha1(hash_decoded)
+            let auth = Buffer.from(`${hex_id}:${hash_encoded}`)
                 .toString('base64')
 
             this._config.basic_token = auth
             this.config = this._config
 
+            // await methods.sleep(10000)
             return auth
         })()
 

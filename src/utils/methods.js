@@ -19,6 +19,10 @@ async function determine_mime(url, bias = 'image/png') {
     return mime_types[split[split.length] - 1] || bias
 }
 
+function sleep(ms) {
+    return new Promise((resolve) => { setTimeout(resolve, ms) })
+}
+
 async function short_cursors(data) {
     let paging = {
         prev: data.paging.hasPrev ? data.paging.cursors.prev : null,
@@ -111,5 +115,6 @@ async function* paginated_generator(source, opts = {}) {
 module.exports = {
     paginated_data: paginated_data,
     paginated_generator: paginated_generator,
-    determine_mime: determine_mime
+    determine_mime: determine_mime,
+    sleep: sleep
 }
