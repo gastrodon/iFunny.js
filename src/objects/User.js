@@ -20,6 +20,27 @@ class User extends FreshObject {
 
     // methods
 
+    static async by_nick(nick, opts = {}) {
+        let Client = require('./Client')
+        let client = opts.client || new Client()
+
+        try {
+            let response = await axios({
+                method: 'GET',
+                url: `${client.api}/users/by_nick/${nick}`,
+                headers: await client.headers
+            })
+
+            return new User(response.data.data.id, { client: this.client, data: response.data.data })
+        } catch (err) {
+            if (err.response && err.response.status === 404) {
+                return null
+            }
+
+            throw err
+        }
+    }
+
     /**
      * Subscribe to this user
      * @return {Promise<User>} The user that this client did subscribe to
