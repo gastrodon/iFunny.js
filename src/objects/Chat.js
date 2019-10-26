@@ -119,21 +119,21 @@ class Chat extends FreshObject {
 
     /**
      * Add an admin to this chat
-     * @param  {User|String}            user User that should be an admin
+     * @param  {Array<User|String>}            users Users that should be an admin
      * @return {Promise<Array<ChatUser>>}     Admins of this chat, including the newly added
      */
-    async add_admin(user) {
-        await this.client.add_chat_admin(user, this)
+    async add_admins(users) {
+        await this.client.add_chat_admins(users, this)
         return await this.fresh.admins
     }
 
     /**
      * Remove an admin from this chat
-     * @param  {User|String}            user User that should not be an admin
+     * @param  {Array<User|String>}            users Users that should not be an admin
      * @return {Promise<Array<ChatUser>>}     Remaining admins of this chat
      */
-    async remove_admin(user) {
-        await this.client.remove_chat_admin(user, this)
+    async remove_admins(users) {
+        await this.client.remove_chat_admins(users, this)
         return await this.fresh.admins
     }
 

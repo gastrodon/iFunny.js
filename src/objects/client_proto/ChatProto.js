@@ -186,19 +186,24 @@ Client.prototype.modify_chat_operator = async function(mode, user, chat) {
 /**
  * Add an admin to a chat
  * @param  {User|String}    user User that should be an admin
- * @param  {Chat|String}    chat Chat to add an admin to
+ * @param  {Array<Chat|String>}    chat Chat to add an admin to
  * @return {Promise<Object>}     API response
  */
-Client.prototype.add_chat_admin = async function(user, chat) {
+Client.prototype.add_chat_admins = async function(users, chat) {
     if (!chat.id) {
         let Chat = require("../Chat")
         chat = new Chat(chat, { client: this })
     }
 
-    let data = JSON.parse(await chat.get('data'))
+    if (users[0] and users[0].id) {
+        users = users.map(it => it.id)
+    }
 
-    data.chatInfo.adminsIdList = [...((await chat.meta)
-        .adminsIdList || []), (user.id || user)]
+    let data = JSON.parse(await chat.get('data'))
+    let admin_ids = new Set([...((await chat.meta)
+        .adminsIdList || []), ...users])
+
+    data.chatInfo.adminsIdList = [...admin_ids]
 
     let response = await axios({
         method: 'PUT',
@@ -213,13 +218,17 @@ Client.prototype.add_chat_admin = async function(user, chat) {
 /**
  * Remove an admin from a chat
  * @param  {User|String}    user User that should not be an admin
- * @param  {Chat|String}    chat Chat to remove an admin from
+ * @param  {Array<Chat|String>}    chat Chat to remove an admin from
  * @return {Promise<Object>}     API response
  */
-Client.prototype.remove_chat_admin = async function(user, chat) {
+Client.prototype.remove_chat_admins = async function(users, chat) {
     if (!chat.id) {
         let Chat = require("../Chat")
         chat = new Chat(chat, { client: this })
+    }
+
+    if (users[0] and users[0].id) {
+        users = users.map(it => it.id)
     }
 
 
@@ -227,7 +236,7 @@ Client.prototype.remove_chat_admin = async function(user, chat) {
 
     data.chatInfo.adminsIdList = ((await chat.meta)
             .adminsIdList || [])
-        .filter(it => it != (user.id || user))
+        .filter(it => !users.includes(it))
 
     let response = await axios({
         method: 'PUT',

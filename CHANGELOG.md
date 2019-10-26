@@ -1,3 +1,6 @@
+### 2.5.2
+- Admin methods are now plural, and accept arrays instead of single users
+
 ### 2.5.1
 - Fix `Client.basic_token` length
 - Move `sleep` to `utils/methods` namespace
