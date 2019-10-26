@@ -184,6 +184,63 @@ Client.prototype.modify_chat_operator = async function(mode, user, chat) {
 }
 
 /**
+ * Add an admin to a chat
+ * @param  {User|String}    user User that should be an admin
+ * @param  {Chat|String}    chat Chat to add an admin to
+ * @return {Promise<Object>}     API response
+ */
+Client.prototype.add_chat_admin = async function(user, chat) {
+    if (!chat.id) {
+        let Chat = require("../Chat")
+        chat = new Chat(chat, { client: this })
+    }
+
+    let data = JSON.parse(await chat.get('data'))
+
+    data.chatInfo.adminsIdList = [...((await chat.meta)
+        .adminsIdList || []), (user.id || user)]
+
+    let response = await axios({
+        method: 'PUT',
+        url: `${this.sendbird_api}/group_channels/${chat.id || chat}`,
+        data: JSON.stringify({ data: JSON.stringify(data) }),
+        headers: await this.sendbird_headers
+    })
+
+    return response
+}
+
+/**
+ * Remove an admin from a chat
+ * @param  {User|String}    user User that should not be an admin
+ * @param  {Chat|String}    chat Chat to remove an admin from
+ * @return {Promise<Object>}     API response
+ */
+Client.prototype.remove_chat_admin = async function(user, chat) {
+    if (!chat.id) {
+        let Chat = require("../Chat")
+        chat = new Chat(chat, { client: this })
+    }
+
+
+    let data = JSON.parse(await chat.get('data'))
+
+    data.chatInfo.adminsIdList = ((await chat.meta)
+            .adminsIdList || [])
+        .filter(it => it != (user.id || user))
+
+    let response = await axios({
+        method: 'PUT',
+        url: `${this.sendbird_api}/group_channels/${chat.id || chat}`,
+        data: JSON.stringify({ data: JSON.stringify(data) }),
+        headers: await this.sendbird_headers
+    })
+
+    return response
+    console.log(JSON.stringify({ data: data }));
+}
+
+/**
  * Upload a file to sendbird's CDN for use in chats
  * @param  {Stream}         image_data Stream of this image
  * @param  {Chat|String}    chat=null  Chat to upload this image for
