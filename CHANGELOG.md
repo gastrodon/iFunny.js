@@ -1,3 +1,8 @@
+### 2.5.0
+- `Client` methods `add_chat_admin` and `remove_chat_admin`
+- `Chat` methods `add_admin` and `remove_admin`
+- `Chat` getter `admins`
+
 ### 2.4.0
 - `User` generators `guests`, `subscriptions`, `subscribers`, `bans`
 - `Post` generators `smiles`, `comments`
