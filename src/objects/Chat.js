@@ -386,9 +386,8 @@ class Chat extends FreshObject {
             let ChatUser = require('./ChatUser')
             return ((await this.meta)
                     .operatorsIdList || [])
-                .map(
-                    id => new ChatUser(id, this, { client: this.client })
-                )
+                .filter(id => typeof(id) === 'string')
+                .map(id => new ChatUser(id, this, { client: this.client }))
         })()
     }
 
@@ -401,9 +400,8 @@ class Chat extends FreshObject {
             let ChatUser = require('./ChatUser')
             return ((await this.meta)
                     .adminsIdList || [])
-                .map(
-                    id => new ChatUser(id, this, { client: this.client })
-                )
+                .filter(id => typeof(id) === 'string')
+                .map(id => new ChatUser(id, this, { client: this.client }))
         })()
     }
 
