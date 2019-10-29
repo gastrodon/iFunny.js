@@ -36,9 +36,9 @@ class Client extends EventEmitter {
         this._socket = null
         this._command = null
         this._event = null
+        this._commands = {}
         this._object_payload = {}
         this._sendbird_session_key = null
-        this._commands = new Set()
         this._req_id = parseInt(Date.now() + (Math.random() * 1000000))
 
         // optional property defaults
@@ -84,7 +84,7 @@ class Client extends EventEmitter {
         let args = content.split(" ")
             .slice(1)
 
-        if (this._commands.has(c_name)) {
+        if (this._commands[c_name] != undefined) {
             this.command.emit(c_name, message, args)
             return c_name
         }

@@ -16,10 +16,11 @@ class Command extends EventEmitter {
      * Register a listener, and add it's name to the list of client Commands
      * @param  {String}     type     Command name to be searched for following a prefix
      * @param  {Function}   listener Function to be executed when this command is called
+     * @param  {String}     help     Help string for this command
      */
-    on(type, listener) {
+    on(type, listener, help) {
         super.on(type, listener)
-        this.client._commands.add(type)
+        this.client._commands[type] = help || ''
     }
 }
 
