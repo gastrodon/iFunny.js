@@ -10,17 +10,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/AurorasPalace/IFunny.js.git"
+        "url": "git+https://github.com/basswaver/ifunny.js.git"
     },
-    "author": "AurorasPalace",
+    "author": "Zero <dakoolstwunn@gmail.com> (https://github.com/basswaver)",
     "contributors": [
-        "Zero <dakoolstwunn@gmail.com> (https://github.com/basswaver)"
+        "AurorasPalace"
     ],
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/AurorasPalace/IFunny.js/issues"
+        "url": "https://github.com/basswaver/IFunny.js/issues"
     },
-    "homepage": "https://github.com/AurorasPalace/IFunny.js#readme",
+    "homepage": "https://github.com/basswaver/IFunny.js#readme",
     "dependencies": {
         "axios": "^0.19.0",
         "js-sha1": "^0.6.0",
