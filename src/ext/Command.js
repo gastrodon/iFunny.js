@@ -20,7 +20,7 @@ class Command extends EventEmitter {
      */
     on(type, listener, help) {
         super.on(type, listener)
-        this.client._commands[type] = help || ''
+        this.client._commands[type] = help || null
     }
 }
 
