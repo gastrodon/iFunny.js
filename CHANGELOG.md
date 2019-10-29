@@ -1,6 +1,7 @@
 ### 2.5.3
 - Admin methods are now plural, and accept arrays instead of single users
 - Filter non-strings from chat admin and operator metadata
+- Fix bad `Chat.kick` endpoint
 
 ### 2.5.1
 - Fix `Client.basic_token` length
