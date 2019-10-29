@@ -103,7 +103,7 @@ class Chat extends FreshObject {
      * @return {Promise<Array<ChatUser>>}   Operators of this chat, including the newly added
      */
     async add_operator(user) {
-        await this.client.modify_chat_operator('put', user, this)
+        await this.client.add_chat_operators([user], this)
         return await this.fresh.operators
     }
 
@@ -113,7 +113,7 @@ class Chat extends FreshObject {
      * @return {Promise<Array<ChatUser>>}   Remaining operators of this chat
      */
     async remove_operator(user) {
-        await this.client.modify_chat_operator('delete', user, this)
+        await this.client.remove_chat_operators([user], this)
         return await this.fresh.operators
     }
 
@@ -163,6 +163,17 @@ class Chat extends FreshObject {
     async kick(user) {
         await this.client.kick_chat_user(user, this)
         return user.fresh
+    }
+
+    /**
+     * Ban a user from a chat
+     * @param  {User}       user     User that should be banned
+     * @param  {Number}     duration Ban duration in seconds, or -1 for pernament
+     * @return {Promise<Chat>}       This chat instance
+     */
+    async ban(user, duration) {
+        await this.client.ban_chat_user(user, this, duration || -1)
+        return this
     }
 
     /**

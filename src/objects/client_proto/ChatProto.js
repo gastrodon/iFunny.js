@@ -112,13 +112,30 @@ Client.prototype.modify_pending_invite = async function(state, chat) {
  * @return {Promise<Object>}                    API response
  */
 Client.prototype.kick_chat_user = async function(user, chat) {
-    let data = `members=${user.id || user}`
+    let data = `users=${user.id || user}`
 
     let response = await axios({
-        method: 'put',
-        url: `${this.api}/chats/channels/${chat.channel_url || chat}/kicked_members`,
+        method: 'PUT',
+        url: `${this.api}/chats/${chat.id || chat}/kicked_users`,
         data: data,
         headers: await this.headers
+    })
+
+    return response
+}
+
+Client.prototype.ban_chat_user = async function(user, chat, duration) {
+    let data = {
+        user_id: user.id || user,
+        seconds: duration || -1,
+        agent_id: this.id_sync
+    }
+
+    let response = await axios({
+        method: 'POST',
+        url: `${this.sendbird_api}/group_channels/${chat.id || chat}/ban`,
+        data: data,
+        headers: await this.sendbird_headers
     })
 
     return response
@@ -181,6 +198,60 @@ Client.prototype.modify_chat_operator = async function(mode, user, chat) {
     })
 
     return response
+}
+
+Client.prototype.add_chat_operators = async function(users, chat) {
+    if (!chat.id) {
+        let Chat = require("../Chat")
+        chat = new Chat(chat, { client: this })
+    }
+
+    if (users[0] && users[0].id) {
+        users = users.map(it => it.id)
+    }
+
+    let data = JSON.parse(await chat.get('data'))
+    let admin_ids = new Set([...((await chat.meta)
+        .operatorsIdList || []), ...users])
+
+    data.chatInfo.operatorsIdList = [...admin_ids]
+
+    let response = await axios({
+        method: 'PUT',
+        url: `${this.sendbird_api}/group_channels/${chat.id || chat}`,
+        data: JSON.stringify({ data: JSON.stringify(data) }),
+        headers: await this.sendbird_headers
+    })
+
+    return response
+}
+
+Client.prototype.remove_chat_operators = async function(users, chat) {
+    if (!chat.id) {
+        let Chat = require("../Chat")
+        chat = new Chat(chat, { client: this })
+    }
+
+    if (users[0] && users[0].id) {
+        users = users.map(it => it.id)
+    }
+
+
+    let data = JSON.parse(await chat.get('data'))
+
+    data.chatInfo.operatorsIdList = ((await chat.meta)
+            .operatorsIdList || [])
+        .filter(it => !users.includes(it))
+
+    let response = await axios({
+        method: 'PUT',
+        url: `${this.sendbird_api}/group_channels/${chat.id || chat}`,
+        data: JSON.stringify({ data: JSON.stringify(data) }),
+        headers: await this.sendbird_headers
+    })
+
+    return response
+    console.log(JSON.stringify({ data: data }));
 }
 
 /**
