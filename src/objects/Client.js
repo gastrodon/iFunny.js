@@ -84,7 +84,7 @@ class Client extends EventEmitter {
         let args = content.split(" ")
             .slice(1)
 
-        if (this._commands[c_name] != undefined) {
+        if (this._commands[c_name] !== undefined) {
             this.command.emit(c_name, message, args)
             return c_name
         }
@@ -92,7 +92,7 @@ class Client extends EventEmitter {
         return null
     }
 
-    async command_help(command) {
+    command_help(command) {
         return this._commands[command]
     }
 
