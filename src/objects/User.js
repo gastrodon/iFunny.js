@@ -372,6 +372,10 @@ class User extends FreshObject {
         return this.get('is_deleted')
     }
 
+    /**
+     * Get the profile image of this user
+     * @type {Promise<Image>}
+     */
     get profile_image() {
         return (async () => {
             let Image = require('./small/Image')
@@ -382,6 +386,10 @@ class User extends FreshObject {
         })()
     }
 
+    /**
+     * Get the cover image of this user
+     * @type {Promise<Image>}
+     */
     get cover_iamge() {
         return (async () => {
             let Image = require('./small/Image')
