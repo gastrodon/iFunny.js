@@ -1,4 +1,5 @@
 const Client = require('../Client')
+const methods = require('../../utils/methods')
 
 
 // chat websocket methods
