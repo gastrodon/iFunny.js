@@ -104,7 +104,7 @@ class Client extends EventEmitter {
         let content = await message.content
 
         if (typeof(this._prefix) === 'function') {
-            prefix = this._prefix(message)
+            prefix = await this._prefix(message)
         }
 
         if (typeof(prefix) === 'string') {
