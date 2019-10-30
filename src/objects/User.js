@@ -33,7 +33,7 @@ class User extends FreshObject {
 
             return new User(response.data.data.id, { client: this.client, data: response.data.data })
         } catch (err) {
-            if (err.response && err.response.status === 404) {
+            if (err.response && err.response.data.error === 'not_found' || err.response.data.error === 'user_is_unavailable') {
                 return null
             }
 
