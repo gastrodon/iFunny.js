@@ -92,6 +92,10 @@ class Client extends EventEmitter {
         return null
     }
 
+    async command_help(command) {
+        return this._commands[command]
+    }
+
     // Determine if a message starts with a possible prefix
     // Return it's length if so
     // Return null otherwise
