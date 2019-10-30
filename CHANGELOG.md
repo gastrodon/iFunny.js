@@ -1,6 +1,7 @@
 ### 2.5.4
 - `Client.command_help` is now sync
 - `User.by_nick` does now return `null` for calls resulting in `error not_found` and `error user_is_unavailable`
+- `SocketProto` was missing methods import
 
 ### 2.5.3
 - Admin methods are now plural, and accept arrays instead of single users
