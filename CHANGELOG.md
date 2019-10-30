@@ -2,6 +2,8 @@
 - Admin methods are now plural, and accept arrays instead of single users
 - Filter non-strings from chat admin and operator metadata
 - Fix bad `Chat.kick` endpoint
+- `Command.on` now does accept an optional docstring third argument for a help message
+- `Client.command_help` does retrieve the docstring of a command
 
 ### 2.5.1
 - Fix `Client.basic_token` length
