@@ -395,7 +395,7 @@ class User extends FreshObject {
             let Image = require('./small/Image')
             let data = await this.get('cover_url')
             if (data) {
-                return new Image(data, { client: this, background: await this.get('cover_url', undefined) })
+                return new Image(data, { client: this, background: await this.get('cover_bg_color', undefined) })
             }
         })()
     }
