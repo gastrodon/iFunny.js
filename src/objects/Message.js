@@ -54,7 +54,6 @@ class Message extends FreshObject {
     /**
      * Send an image message to a chat
      * @param {String}  url             Url pointing to this image
-     * @param {Chat|String}  chat       Chat or channel_url of the chat to send this image to
      * @param {Object} opts={}          Optional parameters
      * @param {Number} opts.height=780  Height of this image
      * @param {Number} opts.width=780   Width of this image
