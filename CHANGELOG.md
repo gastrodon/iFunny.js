@@ -1,3 +1,6 @@
+### 2.5.4
+- `Client.command_help` is now sync
+
 ### 2.5.3
 - Admin methods are now plural, and accept arrays instead of single users
 - Filter non-strings from chat admin and operator metadata
