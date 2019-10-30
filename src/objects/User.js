@@ -390,7 +390,7 @@ class User extends FreshObject {
      * Get the cover image of this user
      * @type {Promise<Image>}
      */
-    get cover_iamge() {
+    get cover_image() {
         return (async () => {
             let Image = require('./small/Image')
             let data = await this.get('cover_url')
