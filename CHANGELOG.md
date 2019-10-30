@@ -4,6 +4,7 @@
 - `SocketProto` was missing methods import
 - `User.cover_image` typo fix
 - `User.cover_image` was not getting the correct cover background color
+- `Client opts.prefix` should now be an async function if a function is used
 
 ### 2.5.3
 - Admin methods are now plural, and accept arrays instead of single users
