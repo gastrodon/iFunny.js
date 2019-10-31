@@ -1,5 +1,7 @@
 ### 2.5.5
 - fix bad bracket notation usage in some `User` getters
+- `User.get` was not being grouped when awaiting, resulting in properties being queried on promises instead of their resolved values
+
 ### 2.5.4
 - `Client.command_help` is now sync
 - `User.by_nick` does now return `null` for calls resulting in `error not_found` and `error user_is_unavailable`
