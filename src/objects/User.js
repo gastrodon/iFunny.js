@@ -210,7 +210,9 @@ class User extends FreshObject {
      */
     get subscriber_count() {
         return (async () => {
-            return await this.get('num')[subscriptions] || this.fresh.get('num')[subscriptions]
+            return await this.get('num')
+                .subscriptions || this.fresh.get('num')
+                .subscriptions
         })()
     }
 
@@ -220,7 +222,9 @@ class User extends FreshObject {
      */
     get subscription_count() {
         return (async () => {
-            return await this.get('num')[subscribers] || this.fresh.get('num')[subscribers]
+            return await this.get('num')
+                .subscribers || this.fresh.get('num')
+                .subscribers
         })()
     }
 
@@ -230,7 +234,9 @@ class User extends FreshObject {
      */
     get post_count() {
         return (async () => {
-            return await this.get('num')[total_posts] || this.fresh.get('num')[total_posts]
+            return await this.get('num')
+                .total_posts || this.fresh.get('num')
+                .total_posts
         })()
     }
 
@@ -240,7 +246,9 @@ class User extends FreshObject {
      */
     get original_post_count() {
         return (async () => {
-            return await this.get('num')[created] || this.fresh.get('num')[created]
+            return await this.get('num')
+                .created || this.fresh.get('num')
+                .created
         })()
     }
 
@@ -260,7 +268,9 @@ class User extends FreshObject {
      */
     get feature_count() {
         return (async () => {
-            return await this.get('num')[featured] || this.fresh.get('num')[featured]
+            return await this.get('num')
+                .featured || this.fresh.get('num')
+                .featured
         })()
     }
 
@@ -270,7 +280,9 @@ class User extends FreshObject {
      */
     get smile_count() {
         return (async () => {
-            return await this.get('num')[total_smiles] || this.fresh.get('num')[total_smiles]
+            return await this.get('num')
+                .total_smiles || this.fresh.get('num')
+                .total_smiles
         })()
     }
 
@@ -280,7 +292,9 @@ class User extends FreshObject {
      */
     get achievement_count() {
         return (async () => {
-            return await this.get('num')[achievements] || this.fresh.get('num')[achievements]
+            return await this.get('num')
+                .achievements || this.fresh.get('num')
+                .achievements
         })()
     }
 
