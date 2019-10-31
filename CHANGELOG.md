@@ -1,3 +1,5 @@
+### 2.5.5
+- fix bad bracket notation usage in some `User` getters
 ### 2.5.4
 - `Client.command_help` is now sync
 - `User.by_nick` does now return `null` for calls resulting in `error not_found` and `error user_is_unavailable`
