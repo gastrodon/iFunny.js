@@ -18,6 +18,12 @@ class Chat extends FreshObject {
         this.url = `${this.sendbird_api}/group_channels/${this.channel_url}`
     }
 
+    /**
+     * Get a Chat by its /c/ link
+     * @param  {String}  link      Link of this chat
+     * @param  {Obkect}  [opts={}] Optional parameters. See Chat.opts
+     * @return {Promise<Chat>|None}           Chat of this link, or null if no such chat
+     */
     static async by_link(link, opts = {}) {
         if (!opts.client) {
             let Client = require('./Client')

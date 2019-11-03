@@ -20,6 +20,12 @@ class User extends FreshObject {
 
     // methods
 
+    /**
+     * Get a user by their nickname
+     * @param  {String}  nick      Nick of the user to get
+     * @param  {Object}  [opts={}] Optional parameter. See User.opts
+     * @return {Promise<User>|Null}           The user found for this nick, or null if no such user
+     */
     static async by_nick(nick, opts = {}) {
         if (!opts.user) {
             let Client = require('./Client')
