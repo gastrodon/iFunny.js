@@ -42,6 +42,21 @@ class User extends FreshObject {
     }
 
     /**
+     * ChatUser representation of this user in some class
+     * @param  {Chat}               chat Chat to represent this user in
+     * @return {Promise<ChatUser>}       This user in a Chat
+     */
+    async in_chat(chat, opts = {}) {
+        let ChatUser = require('./ChatUser')
+
+        opts.client = opts.client || this.client
+        opts.data = opts.data || this._object_payload
+        opts.paginated_size = opts.paginated_size || this.paginated_size
+
+        return new ChatUser(this.id, chat, opts)
+    }
+
+    /**
      * Subscribe to this user
      * @return {Promise<User>} The user that this client did subscribe to
      */
