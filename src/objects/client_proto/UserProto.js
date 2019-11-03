@@ -116,6 +116,11 @@ Client.prototype.report_user = async function(user, type) {
     return response
 }
 
+/**
+ * Get the api response containing the chat url for some user
+ * @param  {User|String} user User to get the chat channel_url
+ * @return {Object}      API response
+ */
 Client.prototype.get_user_chat_url = async function(user) {
     let data = {
         'chat_type': 'chat',
