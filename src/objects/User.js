@@ -29,7 +29,7 @@ class User extends FreshObject {
     static async by_nick(nick, opts = {}) {
         if (!opts.user) {
             let Client = require('./Client')
-            let opts.client = new Client()
+            opts.client = new Client()
         }
 
         try {
@@ -168,9 +168,9 @@ class User extends FreshObject {
     // generators
 
     /**
-     * Generator iterating the guests of this user
+     * Generator iterating the guests of this user and their visit time
      * Non-self user guests are forbidden to non-admin accounts
-     * @type {Promise<Generator<user: User, visit_at: Number>>}
+     * @type {Promise<Generator<Object>>}
      */
     get guests() {
         return methods.paginated_generator(this.client.user_guests_paginated, { instance: this.client, user: this.id })

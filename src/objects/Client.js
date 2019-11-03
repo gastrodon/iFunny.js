@@ -197,8 +197,8 @@ class Client extends EventEmitter {
     }
 
     /**
-     * Generator iterating the guests of this client
-     * @type {Promise<Generator<user: User, visit_at: Number>>}
+     * Generator iterating the guests of this client and their visit time
+     * @type {Promise<Generator<Object>>}
      */
     get guests() {
         return methods.paginated_generator(this.user_guests_paginated, { instance: this, user: this.id_sync })
@@ -206,7 +206,7 @@ class Client extends EventEmitter {
 
     /**
      * Generator iterating this logged un user's unread notifications
-     * @type {[type]}
+     * @type {Promise<Generator<Notification>>}
      */
     get unread_notifications() {
         return (async function*(instance) {
