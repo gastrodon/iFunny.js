@@ -367,7 +367,7 @@ class User extends FreshObject {
      * @type {Promise<String>}
      */
     get chat_privacy() {
-        return this.get('messaging_privacy_status') === 1
+        return this.get('messaging_privacy_status')
     }
 
     /**
