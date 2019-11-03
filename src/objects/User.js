@@ -400,13 +400,19 @@ class User extends FreshObject {
      */
     get chat_url() {
         return (async () => {
+            if (this._chat_url) {
+                return this._chat_url
+            }
+
             if (!await this.can_chat || this.client.id_sync == this.id) {
                 return null
             }
 
-            return (await this.client.get_user_chat_url(this))
+            this._chat_url = (await this.client.get_user_chat_url(this))
                 .data
                 .chatUrl
+
+            return this._chat_url
         })()
     }
 
