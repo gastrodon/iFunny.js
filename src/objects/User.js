@@ -418,7 +418,7 @@ class User extends FreshObject {
 
     get chat() {
         return (async () => {
-            let url = await this.chat_url()
+            let url = await this.chat_url
 
             if (!url) {
                 return null
