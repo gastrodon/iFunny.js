@@ -187,7 +187,7 @@ Client.prototype.chat_members_paginated = async function(opts = {}) {
     let response = await axios({
         method: 'get',
         url: `${instance.sendbird_api}/group_channels/${opts.chat.channel_url || opts.chat}/members`,
-        params: params,
+        params: { ...params, ...(opts.params || {}) },
         headers: await instance.sendbird_headers
     })
 
