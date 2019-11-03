@@ -394,6 +394,22 @@ class User extends FreshObject {
     }
 
     /**
+     * Get the chat channel_url for this user, if they are available for chat
+     * @type {String|Null}
+     */
+    get chat_url() {
+        return (async () => {
+            if (!await this.can_chat || this.client.id_sync == this.id) {
+                return null
+            }
+
+            return (await this.client.get_user_chat_url(this))
+                .data
+                .chatUrl
+        })()
+    }
+
+    /**
      * Is this user banned?
      * @type {Promise<Boolean>}
      */
