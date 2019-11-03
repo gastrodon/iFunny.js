@@ -18,6 +18,29 @@ class Chat extends FreshObject {
         this.url = `${this.sendbird_api}/group_channels/${this.channel_url}`
     }
 
+    static async by_link(link, opts = {}) {
+        if (!opts.client) {
+            let Client = require('./Client')
+            opts.client = new Client()
+        }
+
+        try {
+            let response = await axios({
+                method: 'GET',
+                url: `${opts.client.api}/chats/channels/by_link/${link}`,
+                headers: await opts.client.headers
+            })
+
+            return new Chat(response.data.data.channel_url, opts)
+        } catch (err) {
+            if (err.response && err.response.data.error === 'not_found') {
+                return null
+            }
+
+            throw err
+        }
+    }
+
     // generators
 
     /**
