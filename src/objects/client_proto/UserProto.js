@@ -116,5 +116,21 @@ Client.prototype.report_user = async function(user, type) {
     return response
 }
 
+Client.prototype.get_user_chat_url = async function(user) {
+    let data = {
+        'chat_type': 'chat',
+        'users': user.id || user
+    }
+
+    let response = await axios({
+        method: 'POST',
+        url: `${this.api}/chats`,
+        data: data,
+        headers: await this.headers
+    })
+
+    return response
+}
+
 
 module.exports = Client
