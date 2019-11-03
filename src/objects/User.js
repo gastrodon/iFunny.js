@@ -211,8 +211,8 @@ class User extends FreshObject {
     get subscriber_count() {
         return (async () => {
             return (await this.get('num'))
-                .subscriptions || (this.fresh.get('num'))
-                .subscriptions
+                .subscribers || (this.fresh.get('num'))
+                .subscribers
         })()
     }
 
@@ -223,8 +223,8 @@ class User extends FreshObject {
     get subscription_count() {
         return (async () => {
             return (await this.get('num'))
-                .subscribers || (await this.fresh.get('num'))
-                .subscribers
+                .subscriptions || (await this.fresh.get('num'))
+                .subscriptions
         })()
     }
 
