@@ -56,7 +56,10 @@ class Chat extends FreshObject {
      * @type {Promise<Generator<ChatUser>>}
      */
     get members() {
-        return methods.paginated_generator(this.client.chat_members_paginated, { chat: this, instance: this.client })
+        let params = {
+            member_state_filter: 'joined_only'
+        }
+        return methods.paginated_generator(this.client.chat_members_paginated, { chat: this, instance: this.client, params: params })
     }
 
     /**
