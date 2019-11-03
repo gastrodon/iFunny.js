@@ -21,14 +21,16 @@ class User extends FreshObject {
     // methods
 
     static async by_nick(nick, opts = {}) {
-        let Client = require('./Client')
-        let client = opts.client || new Client()
+        if (!opts.user) {
+            let Client = require('./Client')
+            let opts.client = new Client()
+        }
 
         try {
             let response = await axios({
                 method: 'GET',
-                url: `${client.api}/users/by_nick/${nick}`,
-                headers: await client.headers
+                url: `${opts.client.api}/users/by_nick/${nick}`,
+                headers: await opts.client.headers
             })
 
             return new User(response.data.data.id, { client: this.client, data: response.data.data })
