@@ -181,7 +181,7 @@ Client.prototype.chat_members_paginated = async function(opts = {}) {
     }
 
     if (opts.next) {
-        params.next = opts.next
+        params.token = opts.next
     }
 
     let response = await axios({
