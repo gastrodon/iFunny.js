@@ -1,6 +1,14 @@
 ### 2.5.5
 - fix bad bracket notation usage in some `User` getters
+- `User.in_chat` method to represent a ChatUser instance in some chat
+- `Chat.by_link` method to get a Chat by it's ifunny.co/c/link type link
 - `User.get` was not being grouped when awaiting, resulting in properties being queried on promises instead of their resolved values
+- `Chat.members` did not paginate fully, now it does
+- `Chat.members` now iterates only joined members
+- `Chat.invited_members` iterator, which iterates members invited to a chat
+- `User.chat_privacy` did not return a correct value (bool instead of string), now it does
+- `User.by_nick` does now try to use `opts.client` and only imports Client to set it if it is unset
+- Fix docs not building
 
 ### 2.5.4
 - `Client.command_help` is now sync
