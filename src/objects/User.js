@@ -16,6 +16,7 @@ class User extends FreshObject {
     constructor(id, opts = {}) {
         super(id, opts)
         this.url = `${this.api}/users/${id}`
+        this._chat_url = null
     }
 
     // methods
@@ -406,6 +407,18 @@ class User extends FreshObject {
             return (await this.client.get_user_chat_url(this))
                 .data
                 .chatUrl
+        })()
+    }
+
+    get chat() {
+        return (async () => {
+            let url = await this.chat_url()
+
+            if (!url) {
+                return null
+            }
+
+            return new Chat(url, { client: this.client })
         })()
     }
 
