@@ -40,7 +40,7 @@ class User extends FreshObject {
                 headers: await opts.client.headers
             })
 
-            return new User(response.data.data.id, { client: this.client, data: response.data.data })
+            return new User(response.data.data.id, { client: opts.client, data: response.data.data })
         } catch (err) {
             if (err.response && err.response.data.error === 'not_found' || err.response.data.error === 'user_is_unavailable') {
                 return null
