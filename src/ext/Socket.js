@@ -28,7 +28,9 @@ class Socket extends EventEmitter {
             user_id: (await this.client.id),
             access_token: (await this.client.messenger_token)
         }
-        params = Object.keys(params).map(key => `${key}=${params[key]}`).join('&')
+        params = Object.keys(params)
+            .map(key => `${key}=${params[key]}`)
+            .join('&')
 
         this.connection = new WebSocket(`${this.socket_url}?${params}`)
         await this._associate_listeners(this.connection)
@@ -58,7 +60,7 @@ class Socket extends EventEmitter {
         })
 
         connection.on('error', async (error) => {
-            console.log(`unimplemented - error: ${error}`)
+            // console.log(`unimplemented - error: ${error}`)
         })
 
         connection.on('message', async (data) => {
@@ -72,7 +74,7 @@ class Socket extends EventEmitter {
         })
 
         connection.on('unexpected-response', async (request, response) => {
-            console.log(`unimplemented - unexpected-response: ${request}, ${response}`)
+            // console.log(`unimplemented - unexpected-response: ${request}, ${response}`)
         })
     }
 
