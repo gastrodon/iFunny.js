@@ -425,6 +425,7 @@ class User extends FreshObject {
                 return null
             }
 
+            let Chat = require('./Chat')
             return new Chat(url, { client: this.client })
         })()
     }
