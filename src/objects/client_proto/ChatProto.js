@@ -251,7 +251,6 @@ Client.prototype.remove_chat_operators = async function(users, chat) {
     })
 
     return response
-    console.log(JSON.stringify({ data: data }));
 }
 
 /**
@@ -317,7 +316,6 @@ Client.prototype.remove_chat_admins = async function(users, chat) {
     })
 
     return response
-    console.log(JSON.stringify({ data: data }));
 }
 
 /**
