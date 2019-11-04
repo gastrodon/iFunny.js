@@ -1,4 +1,5 @@
 const Client = require('../Client')
+const qs = require('qs')
 const axios = require('axios')
 
 /**
@@ -130,7 +131,7 @@ Client.prototype.get_user_chat_url = async function(user) {
     let response = await axios({
         method: 'POST',
         url: `${this.api}/chats`,
-        data: data,
+        data: qs.stringify(data),
         headers: await this.headers
     })
 

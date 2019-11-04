@@ -28,7 +28,7 @@ class User extends FreshObject {
      * @return {Promise<User>|Null}           The user found for this nick, or null if no such user
      */
     static async by_nick(nick, opts = {}) {
-        if (!opts.user) {
+        if (!opts.client) {
             let Client = require('./Client')
             opts.client = new Client()
         }
