@@ -210,12 +210,11 @@ Client.prototype.reads_paginated = async function(opts = {}) {
     let instance = opts.instance || this
 
     let data = await methods.paginated_data(`${instance.api}/feeds/reads`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'content',
-            next: opts.next,
-            headers: await instance.headers
-        })
-        .catch(e => console.log(e.response.data))
+        limit: opts.limit || instance.paginated_size,
+        key: 'content',
+        next: opts.next,
+        headers: await instance.headers
+    })
 
     data.items = data.items
         .map(item => new Post(item.id, { client: instance, data: item }))
@@ -235,12 +234,11 @@ Client.prototype.home_paginated = async function(opts = {}) {
     let instance = opts.instance || this
 
     let data = await methods.paginated_data(`${instance.api}/timelines/home`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'content',
-            next: opts.next,
-            headers: await instance.headers
-        })
-        .catch(e => console.log(e.response.data))
+        limit: opts.limit || instance.paginated_size,
+        key: 'content',
+        next: opts.next,
+        headers: await instance.headers
+    })
 
     data.items = data.items
         .map(item => new Post(item.id, { client: instance, data: item }))
@@ -260,12 +258,11 @@ Client.prototype.smiles_paginated = async function(opts = {}) {
     let instance = opts.instance || this
 
     let data = await methods.paginated_data(`${instance.api}/users/my/content_smiles`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'content',
-            next: opts.next,
-            headers: await instance.headers
-        })
-        .catch(e => console.log(e.response.data))
+        limit: opts.limit || instance.paginated_size,
+        key: 'content',
+        next: opts.next,
+        headers: await instance.headers
+    })
 
     data.items = data.items
         .map(item => new Post(item.id, { client: instance, data: item }))
@@ -285,12 +282,11 @@ Client.prototype.comments_paginated = async function(opts = {}) {
     let instance = opts.instance || this
 
     let data = await methods.paginated_data(`${instance.api}/users/my/comments`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'comments',
-            next: opts.next,
-            headers: await instance.headers
-        })
-        .catch(e => console.log(e.response.data))
+        limit: opts.limit || instance.paginated_size,
+        key: 'comments',
+        next: opts.next,
+        headers: await instance.headers
+    })
 
     data.items = data.items
         .map(item => new Comment(item.id, { client: instance, data: item }))
