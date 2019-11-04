@@ -387,13 +387,12 @@ Client.prototype.search_tags_paginated = async function(opts = {}) {
     let instance = opts.instance || this
 
     let data = await methods.paginated_data(`${instance.api}/search/content`, {
-            limit: opts.limit || instance.paginated_size,
-            key: 'content',
-            next: opts.next,
-            params: { q: opts.query },
-            headers: await instance.headers
-        })
-        .catch(error => console.log(error.response))
+        limit: opts.limit || instance.paginated_size,
+        key: 'content',
+        next: opts.next,
+        params: { q: opts.query },
+        headers: await instance.headers
+    })
 
     data.items = data.items
         .map(item => new Post(item.id, { client: instance, data: item }))
