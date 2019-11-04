@@ -410,6 +410,7 @@ class User extends FreshObject {
 
             this._chat_url = (await this.client.get_user_chat_url(this))
                 .data
+                .data
                 .chatUrl
 
             return this._chat_url
