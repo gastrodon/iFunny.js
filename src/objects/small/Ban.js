@@ -20,7 +20,7 @@ class Ban extends FreshObject {
 
         this.user = opts.user || this.client.user
 
-        this.url = `${self.api}/users/${this.user.id}/bans/${self.id}`
+        this.url = `${this.api}/users/${this.user.id}/bans/${this.id}`
     }
 
     /**
