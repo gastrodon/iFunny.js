@@ -235,19 +235,33 @@ class Client extends EventEmitter {
     }
 
     /**
-     * Generator iterating through the active bans of this client
-     * @type {Promise<Generator<Ban>>}
-     */
-    get bans() {
-        return methods.paginated_generator(this.user_bans_paginated, { instance: this, user: this.id_sync })
-    }
-
-    /**
      * Generator iterating through logged in users read posts
      * @type {Promise<Generator<Post>>}
      */
     get reads() {
         return methods.paginated_generator(this.reads_paginated, { instance: this })
+    }
+
+    /**
+     * Active bans on this account
+     * @type {Promise<Array<Ban>>}
+     */
+    get bans() {
+        return (async () => {
+            let Ban = require('./small/Ban')
+
+            let response = await axios({
+                method: 'GET',
+                url: `${this.api}/users/${this.id_sync}/bans`,
+                headers: await this.headers
+            })
+
+            return response
+                .data
+                .data
+                .bans
+                .map(item => new Ban(item.id, { client: this, user: this.user, data: item }))
+        })()
     }
 
     /**
