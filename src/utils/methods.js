@@ -113,8 +113,9 @@ async function* paginated_generator(source, opts = {}) {
 }
 
 module.exports = {
-    paginated_data: paginated_data,
-    paginated_generator: paginated_generator,
-    determine_mime: determine_mime,
-    sleep: sleep
+    paginated_data,
+    paginated_generator,
+    determine_mime,
+    sleep,
+    compose_comment
 }
