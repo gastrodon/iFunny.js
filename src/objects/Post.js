@@ -49,14 +49,15 @@ class Post extends FreshObject {
      * @throws                                              Throws error if bad api response, or if the comment is not posted
      */
     async add_comment(text, attachment, mentions) {
-        let data = await this.client.add_comment_to_post(this, text, attachment, mentions)
+        let data = (await this.client.add_comment_to_post(this, text, attachment, mentions))
+            .data
             .data
 
         if (data.id === '000000000000000000000000') {
             throw data.toString()
         }
 
-        let comment = require('./Comment')
+        let Comment = require('./Comment')
         return new Comment(data.id, { client: this.client, data: data.comment })
     }
 
