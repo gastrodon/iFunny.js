@@ -54,7 +54,7 @@ class Post extends FreshObject {
             .data
 
         if (data.id === '000000000000000000000000') {
-            throw data.toString()
+            throw data
         }
 
         let Comment = require('./Comment')
