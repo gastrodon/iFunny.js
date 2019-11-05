@@ -503,31 +503,6 @@ Client.prototype.user_subscriptions_paginated = async function(opts = {}) {
 }
 
 /**
- * Get a chunk of bans of a user
- * @param  {Object}  opts={}        Optional parameters
- * @param  {User|String}  opts.user User to get the bans of
- * @param  {String}  opts.query     Search query
- * @param  {Number}  opts.limit=25  Number of items to fetch
- * @param  {Number}  opts.next=null Nextpage token
- * @return {Promise<Object>}          Chunk of users with paging info
- */
-Client.prototype.user_bans_paginated = async function(opts = {}) {
-    let Bans = require('../small/Bans')
-    let instance = opts.instance || this
-
-    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}`, {
-        limit: opts.limit || instance.paginated_size,
-        key: 'bans',
-        next: opts.next,
-        headers: await instance.headers
-    })
-    data.items = data.items
-        .map(item => new Ban(item.id, { client: instance, user: opts.user, data: item }))
-
-    return data
-}
-
-/**
  * Get a chunk of smiles of a post
  * @param  {Object}  opts={}        Optional parameters
  * @param  {Post|String}  opts.post Post to get the smiles of
