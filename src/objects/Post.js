@@ -294,7 +294,7 @@ class Post extends FreshObject {
      */
     get smile_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .smiles
         })()
     }
@@ -305,7 +305,7 @@ class Post extends FreshObject {
      */
     get unsmile_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .unsmiles
         })()
     }
@@ -316,7 +316,7 @@ class Post extends FreshObject {
      */
     get guest_smile_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .guest_smiles
         })()
     }
@@ -327,7 +327,7 @@ class Post extends FreshObject {
      */
     get comment_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .comments
         })()
     }
@@ -338,7 +338,7 @@ class Post extends FreshObject {
      */
     get view_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .views
         })()
     }
@@ -349,7 +349,7 @@ class Post extends FreshObject {
      */
     get republish_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .republished
         })()
     }
@@ -360,7 +360,7 @@ class Post extends FreshObject {
      */
     get share_count() {
         return (async () => {
-            return await this.get('num')
+            return (await this.get('num'))
                 .shares
         })()
     }
