@@ -202,6 +202,11 @@ class User extends FreshObject {
         return methods.paginated_generator(this.client.user_bans_paginated, { instance: this.client, user: this.id })
     }
 
+    /**
+     * Generator iterating through the users blocked by this user
+     * Non-self user blocks are forbidden to non-admin accounts
+     * @type {Promise<Generator<User>>}
+     */
     get blocked_users() {
         return methods.paginated_generator(this.client.user_blocked_users, { instance: this.client, user: this.id })
     }

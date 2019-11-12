@@ -60,6 +60,31 @@ Client.prototype.user_guests_paginated = async function(opts = {}) {
 }
 
 /**
+ * Get a chunk of the blocked users of a user
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {User|String}  opts.user User to get the blocked users of
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}          Chunk of users with paging info
+ */
+Client.prototype.user_blocked_users = async function(opts = {}) {
+    let User = require('../User')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}/blocked`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'users',
+        next: opts.next,
+        headers: await instance.headers
+    })
+
+    data.items = data.items
+        .map(item => new User(item.id, { client: instance, data: item }))
+
+    return data
+}
+
+/**
  * Get a Chunk of posts from the feed of a channel
  * @param  {Object}  opts={}            Optional parameters
  * @param  {Number}  opts.limit=25      Number of items to fetch
@@ -548,23 +573,6 @@ Client.prototype.post_comments_paginated = async function(opts = {}) {
     })
     data.items = data.items
         .map(item => new Comment(item.id, item.cid, { client: instance, data: item }))
-
-    return data
-}
-
-Client.prototype.user_blocked_users = async function(opts = {}) {
-    let User = require('../User')
-    let instance = opts.instance || this
-
-    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}/blocked`, {
-        limit: opts.limit || instance.paginated_size,
-        key: 'users',
-        next: opts.next,
-        headers: await instance.headers
-    })
-
-    data.items = data.items
-        .map(item => new User(item.id, { client: instance, data: item }))
 
     return data
 }
