@@ -552,4 +552,21 @@ Client.prototype.post_comments_paginated = async function(opts = {}) {
     return data
 }
 
+Client.prototype.user_blocked_users = async function(opts = {}) {
+    let User = require('../User')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/users/${opts.user.id || opts.user}/blocked`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'users',
+        next: opts.next,
+        headers: await instance.headers
+    })
+
+    data.items = data.items
+        .map(item => new User(item.id, { client: instance, data: item }))
+
+    return data
+}
+
 module.exports = Client
