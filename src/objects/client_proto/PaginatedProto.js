@@ -67,7 +67,7 @@ Client.prototype.user_guests_paginated = async function(opts = {}) {
  * @param  {Number}  opts.next=null Nextpage token
  * @return {Promise<Object>}          Chunk of users with paging info
  */
-Client.prototype.user_blocked_users = async function(opts = {}) {
+Client.prototype.user_blocked_users_paginated = async function(opts = {}) {
     let User = require('../User')
     let instance = opts.instance || this
 
