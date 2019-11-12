@@ -1,3 +1,12 @@
+### 2.6.0
+- `User.chat` and `User.chat_url` properties
+- `Client.get_user_chat_url`, `Client.user_blocked_users_paginated` methods
+- Remove logging and unreachable code
+- `Post.add_comment` no longer fails to post comments
+- `Client.bans` is not paginated, instead it returns an Array
+- `Client.user_bans_paginated` removed, as it does not have paging data
+- `User.blocked_users` generator, for users blocked by a user 
+
 ### 2.5.5
 - fix bad bracket notation usage in some `User` getters
 - `User.in_chat` method to represent a ChatUser instance in some chat
