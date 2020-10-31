@@ -1,7 +1,6 @@
 # iFunny.js
 
-[![Discord](https://img.shields.io/discord/624473515327881216?label=Discord&style=flat-square&logo=discord)](https://discord.gg/7WJZM9q)
-[![Docs](https://img.shields.io/badge/Docs-Online-success?style=flat-square)](http://216.16.208.63:80/)
+[![Discord](https://img.shields.io/discord/646164479863947266?label=Discord&style=flat-square&logo=discord)](https://discord.gg/MRdxWZW)
 
 A simple wrapper for the iFunny API
 
@@ -25,6 +24,3 @@ robot.login('username', 'password')
 ```
 
 Fun fact, there's not a single file in this project called `ifunny.js`
-
-### Documentation
-The [docs](http://216.16.208.63) should get you started. Examples are coming soon.
