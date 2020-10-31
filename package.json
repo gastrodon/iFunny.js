@@ -10,17 +10,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/basswaver/ifunny.js.git"
+        "url": "git+https://github.com/gastrodon/ifunny.js.git"
     },
-    "author": "Zero <dakoolstwunn@gmail.com> (https://github.com/basswaver)",
+    "author": "Zero <dakoolstwunn@gmail.com> (https://github.com/gastrodon)",
     "contributors": [
         "AurorasPalace"
     ],
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/basswaver/IFunny.js/issues"
+        "url": "https://github.com/gastrodon/IFunny.js/issues"
     },
-    "homepage": "https://github.com/basswaver/IFunny.js#readme",
+    "homepage": "https://github.com/gastrodon/IFunny.js#readme",
     "dependencies": {
         "axios": "^0.19.0",
         "js-sha1": "^0.6.0",
