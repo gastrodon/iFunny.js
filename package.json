@@ -31,6 +31,8 @@
     "devDependencies": {
         "axios-debug-log": "^0.6.2",
         "jsdoc": "^3.6.3",
-        "loke-jsdoc-theme": "^2.1.0"
+        "lodash": "^4.17.20",
+        "loke-jsdoc-theme": "^2.1.0",
+        "minimist": "^1.2.5"
     }
 }
