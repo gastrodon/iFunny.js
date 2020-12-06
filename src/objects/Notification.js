@@ -54,7 +54,7 @@ class Notification {
             }
 
             let User = require('./User')
-            return User(data.id, { client: this.client, data: data })
+            return new User(data.id, { client: this.client, data: data })
 
         })()
     }
