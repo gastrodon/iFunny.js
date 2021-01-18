@@ -49,7 +49,7 @@ export class Client extends Freshable {
   constructor(args: args_constructor = {}) {
     super("", { no_client: true, ...args });
 
-    this.config_root = `${Deno.env.get("HOME") ?? "/root"}/.ifunnyjs`;
+    this.config_root = `${Deno.env.get("HOME") ?? "/root"}/.config/ifunny`;
     ensureDirSync(this.config_root);
   }
 
