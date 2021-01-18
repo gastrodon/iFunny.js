@@ -78,6 +78,19 @@ Deno.test({
   ignore: EMAIL === undefined || PASSWORD === undefined ||
     NO_AUTH !== undefined,
   async fn() {
+    const client: Client = new Client();
+    await client.login(EMAIL!, PASSWORD!);
+    const headers: any = await client.headers;
+
+    assertEquals(headers.authorization, `Bearer ${client.token}`);
+  },
+});
+
+Deno.test({
+  name: "login fresh token",
+  ignore: EMAIL === undefined || PASSWORD === undefined ||
+    NO_AUTH !== undefined,
+  async fn() {
     await emptyDir(CONFIG_ROOT);
 
     const client: Client = new Client();
