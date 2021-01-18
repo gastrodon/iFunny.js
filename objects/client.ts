@@ -39,10 +39,10 @@ async function sleep(delay: number): Promise<void> {
 }
 
 export class Client extends Freshable {
+  private _token: string = "";
   private config_cache: any = undefined;
   private config_file: string = "config.json";
   private config_root: string;
-  private token: string = "";
   private token_expires: number = 0;
   readonly path: string = "/account";
 
@@ -78,7 +78,7 @@ export class Client extends Freshable {
       },
     );
 
-    this.token = response.access_token;
+    this._token = response.access_token;
     this.token_expires = response.expires_in;
     console.log(JSON.stringify(response));
     return this;
@@ -147,5 +147,9 @@ export class Client extends Freshable {
           : `Basic ${await this.basic}`,
       };
     })();
+  }
+
+  get token(): string {
+    return this._token;
   }
 }
