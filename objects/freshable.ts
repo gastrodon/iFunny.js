@@ -87,7 +87,7 @@ export class Freshable {
     })();
   }
 
-  get fresh(): Freshable {
+  get fresh(): this {
     this.update = true;
     return this;
   }
