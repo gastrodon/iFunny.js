@@ -37,7 +37,7 @@ export class Freshable {
   async get(key: string, args: args_get = {}) {
     let value: any = (await this.data)[key];
 
-    if (!value) {
+    if (value === undefined) {
       value = (await this.fresh.data)[key];
     }
 
