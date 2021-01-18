@@ -82,7 +82,7 @@ export class Freshable {
     return (async () => {
       if (this.update) {
         this.update = false;
-        this.data_cache = await this.request_json(this.path);
+        this.data_cache = (await this.request_json(this.path)).data;
       }
 
       return this.data_cache;
