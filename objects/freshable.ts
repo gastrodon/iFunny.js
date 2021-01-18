@@ -1,4 +1,5 @@
 import { Client } from "./client.ts";
+import { APIError } from "./error.ts";
 
 export const PAGE_DEFAULT: number = 30;
 
@@ -59,7 +60,12 @@ export class Freshable {
   }
 
   async request_json(path: string, args: any = {}): Promise<any> {
-    return (await this.request(path, args)).json();
+    const data: any = await (await this.request(path, args)).json();
+    if (data.error !== undefined) {
+      throw new APIError(
+        `${data.error}: ${data.error_description ?? "No error_description"}`,
+      );
+    }
   }
 
   get client(): Client {
