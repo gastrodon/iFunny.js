@@ -32,3 +32,25 @@ Deno.test("no client throws", async () => {
     "no client to return",
   );
 });
+
+Deno.test("get", async () => {
+  const data: any = { foo: v4.generate() };
+  const fresh: Freshable = new Freshable("", { data });
+
+  assertEquals(await fresh.get("foo"), data.foo);
+});
+
+Deno.test("get default", async () => {
+  const fresh: Freshable = new Freshable("");
+});
+
+Deno.test("get transformer", async () => {
+  const data: any = { foo: Math.trunc(Math.random() * 100) };
+  const fresh: Freshable = new Freshable("", { data });
+  const transformer: (it: any) => any = (it: number) => it * 10;
+
+  assertEquals(
+    await fresh.get("foo", { transformer }),
+    transformer(data.foo),
+  );
+});
