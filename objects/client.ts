@@ -16,8 +16,7 @@ const HEX_POOL: string[] = [
 ];
 
 interface args_constructor {
-  prefix?: string;
-  reconnect?: boolean;
+  prefix?: string | string[] | ((it: any) => string) | ((it: any) => string[])
   page_size?: number;
   notification_interval?: number;
 }
@@ -38,6 +37,21 @@ async function sleep(delay: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
+/**
+ * iFunny Client, representing a logged user or guest
+ * and handling their session
+ * @extends {Freshable}
+ * @param {args_constructor}  opts
+ * Optional constructor arguments
+ * @param {string | string[] | (it: any) => string (it: any) => string[]} opts.prefix
+ * Prefix that the bot should use. It should be a string, list of strings,
+ * or function that returns either of those.
+ * If it is a function, it will be called with the candidate message
+ * @param {number} opts.page_size
+ * The number of items to get at once when paginating
+ * @param {number} notification_interval
+ * Time in ms to wait between notification checks, if checking for notifications
+ */
 export class Client extends Freshable {
   private _token: string = "";
   private config_cache: any = undefined;
@@ -80,7 +94,7 @@ export class Client extends Freshable {
 
     this._token = response.access_token;
     this.token_expires = response.expires_in;
-    return this;
+    return this.fresh;
   }
 
   private get config(): any {
