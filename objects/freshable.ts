@@ -66,6 +66,8 @@ export class Freshable {
         `${data.error}: ${data.error_description ?? "No error_description"}`,
       );
     }
+
+    return data;
   }
 
   get client(): Client {
