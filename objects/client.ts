@@ -80,17 +80,15 @@ export class Client extends Freshable {
 
     this._token = response.access_token;
     this.token_expires = response.expires_in;
-    console.log(JSON.stringify(response));
     return this;
   }
 
   private get config(): any {
-    if (this.config_cache === undefined || this.update) {
+    if (this.config_cache === undefined) {
       if (!existsSync(this.config_path)) {
         Deno.writeTextFileSync(this.config_path, "{}");
       }
 
-      this.update = false;
       this.config_cache = JSON.parse(Deno.readTextFileSync(this.config_path));
     }
 
