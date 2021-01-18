@@ -10,18 +10,18 @@ interface args_constructor {
 }
 
 interface args_get {
-  default: any;
+  default?: any;
   transformer?: (it: any) => any;
 }
 
 export class Freshable {
-  private data_cache: any;
-  private update: boolean = false;
   private _client: Client | undefined = undefined; // TODO
+  private data_cache: any;
+  protected update: boolean = false;
   readonly api: string = "https://api.ifunny.mobi/v4";
   readonly id: string;
   readonly page_size: number;
-  readonly uri: string = "/";
+  readonly path: string = "/";
 
   constructor(id: string | number | null, args: args_constructor = {}) {
     this.id = id as string;
@@ -33,7 +33,7 @@ export class Freshable {
     }
   }
 
-  async get(key: string, args: args_get = { default: null }) {
+  async get(key: string, args: args_get = {}) {
     let value: any = (await this.data)[key];
 
     if (!value) {
@@ -45,8 +45,8 @@ export class Freshable {
       : value ?? args.default;
   }
 
-  async request(path: string, args: any = {}): Promise<any> {
-    const response: Response = await fetch(
+  async request(path: string, args: any = {}): Promise<Response> {
+    return await fetch(
       `${this.api}${path}`,
       {
         ...args,
@@ -56,18 +56,10 @@ export class Freshable {
         },
       },
     );
+  }
 
-    const body_text: string = await response.text();
-
-    try {
-      return JSON.parse(body_text);
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        return body_text;
-      }
-
-      throw err;
-    }
+  async request_json(path: string, args: any = {}): Promise<any> {
+    return (await this.request(path, args)).json();
   }
 
   get client(): Client {
@@ -80,6 +72,11 @@ export class Freshable {
 
   get data(): Promise<any> {
     return (async () => {
+      if (this.update) {
+        this.update = false;
+        this.data_cache = await this.request_json(this.path);
+      }
+
       return this.data_cache;
     })();
   }
