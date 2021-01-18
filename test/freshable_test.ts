@@ -33,6 +33,18 @@ Deno.test({
 });
 
 Deno.test({
+  name: "headers",
+  async fn() {
+    const fresh: Freshable = new Freshable("");
+    const headers: any = await fresh.headers;
+    const basic: string = await fresh.client.basic;
+
+    assertEquals(headers.authorization, `Basic ${basic}`);
+    assertNotEquals(headers["user-agent"], undefined);
+  },
+});
+
+Deno.test({
   name: "no client throws",
   async fn() {
     const fresh: Freshable = new Freshable("", { no_client: true });
