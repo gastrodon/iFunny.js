@@ -16,7 +16,7 @@ const HEX_POOL: string[] = [
 ];
 
 interface args_constructor {
-  prefix?: string | string[] | ((it: any) => string) | ((it: any) => string[])
+  prefix?: string | string[] | ((it: any) => string) | ((it: any) => string[]);
   page_size?: number;
   notification_interval?: number;
 }
