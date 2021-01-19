@@ -121,10 +121,14 @@ export class Client extends Freshable {
 
   /**
    * Log into an iFunny account
-   * @param   {string} email
-   * email address associated with the account
-   * @param   {string} password
-   * password locking the account
+   * @param   {string}  email
+   * Email address associated with the account
+   * @param   {string}  password=undefined
+   * Password locking the account
+   * May be omitted if relying on a cached auth
+   * @param   {boolean} fresh=false
+   * Force a fresh auth from iFunny?
+   * If true, password must be included
    * @return  {Client}
    * this
    */
@@ -159,9 +163,21 @@ export class Client extends Freshable {
 
   /**
    * Upload an image or video
-   * @param {Blob}  data  Image data to post as a Blob
-   * @param  args [description]
-   * @return      [description]
+   * @param   {Blob}      args.data
+   * Image data to post as a Blob
+   * @param   {string[]}  args.tags=[]
+   * Tags to associate with this image
+   * @param   {string}    args.type=pic
+   * Type of media being uploaded
+   * @param   {string}    args.visibility=public
+   * Visibility of the post, can be public or subscribers
+   * @param   {number}    args.timeout=14
+   * Time in seconds to wait for the upload, if args.wait
+   * @param   {boolean}   args.wait=false
+   * Wait for the post to be created and return it?
+   * @return  {string}
+   * The pending upload id if not args.wait,
+   * otherwise the content id of the uploaded post
    */
   async post_image(data: Blob, args: post_image_args = {}): Promise<string> {
     const form: FormData = new FormData();
@@ -194,6 +210,15 @@ export class Client extends Freshable {
     throw new Error(`Timeout waiting to post ${response.id}`);
   }
 
+  /**
+   * Set the newbie status of this client's basic token
+   * This will fail if called on an authed client
+   * This is called with state=false when a fresh basic is generated
+   * @param   {Boolean} state
+   * Should this token be set as a newbie?
+   * @return  {Client}
+   * this
+   */
   async set_newbie(state: boolean): Promise<this> {
     await this.request_json(
       "/clients/me",
@@ -215,7 +240,7 @@ export class Client extends Freshable {
    * @param   {string}          args.nick
    * account nickname
    * @param   {string}          args.sex
-   * sex of the user in female | male | other
+   * sex of the user, one of female, male, other
    * Cannot be unset
    * @return  {Client}
    * this
