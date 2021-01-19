@@ -9,7 +9,7 @@ import { APIError, Client } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
 const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
-const NO_AUTH: boolean = Deno.env.get("IFUNNYJS_NO_AUTH") === undefined;
+const NO_AUTH: boolean = Deno.env.get("IFUNNYJS_NO_AUTH") !== undefined;
 
 const HOME: string | undefined = Deno.env.get("HOME");
 const CONFIG_ROOT: string = HOME as string + "/.config/ifunny";
