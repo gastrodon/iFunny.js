@@ -94,7 +94,41 @@ export class Client extends Freshable {
 
     this._token = response.access_token;
     this.token_expires = response.expires_in;
-    return this.fresh;
+
+    this.set_config(`bearer ${email}`, this.bearer_token);
+    return this;
+  }
+
+  /**
+   * Update profile data
+   * @param   {string}          args.about
+   * account about section
+   * @param   {string}          args.birth_date
+   * birth date of the user in YYYY-MM-DD
+   * Cannot be unset
+   * @param   {boolean|number}  args.is_private
+   * should this profile be private? Not settable in the app
+   * @param   {string}          args.nick
+   * account nickname
+   * @param   {string}          args.sex
+   * sex of the user in female | male | other
+   * Cannot be unset
+   * @return  {Client}
+   * this
+   */
+  async update_profile(args: update_profile_args): Promise<this> {
+    if (typeof args.is_private === "boolean") {
+      args.is_private = args.is_private === true ? 1 : 0
+    }
+
+    await this.request_json(
+      "/account",
+      { method: "PUT", body: qs_string(args), headers: URLENCODED },
+    );
+
+    return this;
+  }
+
   }
 
   private get config(): any {
