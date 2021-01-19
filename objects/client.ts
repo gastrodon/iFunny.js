@@ -147,7 +147,7 @@ export class Client extends Freshable {
 
     const response: login_response = await this.request_json(
       "/oauth2/token",
-      { method: "POST", body: qs_string(data), headers: URLENCODED },
+      { method: "POST", body: qs_string(data), headers: URLENCODED, raw: true },
     );
 
     this.bearer_token = response.access_token;
