@@ -137,3 +137,83 @@ Deno.test({
     );
   },
 });
+
+Deno.test({
+  name: "login stored",
+  ignore: EMAIL === undefined,
+  async fn() {
+    const client: Client = new Client();
+    await client.login(EMAIL!)
+
+    assertNotEquals(client.token, "")
+  }
+})
+
+Deno.test({
+  name: "update_profile about",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const about: string = v4.generate();
+    await CLIENT!.update_profile({ about });
+
+    assertEquals(about, await CLIENT!.fresh.about);
+  },
+});
+
+Deno.test({
+  name: "update_profile birth_date",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const year: number = 1922 + Math.floor(Math.random() * 78); // year 1922 -> 2000
+    const month: number = 10 + Math.floor(Math.random() * 2); // month 10 -> 12
+    const day: number = 10 + Math.floor(Math.random() * 17); // day 10 -> 28
+    const birth_date: string = `${year}-${month}-${day}`;
+    await CLIENT!.update_profile({ birth_date });
+
+    assertEquals(birth_date, await CLIENT!.fresh.get("birth_date"));
+  },
+});
+
+Deno.test({
+  name: "update_profile is_private",
+  ignore: CLIENT === undefined,
+  async fn() {
+    await CLIENT!.update_profile({ is_private: true });
+    assertEquals(true, await CLIENT!.fresh.is_private);
+
+    await CLIENT!.update_profile({ is_private: false });
+    assertEquals(false, await CLIENT!.fresh.is_private);
+  },
+});
+
+Deno.test({
+  name: "update_profile nick",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const nick_restore: string = await CLIENT!.nick;
+    const nick: string = v4.generate().replaceAll("-", "").substring(20);
+    await CLIENT!.update_profile({ nick });
+
+    try {
+      assertEquals(nick, await CLIENT!.fresh.nick);
+    } finally {
+      await CLIENT!.update_profile({ nick: nick_restore });
+    }
+  },
+});
+
+Deno.test({
+  name: "update_profile sex",
+  ignore: CLIENT === undefined,
+  async fn() {
+    let sex: string = "male";
+    await CLIENT!.update_profile({ sex });
+
+    assertEquals(sex, await CLIENT!.fresh.sex);
+
+    sex = "female";
+    await CLIENT!.update_profile({ sex });
+
+    assertEquals(sex, await CLIENT!.fresh.sex);
+  },
+});
