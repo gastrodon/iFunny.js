@@ -187,6 +187,13 @@ export class Client extends Freshable {
     return this;
   }
 
+  async set_newbie(state: boolean): Promise<this> {
+    await this.request_json(
+      "/clients/me",
+      { method: "PUT", data: qs_string({ newbie: state }) },
+    );
+
+    return this;
   }
 
   private get config(): any {
@@ -232,7 +239,7 @@ export class Client extends Freshable {
       this.update = false;
       this.set_config(`basic_token`, basic);
 
-      await (await this.request("/counters")).body?.cancel();
+      await this.set_newbie(false);
       await sleep(10_000);
       return basic;
     })();

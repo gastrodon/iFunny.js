@@ -217,3 +217,12 @@ Deno.test({
     assertEquals(sex, await CLIENT!.fresh.sex);
   },
 });
+
+Deno.test({
+  name: "set_newbie",
+  only: true,
+  async fn() {
+    await (new Client()).set_newbie(false)
+    await (new Client()).set_newbie(true)
+  }
+})
