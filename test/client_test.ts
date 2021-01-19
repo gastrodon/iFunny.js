@@ -106,7 +106,7 @@ Deno.test({
 // WARNING: fresh auth
 Deno.test({
   name: "login bad email",
-  ignore: NO_AUTH !== undefined,
+  ignore: NO_AUTH,
   async fn() {
     const client: Client = new Client();
     await client.fresh.basic;
@@ -124,7 +124,7 @@ Deno.test({
 // WARNING: fresh auth
 Deno.test({
   name: "login bad password",
-  ignore: EMAIL === undefined || NO_AUTH !== undefined,
+  ignore: EMAIL === undefined || NO_AUTH,
   async fn() {
     const client: Client = new Client();
     await client.fresh.basic;
