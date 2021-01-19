@@ -102,7 +102,7 @@ export class Client extends Freshable {
   private config_file: string = "config.json";
   private config_root: string;
   private token_expires: number = 0;
-  readonly path: string = "/account";
+  protected path: string = "/account";
 
   constructor(args: args_client = {}) {
     super("", { no_client: true, ...args });

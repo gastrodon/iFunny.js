@@ -18,11 +18,11 @@ interface args_get {
 export class Freshable {
   private _client: Client | undefined = undefined; // TODO
   private data_cache: any;
+  protected path: string = "/";
   protected update: boolean = false;
   readonly api: string = "https://api.ifunny.mobi/v4";
   readonly id: string;
   readonly page_size: number;
-  readonly path: string = "/";
 
   constructor(id: string | number | null, args: args_freshable = {}) {
     this.id = id as string;
