@@ -244,7 +244,10 @@ Deno.test({
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
-    let content_id: Content = await CLIENT!.upload_content(data, { wait: true }) as Content;
+    let content_id: Content = await CLIENT!.upload_content(
+      data,
+      { wait: true },
+    ) as Content;
 
     // TODO: better tests when Post class available
     assertNotEquals(content_id, "");

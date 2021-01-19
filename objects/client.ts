@@ -1,4 +1,4 @@
-import { Content } from "./content.ts"
+import { Content } from "./content.ts";
 import { Freshable } from "./freshable.ts";
 import { ensureDirSync, existsSync, sha1 } from "../deps.ts";
 
@@ -180,7 +180,10 @@ export class Client extends Freshable {
    * The pending upload id if not args.wait,
    * otherwise the content id of the uploaded post
    */
-  async upload_content(data: Blob, args: args_upload_content = {}): Promise<Content | string> {
+  async upload_content(
+    data: Blob,
+    args: args_upload_content = {},
+  ): Promise<Content | string> {
     const form: FormData = new FormData();
     form.append("image", data, "image.png");
     form.append("tags", JSON.stringify(args?.tags ?? []));
@@ -201,7 +204,7 @@ export class Client extends Freshable {
       response = await this.request_json(`/tasks/${response.id}`);
 
       if (response.result?.cid !== undefined) {
-        return new Content(response.result!.cid!, { client: this })
+        return new Content(response.result!.cid!, { client: this });
       }
 
       await sleep(500);
@@ -256,6 +259,22 @@ export class Client extends Freshable {
     );
 
     return this;
+  }
+
+  // Content methods
+
+  async set_content_smile(id: string, present: boolean): Promise<void> {
+    await this.request_json(
+      `/content/${id}/smiles`,
+      { method: present ? "PUT" : "DELETE" },
+    );
+  }
+
+  async set_content_unsmile(id: string, present: boolean): Promise<void> {
+    await this.request_json(
+      `/content/${id}/unsmiles`,
+      { method: present ? "PUT" : "DELETE" },
+    );
   }
 
   private get config(): any {
