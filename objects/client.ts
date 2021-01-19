@@ -207,11 +207,11 @@ export class Client extends Freshable {
   }
 
   get token(): string {
-    return this._token;
+    return this.bearer_token;
   }
 
   get about(): Promise<string> {
-    return this.get("about")
+    return this.get("about");
   }
 
   /**
@@ -219,7 +219,7 @@ export class Client extends Freshable {
    * @type {Promise<string>}
    */
   get bans(): Promise<any[]> {
-    return this.get("bans")
+    return this.get("bans");
   }
 
   /**
@@ -229,12 +229,12 @@ export class Client extends Freshable {
   get cover_color(): Promise<number> {
     return this.get(
       "cover_bg_color",
-      { default: "ffffff", transformer: (it: string) => Number(it) }
-    )
+      { default: "ffffff", transformer: (it: string) => Number(it) },
+    );
   }
 
-  get can_chat(): Promise<bool> {
-    return this.get("is_available_for_chat")
+  get can_chat(): Promise<boolean> {
+    return this.get("is_available_for_chat");
   }
 
   // TODO use Image class
@@ -243,7 +243,7 @@ export class Client extends Freshable {
    * @type Promise<string>
    */
   get cover_url(): Promise<string> {
-    return this.get("cover_url")
+    return this.get("cover_url");
   }
 
   /**
@@ -251,121 +251,125 @@ export class Client extends Freshable {
    * @type Promise<string>
    */
   get email(): Promise<string> {
-    return this.get("email")
+    return this.get("email");
   }
 
-  get has_unnotified_achievements(): Promise<bool> {
-    return this.get("have_unnotified_achievements")
+  get has_unnotified_achievements(): Promise<boolean> {
+    return this.get("have_unnotified_achievements");
   }
 
-  get has_unnotified_bans(): Promise<bool> {
-    return this.get("have_unnotified_bans")
+  get has_unnotified_bans(): Promise<boolean> {
+    return this.get("have_unnotified_bans");
   }
 
-  get has_unnotified_levels(): Promise<bool> {
-    return this.get("have_unnotified_levels")
+  get has_unnotified_levels(): Promise<boolean> {
+    return this.get("have_unnotified_levels");
   }
 
-  get has_unnotified_strikes(): Promise<bool> {
-    return this.get("have_unnotified_strikes")
+  get has_unnotified_strikes(): Promise<boolean> {
+    return this.get("have_unnotified_strikes");
   }
 
-  get id(): Promise<string> {
-    return this.get("id")
+  get is_banned(): Promise<boolean> {
+    return this.get("is_banned");
   }
 
-  get is_banned(): Promise<bool> {
-    return this.get("is_banned")
+  get is_blocked_in_messenger(): Promise<boolean> {
+    return this.get("is_blocked_in_messenger");
   }
 
-  get is_blocked_in_messenger(): Promise<bool> {
-    return this.get("is_blocked_in_messenger")
+  get is_deleted(): Promise<boolean> {
+    return this.get("is_deleted");
   }
 
-  get is_deleted(): Promise<bool> {
-    return this.get("is_deleted")
+  get is_ifunny_team_member(): Promise<boolean> {
+    return this.get("is_ifunny_team_member");
   }
 
-  get is_ifunny_team_member(): Promise<bool> {
-    return this.get("is_ifunny_team_member")
+  get is_moderator(): Promise<boolean> {
+    return this.get("is_moderator");
   }
 
-  get is_moderator(): Promise<bool> {
-    return this.get("is_moderator")
+  get is_private(): Promise<boolean> {
+    return this.get("is_private");
   }
 
-  get is_private(): Promise<bool> {
-    return this.get("is_private")
+  get is_verified(): Promise<boolean> {
+    return this.get("is_verified");
   }
 
-  get is_verified(): Promise<bool> {
-    return this.get("is_verified")
-  }
-
-  get is_safe_mode(): Promise<bool> {
-    return this.get("safe_mode")
+  get is_safe_mode(): Promise<boolean> {
+    return this.get("safe_mode");
   }
 
   // TODO getters for individual fields
   // or use a class
   get meme_experience(): Promise<any> {
-    return this.get("meme_experience")
+    return this.get("meme_experience");
   }
 
   get messaging_privacy(): Promise<string> {
-    return this.get("messaging_privacy_status")
+    return this.get("messaging_privacy_status");
   }
 
-  get messenger_active(): Promise<bool> {
-    return this.get("messenger_active")
+  get messenger_active(): Promise<boolean> {
+    return this.get("messenger_active");
   }
 
-  get need_account_setup(): Promise<bool> {
-    return this.get("need_account_setup")
+  get need_account_setup(): Promise<boolean> {
+    return this.get("need_account_setup");
   }
 
   get nick(): Promise<string> {
-    return this.get("nick")
+    return this.get("nick");
   }
 
   get achievement_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.achievements ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.achievements ?? 0 });
   }
 
   get created_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.created ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.created ?? 0 });
   }
 
   get featured_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.featured ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.featured ?? 0 });
   }
 
   get subscriber_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.subscribers ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.subscribers ?? 0 });
   }
 
   get subscription_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.subscriptions ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.subscriptions ?? 0 });
   }
 
   get post_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.total_posts ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.total_posts ?? 0 });
   }
 
   get smile_count(): Promise<number> {
-    return this.get("num", { transformer: (it: any) => it.total_smiles ?? 0 })
+    return this.get("num", { transformer: (it: any) => it.total_smiles ?? 0 });
   }
 
   get original_nick(): Promise<string> {
-    return this.get("original_nick")
+    return this.get("original_nick");
   }
 
   // TODO Image class
   get photo(): Promise<any> {
-    return this.get("photo")
+    return this.get("photo");
   }
 
   get web_url(): Promise<string> {
-    return this.get("web_url")
+    return this.get("web_url");
+  }
+
+  get sex(): Promise<string | null> {
+    return this.get("sex", { default: null });
+  }
+
+  get birth_date(): Promise<string | null> {
+    return this.get("birth_date", { default: null });
   }
 }
