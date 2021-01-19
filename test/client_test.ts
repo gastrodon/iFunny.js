@@ -24,7 +24,7 @@ if (HOME === undefined) {
   throw new Error("HOME must be set");
 }
 
-if (EMAIL && NO_AUTH) {
+if (EMAIL) {
   CLIENT = (await (new Client()).login(EMAIL!)).fresh;
 } else if (PASSWORD && !NO_AUTH) {
   CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
