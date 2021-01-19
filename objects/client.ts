@@ -34,6 +34,34 @@ interface login_response {
   expires_in: number;
 }
 
+interface update_profile_args {
+  about?: string;
+  birth_date?: string; // YYYY-MM-DD
+  is_private?: boolean | number; // sent as an int representing a bool
+  nick?: string;
+  sex?: string; // male, female, other
+}
+
+interface post_image_args {
+  tags?: string[];
+  type?: string;
+  visibility?: string;
+  // separate because these are ifunnyjs options
+  timeout?: number;
+  wait?: boolean;
+}
+
+interface post_image_task_result {
+  cid: string;
+}
+
+interface post_image_response {
+  id: string;
+  result?: post_image_task_result;
+  retry_after?: number;
+  state: string;
+  type: string;
+}
 
 function qs_string(data: { [key: string]: any }): string {
   return Object
@@ -56,19 +84,19 @@ async function sleep(delay: number): Promise<void> {
  * iFunny Client, representing a logged user or guest
  * and handling their session
  * @extends {Freshable}
- * @param {args_constructor}  opts
+ * @param {args_constructor}  args
  * Optional constructor arguments
- * @param {string | string[] | (it: any) => string (it: any) => string[]} opts.prefix
+ * @param {string | string[] | (it: any) => string (it: any) => string[]} args.prefix
  * Prefix that the bot should use. It should be a string, list of strings,
  * or function that returns either of those.
  * If it is a function, it will be called with the candidate message
- * @param {number} opts.page_size
+ * @param {number} args.page_size
  * The number of items to get at once when paginating
  * @param {number} notification_interval
  * Time in ms to wait between notification checks, if checking for notifications
  */
 export class Client extends Freshable {
-  private _token: string = "";
+  private bearer_token: string = "";
   private config_cache: any = undefined;
   private config_file: string = "config.json";
   private config_root: string;
@@ -91,19 +119,38 @@ export class Client extends Freshable {
     return this.config[key] ?? undefined;
   }
 
-  async login(email: string, password?: string, fresh: boolean = false) {
+  /**
+   * Log into an iFunny account
+   * @param   {string} email
+   * email address associated with the account
+   * @param   {string} password
+   * password locking the account
+   * @return  {Client}
+   * this
+   */
+  async login(
+    email: string,
+    password?: string,
+    fresh?: boolean,
+  ): Promise<this> {
     const data: login_data = {
       grant_type: "password",
       password: password ?? "",
       username: email,
     };
 
+    const from_config: string | undefined = this.get_config(`bearer ${email}`);
+    if (!fresh && from_config !== undefined) {
+      this.bearer_token = from_config as string;
+      return this;
+    }
+
     const response: login_response = await this.request_json(
       "/oauth2/token",
       { method: "POST", body: qs_string(data), headers: URLENCODED },
     );
 
-    this._token = response.access_token;
+    this.bearer_token = response.access_token;
     this.token_expires = response.expires_in;
 
     this.set_config(`bearer ${email}`, this.bearer_token);
