@@ -3,7 +3,7 @@ import { APIError } from "./error.ts";
 
 export const PAGE_DEFAULT: number = 30;
 
-interface args_constructor {
+export interface args_freshable {
   client?: Client;
   data?: any;
   no_client?: boolean;
@@ -24,7 +24,7 @@ export class Freshable {
   readonly page_size: number;
   readonly path: string = "/";
 
-  constructor(id: string | number | null, args: args_constructor = {}) {
+  constructor(id: string | number | null, args: args_freshable = {}) {
     this.id = id as string;
     this.data_cache = args.data ?? {};
     this.page_size = args.page_size ?? PAGE_DEFAULT;

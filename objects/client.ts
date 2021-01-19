@@ -16,7 +16,7 @@ const HEX_POOL: string[] = [
   "6", "7", "8", "9", "0",
 ];
 
-interface args_constructor {
+interface args_client {
   prefix?: string | string[] | ((it: any) => string) | ((it: any) => string[]);
   page_size?: number;
   notification_interval?: number;
@@ -34,7 +34,7 @@ interface login_response {
   expires_in: number;
 }
 
-interface update_profile_args {
+interface args_update_profile {
   about?: string;
   birth_date?: string; // YYYY-MM-DD
   is_private?: boolean | number; // sent as an int representing a bool
@@ -42,7 +42,7 @@ interface update_profile_args {
   sex?: string; // male, female, other
 }
 
-interface post_image_args {
+interface args_post_image {
   tags?: string[];
   type?: string;
   visibility?: string;
@@ -84,7 +84,7 @@ async function sleep(delay: number): Promise<void> {
  * iFunny Client, representing a logged user or guest
  * and handling their session
  * @extends {Freshable}
- * @param {args_constructor}  args
+ * @param {args_client}  args
  * Optional constructor arguments
  * @param {string | string[] | (it: any) => string (it: any) => string[]} args.prefix
  * Prefix that the bot should use. It should be a string, list of strings,
@@ -103,7 +103,7 @@ export class Client extends Freshable {
   private token_expires: number = 0;
   readonly path: string = "/account";
 
-  constructor(args: args_constructor = {}) {
+  constructor(args: args_client = {}) {
     super("", { no_client: true, ...args });
 
     this.config_root = `${Deno.env.get("HOME") ?? "/root"}/.config/ifunny`;
@@ -179,7 +179,7 @@ export class Client extends Freshable {
    * The pending upload id if not args.wait,
    * otherwise the content id of the uploaded post
    */
-  async post_image(data: Blob, args: post_image_args = {}): Promise<string> {
+  async post_image(data: Blob, args: args_post_image = {}): Promise<string> {
     const form: FormData = new FormData();
     form.append("image", data, "image.png");
     form.append("tags", JSON.stringify(args?.tags ?? []));
@@ -245,7 +245,7 @@ export class Client extends Freshable {
    * @return  {Client}
    * this
    */
-  async update_profile(args: update_profile_args): Promise<this> {
+  async update_profile(args: args_update_profile): Promise<this> {
     if (typeof args.is_private === "boolean") {
       args.is_private = args.is_private === true ? 1 : 0;
     }
