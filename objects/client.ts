@@ -43,7 +43,7 @@ interface args_update_profile {
   sex?: string; // male, female, other
 }
 
-interface args_post_image {
+interface args_upload_content {
   tags?: string[];
   type?: string;
   visibility?: string;
@@ -52,13 +52,13 @@ interface args_post_image {
   wait?: boolean;
 }
 
-interface post_image_task_result {
+interface upload_content_task_result {
   cid: string;
 }
 
-interface post_image_response {
+interface upload_content_response {
   id: string;
-  result?: post_image_task_result;
+  result?: upload_content_task_result;
   retry_after?: number;
   state: string;
   type: string;
@@ -180,14 +180,14 @@ export class Client extends Freshable {
    * The pending upload id if not args.wait,
    * otherwise the content id of the uploaded post
    */
-  async post_image(data: Blob, args: args_post_image = {}): Promise<Content | string> {
+  async upload_content(data: Blob, args: args_upload_content = {}): Promise<Content | string> {
     const form: FormData = new FormData();
     form.append("image", data, "image.png");
     form.append("tags", JSON.stringify(args?.tags ?? []));
     form.append("type", args?.type ?? "pic");
     form.append("visibility", args?.visibility ?? "public");
 
-    let response: post_image_response = await this.request_json(
+    let response: upload_content_response = await this.request_json(
       "/content",
       { method: "POST", body: form },
     );

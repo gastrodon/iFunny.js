@@ -229,22 +229,22 @@ Deno.test({
 });
 
 Deno.test({
-  name: "post_image",
+  name: "upload_content",
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
-    let id: string = await CLIENT!.post_image(data) as string;
+    let id: string = await CLIENT!.upload_content(data) as string;
 
     assertEquals(v1.validate(id), true);
   },
 });
 
 Deno.test({
-  name: "post_image wait",
+  name: "upload_content wait",
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
-    let content_id: Content = await CLIENT!.post_image(data, { wait: true }) as Content;
+    let content_id: Content = await CLIENT!.upload_content(data, { wait: true }) as Content;
 
     // TODO: better tests when Post class available
     assertNotEquals(content_id, "");
