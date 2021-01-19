@@ -187,6 +187,43 @@ export class Client extends Freshable {
     return this;
   }
 
+  /**
+   * Upload an image or video
+   * @param {Blob}  data  Image data to post as a Blob
+   * @param  args [description]
+   * @return      [description]
+   */
+  async post_image(data: Blob, args: post_image_args = {}): Promise<string> {
+    const form: FormData = new FormData();
+    form.append("image", data, "image.png");
+    form.append("tags", JSON.stringify(args?.tags ?? []));
+    form.append("type", args?.type ?? "pic");
+    form.append("visibility", args?.visibility ?? "public");
+
+    let response: post_image_response = await this.request_json(
+      "/content",
+      { method: "POST", body: form },
+    );
+
+    if (!args.wait) {
+      return response.id;
+    }
+
+    let timeout = (args?.timeout || 15) * 2;
+    while (timeout-- >= 0) {
+      response = await this.request_json(`/tasks/${response.id}`);
+
+      if (response.result !== undefined) {
+        // TODO make a post
+        return response.result!.cid;
+      }
+
+      await sleep(500);
+    }
+
+    throw new Error(`Timeout waiting to post ${response.id}`);
+  }
+
   async set_newbie(state: boolean): Promise<this> {
     await this.request_json(
       "/clients/me",

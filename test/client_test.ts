@@ -2,6 +2,7 @@ import {
   assertEquals,
   assertNotEquals,
   assertThrowsAsync,
+  v1,
   v4,
 } from "../deps.ts";
 
@@ -220,9 +221,31 @@ Deno.test({
 
 Deno.test({
   name: "set_newbie",
-  only: true,
   async fn() {
     await (new Client()).set_newbie(false)
     await (new Client()).set_newbie(true)
+  }
+})
+
+Deno.test({
+  name: "post_image",
+  ignore: CLIENT === undefined,
+  async fn() {
+    let data: Blob = new Blob([ await Deno.readFile("./test/test.png") ])
+    let id: string = await CLIENT!.post_image(data)
+
+    assertEquals(v1.validate(id), true)
+  }
+})
+
+Deno.test({
+  name: "post_image wait",
+  ignore: CLIENT === undefined,
+  async fn() {
+    let data: Blob = new Blob([ await Deno.readFile("./test/test.png") ])
+    let content_id: string = await CLIENT!.post_image(data, { wait: true })
+
+    // TODO: better tests when Post class available
+    assertNotEquals(content_id, "")
   }
 })
