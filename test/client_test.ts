@@ -1,4 +1,5 @@
 import {
+  assert,
   assertEquals,
   assertNotEquals,
   assertThrowsAsync,
@@ -24,9 +25,9 @@ if (HOME === undefined) {
 }
 
 if (EMAIL && NO_AUTH) {
-  CLIENT = await (new Client()).login(EMAIL!);
+  CLIENT = (await (new Client()).login(EMAIL!)).fresh;
 } else if (PASSWORD && !NO_AUTH) {
-  CLIENT = await (new Client()).login(EMAIL!, PASSWORD!);
+  CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
 }
 
 Deno.test({
@@ -247,5 +248,265 @@ Deno.test({
 
     // TODO: better tests when Post class available
     assertNotEquals(content_id, "")
+  }
+})
+
+Deno.test({
+  name: "getter about",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.about)
+  }
+})
+
+Deno.test({
+  name: "getter cover_color",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.cover_color <= 0xFFFFFF)
+    assert(await CLIENT!.cover_color >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter can_chat",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.can_chat)
+  }
+})
+
+Deno.test({
+  name: "getter cover_url",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.cover_url)
+  }
+})
+
+Deno.test({
+  name: "getter email",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.email, EMAIL!)
+  }
+})
+
+Deno.test({
+  name: "getter has_unnotified_bans",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertNotEquals(await CLIENT!.has_unnotified_bans, undefined)
+  }
+})
+
+Deno.test({
+  name: "getter has_unnotified_levels",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertNotEquals(await CLIENT!.has_unnotified_levels, undefined)
+  }
+})
+
+Deno.test({
+  name: "getter has_unnotified_strikes",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertNotEquals(await CLIENT!.has_unnotified_strikes, undefined)
+  }
+})
+
+Deno.test({
+  name: "getter is_banned",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_banned, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_blocked_in_messenger",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_blocked_in_messenger, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_deleted",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_deleted, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_ifunny_team_member",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_ifunny_team_member, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_moderator",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_moderator, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_private",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_private, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_verified",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_verified, false)
+  }
+})
+
+Deno.test({
+  name: "getter is_safe_mode",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.is_safe_mode, false)
+  }
+})
+
+Deno.test({
+  name: "getter meme_experience",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.meme_experience)
+  }
+})
+
+Deno.test({
+  name: "getter messaging_privacy",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.messaging_privacy, "public")
+  }
+})
+
+Deno.test({
+  name: "getter messaging_privacy",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.messaging_privacy)
+  }
+})
+
+Deno.test({
+  name: "getter need_account_setup",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(await CLIENT!.need_account_setup, false)
+  }
+})
+
+Deno.test({
+  name: "getter nick",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.nick)
+  }
+})
+
+Deno.test({
+  name: "getter achievement_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.achievement_count)
+  }
+})
+
+Deno.test({
+  name: "getter created_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.created_count >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter featured_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.featured_count >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter subscriber_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.subscriber_count >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter subscription_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.subscription_count >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter post_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.post_count >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter smile_count",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.smile_count >= 0)
+  }
+})
+
+Deno.test({
+  name: "getter photo",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assert(await CLIENT!.photo) // TODO Image class
+  }
+})
+
+Deno.test({
+  name: "getter web_url",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertEquals(
+      await CLIENT!.web_url,
+      `https://ifunny.co/user/${await CLIENT!.nick}`
+    )
+  }
+})
+
+Deno.test({
+  name: "getter sex",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertNotEquals(await CLIENT!.sex, undefined)
+  }
+})
+
+Deno.test({
+  name: "getter birth_date",
+  ignore: CLIENT === undefined,
+  async fn() {
+    assertNotEquals(await CLIENT!.birth_date, undefined)
   }
 })
