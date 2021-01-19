@@ -143,11 +143,11 @@ Deno.test({
   ignore: EMAIL === undefined,
   async fn() {
     const client: Client = new Client();
-    await client.login(EMAIL!)
+    await client.login(EMAIL!);
 
-    assertNotEquals(client.token, "")
-  }
-})
+    assertNotEquals(client.token, "");
+  },
+});
 
 Deno.test({
   name: "update_profile about",

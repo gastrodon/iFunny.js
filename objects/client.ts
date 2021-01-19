@@ -176,7 +176,7 @@ export class Client extends Freshable {
    */
   async update_profile(args: update_profile_args): Promise<this> {
     if (typeof args.is_private === "boolean") {
-      args.is_private = args.is_private === true ? 1 : 0
+      args.is_private = args.is_private === true ? 1 : 0;
     }
 
     await this.request_json(
