@@ -4,6 +4,7 @@ import { ensureDirSync, existsSync, sha1 } from "../deps.ts";
 const ID: string = "MsOIJ39Q28";
 const SECRET: string = "PTDc3H8a)Vi=UYap";
 const USER_AGENT: string = "iFunny/6.20.1(21471) Android";
+const URLENCODED: any = { "Content-Type": "application/x-www-form-urlencoded" };
 
 const HEX_SIZE: number = 16;
 
@@ -31,6 +32,20 @@ interface login_response {
   access_token: string;
   token_type: string;
   expires_in: number;
+}
+
+
+function qs_string(data: { [key: string]: any }): string {
+  return Object
+    .entries(data)
+    .map((it: [string, any]): string => {
+      const key: string = encodeURIComponent(it[0]);
+      const value: string = encodeURIComponent(
+        it[1].toString ? it[1].toString() : `${it[1]}`,
+      );
+
+      return `${key}=${value}`;
+    }).join("&");
 }
 
 async function sleep(delay: number): Promise<void> {
@@ -85,11 +100,7 @@ export class Client extends Freshable {
 
     const response: login_response = await this.request_json(
       "/oauth2/token",
-      {
-        method: "POST",
-        body: Object.entries(data).map((it) => `${it[0]}=${it[1]}`).join("&"),
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      },
+      { method: "POST", body: qs_string(data), headers: URLENCODED },
     );
 
     this._token = response.access_token;
