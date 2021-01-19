@@ -1,3 +1,4 @@
+import { Content } from "./content.ts"
 import { Freshable } from "./freshable.ts";
 import { ensureDirSync, existsSync, sha1 } from "../deps.ts";
 
@@ -179,7 +180,7 @@ export class Client extends Freshable {
    * The pending upload id if not args.wait,
    * otherwise the content id of the uploaded post
    */
-  async post_image(data: Blob, args: args_post_image = {}): Promise<string> {
+  async post_image(data: Blob, args: args_post_image = {}): Promise<Content | string> {
     const form: FormData = new FormData();
     form.append("image", data, "image.png");
     form.append("tags", JSON.stringify(args?.tags ?? []));
@@ -199,9 +200,8 @@ export class Client extends Freshable {
     while (timeout-- >= 0) {
       response = await this.request_json(`/tasks/${response.id}`);
 
-      if (response.result !== undefined) {
-        // TODO make a post
-        return response.result!.cid;
+      if (response.result?.cid !== undefined) {
+        return new Content(response.result!.cid!, { client: this })
       }
 
       await sleep(500);

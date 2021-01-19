@@ -7,7 +7,7 @@ import {
   v4,
 } from "../deps.ts";
 
-import { APIError, Client } from "../mod.ts";
+import { APIError, Client, Content } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
 const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
@@ -233,7 +233,7 @@ Deno.test({
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
-    let id: string = await CLIENT!.post_image(data);
+    let id: string = await CLIENT!.post_image(data) as string;
 
     assertEquals(v1.validate(id), true);
   },
@@ -244,7 +244,7 @@ Deno.test({
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
-    let content_id: string = await CLIENT!.post_image(data, { wait: true });
+    let content_id: Content = await CLIENT!.post_image(data, { wait: true }) as Content;
 
     // TODO: better tests when Post class available
     assertNotEquals(content_id, "");
