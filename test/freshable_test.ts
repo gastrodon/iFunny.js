@@ -1,6 +1,6 @@
-import { Freshable } from "../mod.ts";
+import { APIError, Freshable } from "../mod.ts";
 import { PAGE_DEFAULT } from "../objects/freshable.ts";
-import { assertEquals, assertNotEquals, assertThrows, v4 } from "../deps.ts";
+import { assertEquals, assertNotEquals, assertThrows, assertThrowsAsync, v4 } from "../deps.ts";
 
 Deno.test({
   name: "construct",
@@ -87,3 +87,15 @@ Deno.test({
     );
   },
 });
+
+Deno.test({
+  name: "request_json throws",
+  async fn() {
+    const fresh: Freshable = new Freshable("")
+    await assertThrowsAsync(
+      async() => { await fresh.request_json("/foo/bar") },
+      APIError,
+      "not_found",
+    )
+  }
+})
