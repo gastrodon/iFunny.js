@@ -67,7 +67,7 @@ export class Freshable {
       );
     }
 
-    return data;
+    return args.raw ? data : data.data;
   }
 
   get client(): Client {
