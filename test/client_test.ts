@@ -117,7 +117,7 @@ Deno.test({
         await client.login(`${v4.generate()}@kaffir.io`, v4.generate());
       },
       APIError,
-      "invalid_grant: Wrong user credentials",
+      "invalid_grant",
     );
   },
 });
@@ -135,7 +135,7 @@ Deno.test({
         await client.login(EMAIL!, v4.generate(), true);
       },
       APIError,
-      "invalid_grant: Wrong user credentials",
+      "invalid_grant",
     );
   },
 });
