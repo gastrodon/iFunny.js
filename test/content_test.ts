@@ -24,7 +24,7 @@ Deno.test({
   name: "modify smiles",
   ignore: CLIENT === undefined,
   async fn() {
-    const content: Content = await random_content()
+    const content: Content = await random_content();
     const smiles: number = (await content.get("num")).smiles;
 
     await content.smile();
@@ -39,13 +39,13 @@ Deno.test({
   name: "modify unsmiles",
   ignore: CLIENT === undefined,
   async fn() {
-    const content: Content = await random_content()
+    const content: Content = await random_content();
     const unsmiles: number = (await content.get("num")).unsmiles;
 
     await content.unsmile();
-    assertEquals((await content.fresh.get("num")).unsmiles, unsmiles + 1)
+    assertEquals((await content.fresh.get("num")).unsmiles, unsmiles + 1);
 
     await content.remove_unsmile();
-    assertEquals((await content.fresh.get("num")).unsmiles, unsmiles)
-  }
-})
+    assertEquals((await content.fresh.get("num")).unsmiles, unsmiles);
+  },
+});
