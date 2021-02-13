@@ -2,6 +2,19 @@ import { Content } from "./content.ts";
 import { Freshable } from "./freshable.ts";
 import { ensureDirSync, existsSync, sha1 } from "../deps.ts";
 
+import {
+  add_comment,
+  constructor,
+  login,
+  update_profile,
+  upload_content,
+} from "./interfaces/client.ts";
+
+import {
+  post_content_response,
+  post_login_response,
+} from "./interfaces/request.ts";
+
 const ID: string = "MsOIJ39Q28";
 const SECRET: string = "PTDc3H8a)Vi=UYap";
 const USER_AGENT: string = "iFunny/6.20.1(21471) Android";
@@ -16,53 +29,6 @@ const HEX_POOL: string[] = [
   "1", "2", "3", "4", "5",
   "6", "7", "8", "9", "0",
 ];
-
-interface args_client {
-  prefix?: string | string[] | ((it: any) => string) | ((it: any) => string[]);
-  page_size?: number;
-  notification_interval?: number;
-}
-
-interface login_data {
-  grant_type: string;
-  password: string;
-  username: string;
-}
-
-interface login_response {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-}
-
-interface args_update_profile {
-  about?: string;
-  birth_date?: string; // YYYY-MM-DD
-  is_private?: boolean | number; // sent as an int representing a bool
-  nick?: string;
-  sex?: string; // male, female, other
-}
-
-interface args_upload_content {
-  tags?: string[];
-  type?: string;
-  visibility?: string;
-  // separate because these are ifunnyjs options
-  timeout?: number;
-  wait?: boolean;
-}
-
-interface upload_content_task_result {
-  cid: string;
-}
-
-interface upload_content_response {
-  id: string;
-  result?: upload_content_task_result;
-  retry_after?: number;
-  state: string;
-  type: string;
-}
 
 function qs_string(data: { [key: string]: any }): string {
   return Object
@@ -85,7 +51,7 @@ async function sleep(delay: number): Promise<void> {
  * iFunny Client, representing a logged user or guest
  * and handling their session
  * @extends {Freshable}
- * @param {args_client}  args
+ * @param {constructor}  args
  * Optional constructor arguments
  * @param {string | string[] | (it: any) => string (it: any) => string[]} args.prefix
  * Prefix that the bot should use. It should be a string, list of strings,
@@ -104,7 +70,7 @@ export class Client extends Freshable {
   private token_expires: number = 0;
   protected path: string = "/account";
 
-  constructor(args: args_client = {}) {
+  constructor(args: constructor = {}) {
     super("", { no_client: true, ...args });
 
     this.config_root = `${Deno.env.get("HOME") ?? "/root"}/.config/ifunny`;
@@ -138,7 +104,7 @@ export class Client extends Freshable {
     password?: string,
     fresh?: boolean,
   ): Promise<this> {
-    const data: login_data = {
+    const data: login = {
       grant_type: "password",
       password: password ?? "",
       username: email,
@@ -150,7 +116,7 @@ export class Client extends Freshable {
       return this;
     }
 
-    const response: login_response = await this.request_json(
+    const response: post_login_response = await this.request_json(
       "/oauth2/token",
       { method: "POST", body: qs_string(data), headers: URLENCODED, raw: true },
     );
@@ -182,7 +148,7 @@ export class Client extends Freshable {
    */
   async upload_content(
     data: Blob,
-    args: args_upload_content = {},
+    args: upload_content = {},
   ): Promise<Content | string> {
     const form: FormData = new FormData();
     form.append("image", data, "image.png");
@@ -190,7 +156,7 @@ export class Client extends Freshable {
     form.append("type", args?.type ?? "pic");
     form.append("visibility", args?.visibility ?? "public");
 
-    let response: upload_content_response = await this.request_json(
+    let response: post_content_response = await this.request_json(
       "/content",
       { method: "POST", body: form },
     );
@@ -248,7 +214,7 @@ export class Client extends Freshable {
    * @return  {Client}
    * this
    */
-  async update_profile(args: args_update_profile): Promise<this> {
+  async update_profile(args: update_profile): Promise<this> {
     if (typeof args.is_private === "boolean") {
       args.is_private = args.is_private === true ? 1 : 0;
     }
@@ -263,10 +229,59 @@ export class Client extends Freshable {
 
   // Content methods
 
+  async content_add_comment(id: string, args: add_comment): Promise<any> {
+    await this.request_json(
+      `/content/${id}/comments`,
+      { method: "POST", body: qs_string(args) },
+    );
+  }
+
+  async content_delete(id: string): Promise<void> {
+    await this.request_json(
+      `/content/${id}`,
+      { method: "DELETE" },
+    );
+  }
+
+  async content_report(id: string, type: string): Promise<void> {
+    await this.request_json(
+      `/content/${id}/abuses?${qs_string({ type })}`,
+      { method: "PUT" },
+    );
+  }
+
+  async read_post(id: string): Promise<void> {
+    await this.request_json(
+      `/reads/${id}`,
+      { method: "PUT" },
+    );
+  }
+
+  async set_content_republish(id: string, present: boolean): Promise<void> {
+    await this.request_json(
+      `/content/${id}/republished`,
+      { method: present ? "PUT" : "DELETE" },
+    );
+  }
+
+  async set_content_schedule(id: string, time: number): Promise<void> {
+    await this.request_json(
+      `/content/${id}`,
+      { method: "PATCH", body: qs_string({ publish_at: time }) },
+    );
+  }
+
   async set_content_smile(id: string, present: boolean): Promise<void> {
     await this.request_json(
       `/content/${id}/smiles`,
       { method: present ? "PUT" : "DELETE" },
+    );
+  }
+
+  async set_content_tags(id: string, tags: string[]): Promise<void> {
+    await this.request_json(
+      `/content/${id}/tags`,
+      { method: "PUT", body: qs_string({ tags: JSON.stringify(tags) }) },
     );
   }
 
@@ -276,6 +291,15 @@ export class Client extends Freshable {
       { method: present ? "PUT" : "DELETE" },
     );
   }
+
+  async set_content_visibility(id: string, visibility: string): Promise<void> {
+    await this.request_json(
+      `/content/${id}`,
+      { method: "PATCH", body: qs_string({ visibility }) },
+    );
+  }
+
+  // private
 
   private get config(): any {
     if (this.config_cache === undefined) {
@@ -297,6 +321,8 @@ export class Client extends Freshable {
   private get config_path(): string {
     return `${this.config_root}/${this.config_file}`;
   }
+
+  // getters
 
   get basic(): Promise<string> {
     return (async (): Promise<string> => {
@@ -344,6 +370,8 @@ export class Client extends Freshable {
   get token(): string {
     return this.bearer_token;
   }
+
+  // property getters
 
   get about(): Promise<string> {
     return this.get("about");
