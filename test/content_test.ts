@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals } from "../deps.ts";
+import { assertEquals, assertNotEquals, v4 } from "../deps.ts";
 import { Client, Content } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
@@ -75,5 +75,30 @@ Deno.test({
     assertNotEquals(content.id, republished.id);
 
     await content.remove_republish();
+  },
+});
+
+Deno.test({
+  name: "set tags",
+  ignore: CLIENT === undefined,
+  async fn() {
+    let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
+    let content: Content = await CLIENT!.upload_content(
+      data,
+      { wait: true },
+    ) as Content;
+
+    let tags: string[] = [
+      v4.generate().replaceAll("-", ""),
+      v4.generate().replaceAll("-", ""),
+    ];
+
+    await content.set_tags(tags);
+
+    assertEquals(await content.fresh.get("tags"), tags);
+
+    await content.set_tags([])
+
+    assertEquals(await content.fresh.get("tags"), [])
   },
 });

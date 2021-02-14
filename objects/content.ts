@@ -8,6 +8,8 @@ export class Content extends Freshable {
     this.path = `/content/${this.id}`;
   }
 
+  // on any content
+
   async smile(): Promise<this> {
     await this.client.set_content_smile(this.id, true);
     return this;
@@ -28,6 +30,8 @@ export class Content extends Freshable {
     return this;
   }
 
+  // on non owned content
+
   async republish(): Promise<Content> {
     const data: post_content_republish_response = await this.client
       .set_content_republish(this.id, true);
@@ -37,6 +41,13 @@ export class Content extends Freshable {
 
   async remove_republish(): Promise<this> {
     await this.client.set_content_republish(this.id, false);
+    return this;
+  }
+
+  // on owned content
+
+  async set_tags(tags: string[]): Promise<this> {
+    await this.client.set_content_tags(this.id, tags);
     return this;
   }
 }
