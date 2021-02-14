@@ -11,6 +11,7 @@ import {
 } from "./interfaces/client.ts";
 
 import {
+  post_content_republish_response,
   post_content_response,
   post_login_response,
 } from "./interfaces/request.ts";
@@ -257,10 +258,13 @@ export class Client extends Freshable {
     );
   }
 
-  async set_content_republish(id: string, present: boolean): Promise<void> {
-    await this.request_json(
+  async set_content_republish(
+    id: string,
+    present: boolean,
+  ): Promise<post_content_republish_response> {
+    return await this.request_json(
       `/content/${id}/republished`,
-      { method: present ? "PUT" : "DELETE" },
+      { method: present ? "POST" : "DELETE" },
     );
   }
 

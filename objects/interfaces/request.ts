@@ -10,6 +10,11 @@ export interface post_content_response {
   type: string;
 }
 
+export interface post_content_republish_response {
+  id?: string;
+  num_republished: number;
+}
+
 export interface post_login_response {
   access_token: string;
   token_type: string;

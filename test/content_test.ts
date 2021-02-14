@@ -1,4 +1,4 @@
-import { assertEquals } from "../deps.ts";
+import { assertEquals, assertNotEquals } from "../deps.ts";
 import { Client, Content } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
@@ -47,5 +47,33 @@ Deno.test({
 
     await content.remove_unsmile();
     assertEquals((await content.fresh.get("num")).unsmiles, unsmiles);
+  },
+});
+
+Deno.test({
+  name: "modify repub",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const content: Content = await random_content();
+    const republished: number = (await content.get("num")).republished;
+
+    await content.republish();
+    assertEquals((await content.fresh.get("num")).republished, republished + 1);
+
+    await content.remove_republish();
+    assertEquals((await content.fresh.get("num")).republished, republished);
+  },
+});
+
+Deno.test({
+  name: "modify repub",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const content: Content = await random_content();
+    const republished: Content = await content.republish();
+
+    assertNotEquals(content.id, republished.id);
+
+    await content.remove_republish();
   },
 });
