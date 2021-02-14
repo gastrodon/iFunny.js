@@ -106,6 +106,8 @@ Deno.test({
     await content.set_tags([])
 
     assertEquals(await content.fresh.get("tags"), [])
+
+    await content.delete()
   },
 });
 

@@ -30,6 +30,10 @@ if (EMAIL) {
   CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
 }
 
+async function sleep(delay: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
 Deno.test({
   name: "construct",
   async fn() {
@@ -244,12 +248,13 @@ Deno.test({
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
-    let content_id: Content = await CLIENT!.upload_content(
+    let content: Content = await CLIENT!.upload_content(
       data,
       { wait: true },
     ) as Content;
 
-    assertNotEquals(content_id, "");
+    assertNotEquals(await content.id, "");
+    await content.delete()
   },
 });
 
