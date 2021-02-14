@@ -249,7 +249,6 @@ Deno.test({
       { wait: true },
     ) as Content;
 
-    // TODO: better tests when Post class available
     assertNotEquals(content_id, "");
   },
 });
