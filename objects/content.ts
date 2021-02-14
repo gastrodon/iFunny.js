@@ -46,6 +46,11 @@ export class Content extends Freshable {
 
   // on owned content
 
+  async delete(): Promise<this> {
+    await this.client.content_delete(this.id);
+    return this;
+  }
+
   async set_tags(tags: string[]): Promise<this> {
     await this.client.set_content_tags(this.id, tags);
     return this;

@@ -1,5 +1,11 @@
-import { assertEquals, assertNotEquals, v4 } from "../deps.ts";
-import { Client, Content } from "../mod.ts";
+import {
+  assertEquals,
+  assertNotEquals,
+  assertThrowsAsync,
+  v4,
+} from "../deps.ts";
+
+import { APIError, Client, Content } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
 const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
@@ -102,3 +108,27 @@ Deno.test({
     assertEquals(await content.fresh.get("tags"), [])
   },
 });
+
+Deno.test({
+  name: "delete",
+  ignore: CLIENT === undefined,
+  async fn() {
+    let data: Blob = new Blob([await Deno.readFile("./test/test.png")])
+    let content: Content = await CLIENT!.upload_content(
+      data,
+      { wait: true },
+    ) as Content
+
+    assertNotEquals(await content.fresh.data, {})
+
+    await content.delete()
+
+    await assertThrowsAsync(
+      async () => {
+        await content.fresh.data
+      },
+      APIError,
+      "not_found",
+    )
+  }
+})
