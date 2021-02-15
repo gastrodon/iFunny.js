@@ -1,8 +1,9 @@
-import { args_freshable, Freshable } from "./freshable.ts";
+import { Freshable } from "./freshable.ts";
 import { post_content_republish_response } from "./interfaces/request.ts";
+import { constructor } from "./interfaces/freshable.ts";
 
 export class Content extends Freshable {
-  constructor(id: string, args: args_freshable = {}) {
+  constructor(id: string, args: constructor = {}) {
     super(id, args);
 
     this.path = `/content/${this.id}`;

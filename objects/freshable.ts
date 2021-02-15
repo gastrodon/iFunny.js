@@ -1,19 +1,8 @@
 import { Client } from "./client.ts";
 import { APIError } from "./error.ts";
+import { constructor, get } from "./interfaces/freshable.ts";
 
 export const PAGE_DEFAULT: number = 30;
-
-export interface args_freshable {
-  client?: Client;
-  data?: any;
-  no_client?: boolean;
-  page_size?: number;
-}
-
-interface args_get {
-  default?: any;
-  transformer?: (it: any) => any;
-}
 
 export class Freshable {
   private _client: Client | undefined = undefined; // TODO
@@ -24,7 +13,7 @@ export class Freshable {
   readonly id: string;
   readonly page_size: number;
 
-  constructor(id: string | number | null, args: args_freshable = {}) {
+  constructor(id: string | number | null, args: constructor = {}) {
     this.id = id as string;
     this.data_cache = args.data ?? {};
     this.page_size = args.page_size ?? PAGE_DEFAULT;
@@ -34,7 +23,7 @@ export class Freshable {
     }
   }
 
-  async get(key: string, args: args_get = {}) {
+  async get(key: string, args: get = {}) {
     let value: any = (await this.data)[key];
 
     if (value === undefined) {
