@@ -103,11 +103,11 @@ Deno.test({
 
     assertEquals(await content.fresh.get("tags"), tags);
 
-    await content.set_tags([])
+    await content.set_tags([]);
 
-    assertEquals(await content.fresh.get("tags"), [])
+    assertEquals(await content.fresh.get("tags"), []);
 
-    await content.delete()
+    await content.delete();
   },
 });
 
@@ -115,22 +115,22 @@ Deno.test({
   name: "delete",
   ignore: CLIENT === undefined,
   async fn() {
-    let data: Blob = new Blob([await Deno.readFile("./test/test.png")])
+    let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
     let content: Content = await CLIENT!.upload_content(
       data,
       { wait: true },
-    ) as Content
+    ) as Content;
 
-    assertNotEquals(await content.fresh.data, {})
+    assertNotEquals(await content.fresh.data, {});
 
-    await content.delete()
+    await content.delete();
 
     await assertThrowsAsync(
       async () => {
-        await content.fresh.data
+        await content.fresh.data;
       },
       APIError,
       "not_found",
-    )
-  }
-})
+    );
+  },
+});

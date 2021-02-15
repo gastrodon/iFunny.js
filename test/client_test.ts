@@ -254,7 +254,7 @@ Deno.test({
     ) as Content;
 
     assertNotEquals(await content.id, "");
-    await content.delete()
+    await content.delete();
   },
 });
 
