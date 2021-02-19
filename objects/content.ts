@@ -12,22 +12,22 @@ export class Content extends Freshable {
   // on any content
 
   async smile(): Promise<this> {
-    await this.client.set_content_smile(this.id, true);
+    await this.client.content_set_smile(this.id, true);
     return this;
   }
 
   async remove_smile(): Promise<this> {
-    await this.client.set_content_smile(this.id, false);
+    await this.client.content_set_smile(this.id, false);
     return this;
   }
 
   async unsmile(): Promise<this> {
-    await this.client.set_content_unsmile(this.id, true);
+    await this.client.content_set_unsmile(this.id, true);
     return this;
   }
 
   async remove_unsmile(): Promise<this> {
-    await this.client.set_content_unsmile(this.id, false);
+    await this.client.content_set_unsmile(this.id, false);
     return this;
   }
 
@@ -35,13 +35,13 @@ export class Content extends Freshable {
 
   async republish(): Promise<Content> {
     const data: post_content_republish_response = await this.client
-      .set_content_republish(this.id, true);
+      .content_set_republish(this.id, true);
 
     return new Content(data.id!, { client: this.client });
   }
 
   async remove_republish(): Promise<this> {
-    await this.client.set_content_republish(this.id, false);
+    await this.client.content_set_republish(this.id, false);
     return this;
   }
 
@@ -53,7 +53,7 @@ export class Content extends Freshable {
   }
 
   async set_tags(tags: string[]): Promise<this> {
-    await this.client.set_content_tags(this.id, tags);
+    await this.client.content_set_tags(this.id, tags);
     return this;
   }
 }

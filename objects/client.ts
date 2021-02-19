@@ -258,7 +258,7 @@ export class Client extends Freshable {
     );
   }
 
-  async set_content_republish(
+  async content_set_republish(
     id: string,
     present: boolean,
   ): Promise<post_content_republish_response> {
@@ -268,35 +268,35 @@ export class Client extends Freshable {
     );
   }
 
-  async set_content_schedule(id: string, time: number): Promise<void> {
+  async content_set_schedule(id: string, time: number): Promise<void> {
     await this.request_json(
       `/content/${id}`,
       { method: "PATCH", body: qs_string({ publish_at: time }) },
     );
   }
 
-  async set_content_smile(id: string, present: boolean): Promise<void> {
+  async content_set_smile(id: string, present: boolean): Promise<void> {
     await this.request_json(
       `/content/${id}/smiles`,
       { method: present ? "PUT" : "DELETE" },
     );
   }
 
-  async set_content_tags(id: string, tags: string[]): Promise<void> {
+  async content_set_tags(id: string, tags: string[]): Promise<void> {
     await this.request_json(
       `/content/${id}/tags`,
       { method: "PUT", body: qs_string({ tags: JSON.stringify(tags) }) },
     );
   }
 
-  async set_content_unsmile(id: string, present: boolean): Promise<void> {
+  async content_set_unsmile(id: string, present: boolean): Promise<void> {
     await this.request_json(
       `/content/${id}/unsmiles`,
       { method: present ? "PUT" : "DELETE" },
     );
   }
 
-  async set_content_visibility(id: string, visibility: string): Promise<void> {
+  async content_set_visibility(id: string, visibility: string): Promise<void> {
     await this.request_json(
       `/content/${id}`,
       { method: "PATCH", body: qs_string({ visibility }) },
