@@ -1,3 +1,12 @@
+export interface json {
+  [key: string]: string | number | boolean | null | json | json[];
+}
+
+interface post_contnet_comment_response {
+  id: string;
+  comment: json;
+}
+
 interface post_content_task_result {
   cid: string;
 }
