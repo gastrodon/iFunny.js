@@ -1,8 +1,6 @@
-import {
-    assertEquals,
-} from "../deps.ts"
+import { assertEquals } from "../deps.ts";
 
-import { Comment, Client } from "../mod.ts"
+import { Client, Comment } from "../mod.ts";
 
 import { json } from "../objects/interfaces/request.ts";
 
@@ -21,18 +19,17 @@ if (EMAIL) {
 }
 
 async function random_comment(): Promise<Comment> {
-    // TODO this will also pull from collective
-    // when collective is implemented
-    return new Comment(COMMENT_ID, CONTENT_ID, { client: CLIENT! });
+  // TODO this will also pull from collective
+  // when collective is implemented
+  return new Comment(COMMENT_ID, CONTENT_ID, { client: CLIENT! });
 }
-
 
 Deno.test({
   name: "data at root",
   ignore: CLIENT === undefined,
   async fn() {
-    const data: json = await (await random_comment()).fresh.data
+    const data: json = await (await random_comment()).fresh.data;
 
-    assertEquals(data.comment, undefined)
-  }
-})
+    assertEquals(data.comment, undefined);
+  },
+});

@@ -13,7 +13,7 @@ export class Comment extends Freshable {
 
   get data(): Promise<any> {
     return (async () => {
-      return (await super.data).comment
+      return (await super.data).comment;
     })();
   }
 }
