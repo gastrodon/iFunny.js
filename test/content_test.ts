@@ -5,7 +5,7 @@ import {
   v4,
 } from "../deps.ts";
 
-import { APIError, Client, Content } from "../mod.ts";
+import { APIError, Client, Content, Comment } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
 const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
@@ -134,3 +134,15 @@ Deno.test({
     );
   },
 });
+
+Deno.test({
+  name: "add comment",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const content: Content = await random_content();
+    const text: string = `real content ${ v4.generate().slice(16) }`;
+    const comment: Comment = await content.add_comment({ text });
+
+    assertNotEquals("000000000000000000000000", comment.id)
+  }
+})

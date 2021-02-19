@@ -1,4 +1,5 @@
 import { Content } from "./content.ts";
+import { Comment } from "./comment.ts";
 import { Freshable } from "./freshable.ts";
 import { ensureDirSync, existsSync, sha1 } from "../deps.ts";
 
@@ -13,6 +14,7 @@ import {
 import {
   post_content_republish_response,
   post_content_response,
+  post_contnet_comment_response,
   post_login_response,
 } from "./interfaces/request.ts";
 
@@ -231,10 +233,12 @@ export class Client extends Freshable {
   // Content methods
 
   async content_add_comment(id: string, args: add_comment): Promise<any> {
-    await this.request_json(
+    const data: post_contnet_comment_response = await this.request_json(
       `/content/${id}/comments`,
-      { method: "POST", body: qs_string(args) },
+      { method: "POST", body: qs_string(args), headers: URLENCODED },
     );
+
+    return new Comment(data.id, id, { client: this, data: data.comment })
   }
 
   async content_delete(id: string): Promise<void> {
