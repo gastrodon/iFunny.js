@@ -1,7 +1,7 @@
 export interface add_comment {
   text?: string;
   attachment?: string; // content id
-  mentions?: any[]; // I don't know yet
+  // mentions?: any[]; // I don't know yet
 }
 
 export interface constructor {
