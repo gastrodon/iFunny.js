@@ -4,6 +4,8 @@ import {
 
 import { Comment, Client } from "../mod.ts"
 
+import { json } from "../objects/interfaces/request.ts";
+
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
 const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
 const NO_AUTH: boolean = Deno.env.get("IFUNNYJS_NO_AUTH") !== undefined;
@@ -23,3 +25,14 @@ async function random_comment(): Promise<Comment> {
     // when collective is implemented
     return new Comment(COMMENT_ID, CONTENT_ID, { client: CLIENT! });
 }
+
+
+Deno.test({
+  name: "data at root",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const data: json = await (await random_comment()).fresh.data
+
+    assertEquals(data.comment, undefined)
+  }
+})
