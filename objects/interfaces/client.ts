@@ -1,6 +1,6 @@
 export interface add_comment {
   text?: string;
-  attachment?: string; // content id
+  content?: string; // content id
   // mentions?: any[]; // I don't know yet
 }
 

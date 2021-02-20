@@ -5,12 +5,13 @@ import {
   v4,
 } from "../deps.ts";
 
-import { APIError, Client, Content, Comment } from "../mod.ts";
+import { APIError, Client, Comment, Content } from "../mod.ts";
 
 const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
 const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
 const NO_AUTH: boolean = Deno.env.get("IFUNNYJS_NO_AUTH") !== undefined;
 
+const CONTENT_ID_PIN: string = "mave1lj07"; // pinned by test@gastrodon.io
 let CONTENT_ID: string = "5VRu6KHI7";
 let CLIENT: Client | undefined = undefined;
 
@@ -140,9 +141,31 @@ Deno.test({
   ignore: CLIENT === undefined,
   async fn() {
     const content: Content = await random_content();
-    const text: string = `real content ${ v4.generate().slice(16) }`;
+    const text: string = `real content ${v4.generate().slice(16)}`;
     const comment: Comment = await content.add_comment({ text });
 
-    assertNotEquals("000000000000000000000000", comment.id)
-  }
-})
+    assertNotEquals("000000000000000000000000", comment.id);
+    assertEquals(content.id, await comment.get("cid"));
+  },
+});
+
+Deno.test({
+  name: "add comment attachment",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const text: string = `real attached content ${v4.generate().slice(16)}`;
+    const content: Content = await random_content();
+    const comment: Comment = await content.add_comment({
+      text,
+      content: CONTENT_ID_PIN,
+    });
+
+    assertNotEquals("000000000000000000000000", comment.id);
+
+    console.log(await comment.fresh.data);
+
+    const attachment: any = (await comment.get("attachments"));
+    assertNotEquals(undefined, attachment);
+    assertEquals(CONTENT_ID_PIN, attachment[0].id);
+  },
+});
