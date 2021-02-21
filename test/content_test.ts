@@ -141,7 +141,7 @@ Deno.test({
   ignore: CLIENT === undefined,
   async fn() {
     const content: Content = await random_content();
-    const text: string = `real content ${v4.generate().slice(16)}`;
+    const text: string = `real content ${v4.generate().slice(8)}`;
     const comment: Comment = await content.add_comment({ text });
 
     assertNotEquals("000000000000000000000000", comment.id);
@@ -153,7 +153,7 @@ Deno.test({
   name: "add comment attachment",
   ignore: CLIENT === undefined,
   async fn() {
-    const text: string = `real attached content ${v4.generate().slice(16)}`;
+    const text: string = `real attached content ${v4.generate().slice(8)}`;
     const content: Content = await random_content();
     const comment: Comment = await content.add_comment({
       text,
@@ -162,10 +162,34 @@ Deno.test({
 
     assertNotEquals("000000000000000000000000", comment.id);
 
-    console.log(await comment.fresh.data);
-
-    const attachment: any = (await comment.get("attachments"));
+    const attachment: any = (await comment.get("attachments")).content[0];
     assertNotEquals(undefined, attachment);
-    assertEquals(CONTENT_ID_PIN, attachment[0].id);
+    assertEquals(CONTENT_ID_PIN, attachment.id);
+  },
+});
+
+Deno.test({
+  name: "add comment mention",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const nick: string = "gastrodon";
+    const text: string = `${nick} ${v4.generate().slice(8)}`;
+    const content: Content = await random_content();
+    const id: string = await content.get(
+      "creator",
+      { transformer: (it: any) => it.id },
+    );
+
+    const comment: Comment = await content.add_comment({
+      text,
+      mentions: [{ id, start: 0, stop: nick.length }],
+    });
+
+    assertNotEquals("000000000000000000000000", comment.id);
+
+    const attachment: any = (await comment.get("attachments")).mention_user[0];
+    assertNotEquals(undefined, attachment);
+    assertEquals(comment.id, attachment.id);
+    assertEquals(id, attachment.user_id);
   },
 });
