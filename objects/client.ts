@@ -5,6 +5,7 @@ import { ensureDirSync, existsSync, sha1 } from "../deps.ts";
 
 import {
   add_comment,
+  add_comment_mention,
   constructor,
   login,
   update_profile,
@@ -234,6 +235,16 @@ export class Client extends Freshable {
   // Content methods
 
   async content_add_comment(id: string, args: add_comment): Promise<any> {
+    if (args.mentions !== undefined) {
+      args.user_mentions = Object
+        .entries(args.mentions)
+        .map((it: [string, add_comment_mention]): string => {
+          return `${it[1].id}:${it[1].start}:${it[1].stop}`;
+        }).join(";");
+
+      delete args.mentions;
+    }
+
     const data: post_contnet_comment_response = await this.request_json(
       `/content/${id}/comments`,
       { method: "POST", body: qs_string(args), headers: URLENCODED },

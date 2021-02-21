@@ -1,7 +1,16 @@
 export interface add_comment {
   text?: string;
   content?: string; // content id
-  // mentions?: any[]; // I don't know yet
+  mentions?: add_comment_mention[];
+  // this can be done manually,
+  // but it's really here for mentions to marshal into
+  user_mentions?: string;
+}
+
+export interface add_comment_mention {
+  id: string;
+  start: number;
+  stop: number;
 }
 
 export interface constructor {
