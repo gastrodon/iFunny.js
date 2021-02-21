@@ -171,10 +171,11 @@ Deno.test({
 Deno.test({
   name: "add comment mention",
   ignore: CLIENT === undefined,
-  only: true,
   async fn() {
     const nick: string = "gastrodon";
-    const text: string = `${nick} I am having a ligma attack ${v4.generate().slice(8).replaceAll("-", "")}`;
+    const text: string = `${nick} I am having a ligma attack ${
+      v4.generate().slice(8).replaceAll("-", "")
+    }`;
     const content: Content = await random_content();
     const id: string = await content.get(
       "creator",
@@ -193,5 +194,25 @@ Deno.test({
 
     assertNotEquals(undefined, attachment);
     assertEquals(id, attachment.user_id);
+  },
+});
+
+Deno.test({
+  name: "pin",
+  ignore: CLIENT === undefined,
+  async fn() {
+    let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
+    let content: Content = await CLIENT!.upload_content(
+      data,
+      { wait: true },
+    ) as Content;
+
+    // TODO
+    // GET /content/:contend_id prop is_pinned doesn't report correctly
+    // so I can't actually test whether or not this is pinned
+    // without paginating the owner's timeline
+    await content.pin();
+    await content.remove_pin();
+    await content.delete();
   },
 });

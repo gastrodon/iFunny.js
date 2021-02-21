@@ -13,6 +13,7 @@ import {
 } from "./interfaces/client.ts";
 
 import {
+  post_content_comment_response,
   post_content_republish_response,
   post_content_response,
   post_content_comment_response,
@@ -316,6 +317,13 @@ export class Client extends Freshable {
     await this.request_json(
       `/content/${id}`,
       { method: "PATCH", body: qs_string({ visibility }) },
+    );
+  }
+
+  async content_set_pin(id: string, pinned: boolean): Promise<void> {
+    await this.request_json(
+      `/content/${id}/pinned`,
+      { method: pinned ? "PUT" : "DELETE" },
     );
   }
 

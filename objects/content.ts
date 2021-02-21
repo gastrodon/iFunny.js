@@ -62,4 +62,14 @@ export class Content extends Freshable {
   async add_comment(args: add_comment): Promise<Comment> {
     return await this.client.content_add_comment(this.id, args);
   }
+
+  async pin(): Promise<this> {
+    await this.client.contnet_set_pin(this.id, true);
+    return this
+  }
+
+  async remove_pin(): Promise<this> {
+    await this.client.contnet_set_pin(this.id, false);
+    return this
+  }
 }
