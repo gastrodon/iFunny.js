@@ -16,7 +16,6 @@ import {
   post_content_comment_response,
   post_content_republish_response,
   post_content_response,
-  post_content_comment_response,
   post_login_response,
 } from "./interfaces/request.ts";
 

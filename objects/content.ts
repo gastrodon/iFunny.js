@@ -64,12 +64,12 @@ export class Content extends Freshable {
   }
 
   async pin(): Promise<this> {
-    await this.client.contnet_set_pin(this.id, true);
-    return this
+    await this.client.content_set_pin(this.id, true);
+    return this;
   }
 
   async remove_pin(): Promise<this> {
-    await this.client.contnet_set_pin(this.id, false);
-    return this
+    await this.client.content_set_pin(this.id, false);
+    return this;
   }
 }
