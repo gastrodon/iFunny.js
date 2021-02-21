@@ -20,7 +20,8 @@ import {
 
 const ID: string = "MsOIJ39Q28";
 const SECRET: string = "PTDc3H8a)Vi=UYap";
-const USER_AGENT: string = "iFunny/6.20.1(21471) Android";
+const USER_AGENT: string =
+  "iFunny/6.20.1(21471) iphone/14.4 (Apple; iPhone8,1)";
 const URLENCODED: any = { "Content-Type": "application/x-www-form-urlencoded" };
 
 const HEX_SIZE: number = 16;
