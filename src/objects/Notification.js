@@ -54,7 +54,7 @@ class Notification {
             }
 
             let User = require('./User')
-            return User(data.id, { client: this.client, data: data })
+            return new User(data.id, { client: this.client, data: data })
 
         })()
     }
@@ -72,7 +72,7 @@ class Notification {
             }
 
             let Comment = require('./Comment')
-            return Comment(data.id, this.post, { client: this.client, data: data })
+            return new Comment(data.id, this.post, { client: this.client, data: data })
         })()
     }
 
@@ -89,7 +89,7 @@ class Notification {
             }
 
             let Post = require('./Post')
-            return Post(data.id, { client: this.client, data: data })
+            return new Post(data.id, { client: this.client, data: data })
 
         })()
     }
