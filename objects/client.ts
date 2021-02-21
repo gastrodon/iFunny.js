@@ -15,7 +15,7 @@ import {
 import {
   post_content_republish_response,
   post_content_response,
-  post_contnet_comment_response,
+  post_content_comment_response,
   post_login_response,
 } from "./interfaces/request.ts";
 
@@ -245,7 +245,7 @@ export class Client extends Freshable {
       delete args.mentions;
     }
 
-    const data: post_contnet_comment_response = await this.request_json(
+    const data: post_content_comment_response = await this.request_json(
       `/content/${id}/comments`,
       { method: "POST", body: qs_string(args), headers: URLENCODED },
     );

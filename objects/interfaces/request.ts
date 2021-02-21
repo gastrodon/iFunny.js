@@ -2,7 +2,7 @@ export interface json {
   [key: string]: string | number | boolean | null | json | json[];
 }
 
-export interface post_contnet_comment_response {
+export interface post_content_comment_response {
   id: string;
   comment: json;
 }
