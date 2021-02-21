@@ -277,6 +277,24 @@ Deno.test({
 });
 
 Deno.test({
+  name: "upload contnet visibility",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const visibility: string = "subscribers";
+    const data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
+    const content: Content = await CLIENT!.upload_content(
+      data,
+      { wait: true, visibility },
+    ) as Content;
+
+    assertNotEquals(content.id, "");
+    assertEquals(await content.fresh.get("visibility"), visibility);
+
+    await content.delete();
+  },
+});
+
+Deno.test({
   name: "getter about",
   ignore: CLIENT === undefined,
   async fn() {
