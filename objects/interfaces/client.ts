@@ -26,6 +26,7 @@ export interface login {
 }
 
 export interface upload_content {
+  publish_at?: number; // future Unix timestamp
   tags?: string[];
   type?: string;
   visibility?: string;

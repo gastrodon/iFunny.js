@@ -233,7 +233,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "upload_content",
+  name: "upload content",
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
@@ -244,7 +244,7 @@ Deno.test({
 });
 
 Deno.test({
-  name: "upload_content wait",
+  name: "upload content wait",
   ignore: CLIENT === undefined,
   async fn() {
     let data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
@@ -254,6 +254,24 @@ Deno.test({
     ) as Content;
 
     assertNotEquals(await content.id, "");
+    await content.delete();
+  },
+});
+
+Deno.test({
+  name: "upload content scheduled",
+  ignore: CLIENT === undefined,
+  async fn() {
+    const when: number = Math.trunc(Date.now() / 1000) + 10000;
+    const data: Blob = new Blob([await Deno.readFile("./test/test.png")]);
+    const content: Content = await CLIENT!.upload_content(
+      data,
+      { wait: true, publish_at: when },
+    ) as Content;
+
+    assertNotEquals(content.id, "");
+    assertEquals(await content.get("publish_at"), when);
+
     await content.delete();
   },
 });

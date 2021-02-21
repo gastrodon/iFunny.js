@@ -161,6 +161,10 @@ export class Client extends Freshable {
     form.append("type", args?.type ?? "pic");
     form.append("visibility", args?.visibility ?? "public");
 
+    if (args?.publish_at) {
+      form.append("publish_at", args!.publish_at.toString());
+    }
+
     let response: post_content_response = await this.request_json(
       "/content",
       { method: "POST", body: form },
