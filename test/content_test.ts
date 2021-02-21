@@ -171,9 +171,10 @@ Deno.test({
 Deno.test({
   name: "add comment mention",
   ignore: CLIENT === undefined,
+  only: true,
   async fn() {
     const nick: string = "gastrodon";
-    const text: string = `${nick} ${v4.generate().slice(8)}`;
+    const text: string = `${nick} I am having a ligma attack ${v4.generate().slice(8).replaceAll("-", "")}`;
     const content: Content = await random_content();
     const id: string = await content.get(
       "creator",
@@ -187,9 +188,10 @@ Deno.test({
 
     assertNotEquals("000000000000000000000000", comment.id);
 
-    const attachment: any = (await comment.get("attachments")).mention_user[0];
+    const attachment: any = (await comment.fresh.get("attachments"))
+      .mention_user[0];
+
     assertNotEquals(undefined, attachment);
-    assertEquals(comment.id, attachment.id);
     assertEquals(id, attachment.user_id);
   },
 });
