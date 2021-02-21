@@ -5,7 +5,7 @@ import { constructor, get } from "./interfaces/freshable.ts";
 export const PAGE_DEFAULT: number = 30;
 
 export class Freshable {
-  private _client: Client | undefined = undefined; // TODO
+  private _client: Client | undefined = undefined;
   private data_cache: any;
   protected path: string = "/";
   protected update: boolean = false;
@@ -71,7 +71,7 @@ export class Freshable {
     return (async () => {
       if (this.update) {
         this.update = false;
-        this.data_cache = (await this.request_json(this.path));
+        this.data_cache = await this.request_json(this.path);
       }
 
       return this.data_cache;
