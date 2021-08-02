@@ -116,5 +116,6 @@ module.exports = {
     paginated_data: paginated_data,
     paginated_generator: paginated_generator,
     determine_mime: determine_mime,
-    sleep: sleep
+    sleep: sleep,
+    compose_comment: compose_comment
 }
