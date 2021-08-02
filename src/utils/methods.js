@@ -78,6 +78,7 @@ async function compose_comment(text, attachment, mentions) {
 
     if (text) {
         data.text = text
+        data.from = 'prof'
     }
 
     if (attachment) {
