@@ -28,7 +28,7 @@ class Client extends EventEmitter {
         // read-only implied private data
         this._client_id = 'MsOIJ39Q28'
         this._client_secret = 'PTDc3H8a)Vi=UYap'
-        this._user_agent = 'iFunny/5.43.1(1117828) Android/5.0.2 (samsung; SCH-R530U; samsung)'
+        this._user_agent = 'iFunny/7.7.1(1119745) Android/11 (samsung; GT-N8013; samsung)'
 
         // stored values that methods will update
         this._update = false
