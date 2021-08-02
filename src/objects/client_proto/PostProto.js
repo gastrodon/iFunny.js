@@ -12,7 +12,7 @@ const { compose_comment } = require('../../utils/methods')
  * @return {Promise<Object>}                                     API response
  */
 Client.prototype.add_comment_to_post = async function(post, text, attachment, mentions) {
-    let data = compose_comment(text, attachment, mentions)
+    let data = await compose_comment(text, attachment, mentions)
 
     let response = await axios({
         method: 'post',
