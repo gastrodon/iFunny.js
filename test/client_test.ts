@@ -9,26 +9,15 @@ import {
 
 import { APIError, Client, Content } from "../mod.ts";
 
-const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
-const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
-const NO_AUTH: boolean = Deno.env.get("IFUNNYJS_NO_AUTH") !== undefined;
-
-const HOME: string | undefined = Deno.env.get("HOME");
-const CONFIG_ROOT: string = HOME as string + "/.config/ifunny";
-
-const BASIC_SIZE: number = 168;
-
-let CLIENT: Client | undefined = undefined;
-
-if (HOME === undefined) {
-  throw new Error("HOME must be set");
-}
-
-if (EMAIL) {
-  CLIENT = (await (new Client()).login(EMAIL!)).fresh;
-} else if (PASSWORD && !NO_AUTH) {
-  CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
-}
+import {
+  BASIC_SIZE,
+  CLIENT,
+  CONFIG_ROOT,
+  EMAIL,
+  HOME,
+  NO_AUTH,
+  PASSWORD,
+} from "./const.ts";
 
 async function sleep(delay: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, delay));
@@ -85,7 +74,8 @@ Deno.test({
 // WARNING: fresh auth
 Deno.test({
   name: "login",
-  ignore: EMAIL === undefined || PASSWORD === undefined || NO_AUTH,
+  only: true,
+  ignore: EMAIL === "" || PASSWORD === "" || NO_AUTH,
   async fn() {
     const client: Client = new Client();
     await client.login(EMAIL!, PASSWORD!, true);
@@ -98,7 +88,7 @@ Deno.test({
 // WARNING: fresh auth
 Deno.test({
   name: "login fresh token",
-  ignore: EMAIL === undefined || PASSWORD === undefined || NO_AUTH,
+  ignore: EMAIL === "" || PASSWORD === "" || NO_AUTH,
   async fn() {
     const client: Client = new Client();
     await client.login(EMAIL!, PASSWORD!, true);

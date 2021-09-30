@@ -7,19 +7,14 @@ import {
 
 import { APIError, Client, Comment, Content } from "../mod.ts";
 
-const EMAIL: string | undefined = Deno.env.get("IFUNNYJS_EMAIL");
-const PASSWORD: string | undefined = Deno.env.get("IFUNNYJS_PASSWORD");
-const NO_AUTH: boolean = Deno.env.get("IFUNNYJS_NO_AUTH") !== undefined;
-
-const CONTENT_ID_PIN: string = "mave1lj07"; // pinned by test@gastrodon.io
-let CONTENT_ID: string = "5VRu6KHI7";
-let CLIENT: Client | undefined = undefined;
-
-if (EMAIL) {
-  CLIENT = (await (new Client()).login(EMAIL!)).fresh;
-} else if (PASSWORD && !NO_AUTH) {
-  CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
-}
+import {
+  CLIENT,
+  CONTENT_ID,
+  CONTENT_ID_PIN,
+  EMAIL,
+  NO_AUTH,
+  PASSWORD,
+} from "./const.ts";
 
 async function random_content(): Promise<Content> {
   // TODO this will pull from collective
