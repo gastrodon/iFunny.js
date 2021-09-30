@@ -74,7 +74,6 @@ Deno.test({
 // WARNING: fresh auth
 Deno.test({
   name: "login",
-  only: true,
   ignore: EMAIL === "" || PASSWORD === "" || NO_AUTH,
   async fn() {
     const client: Client = new Client();
