@@ -23,6 +23,7 @@ const ID: string = "MsOIJ39Q28";
 const SECRET: string = "PTDc3H8a)Vi=UYap";
 const USER_AGENT: string =
   "iFunny/6.20.1(21471) iphone/14.4 (Apple; iPhone8,1)";
+const PROJECT_ID: string = "iFunny";
 const URLENCODED: any = { "Content-Type": "application/x-www-form-urlencoded" };
 
 const HEX_SIZE: number = 16;
@@ -387,6 +388,7 @@ export class Client extends Freshable {
     return (async (): Promise<any> => {
       return {
         "user-agent": USER_AGENT,
+        "ifunny-project-id": PROJECT_ID,
         "authorization": this.token
           ? `Bearer ${this.token}`
           : `Basic ${await this.basic}`,
