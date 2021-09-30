@@ -20,8 +20,10 @@ if (HOME === "") {
 
 export let CLIENT: Client | undefined = undefined;
 
-if (EMAIL) {
-  CLIENT = (await (new Client()).login(EMAIL!)).fresh;
-} else if (PASSWORD && !NO_AUTH) {
-  CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
+if (CLIENT === undefined) {
+  if (EMAIL) {
+    CLIENT = (await (new Client()).login(EMAIL!, undefined)).fresh;
+  } else if (PASSWORD && !NO_AUTH) {
+    CLIENT = (await (new Client()).login(EMAIL!, PASSWORD!)).fresh;
+  }
 }
