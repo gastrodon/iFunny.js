@@ -251,7 +251,7 @@ export class Client extends Freshable {
       { method: "POST", body: qs_string(args), headers: URLENCODED },
     );
 
-    return new Comment(data.id, id, { client: this, data: data.comment });
+    return new Comment(data.id, id, { client: this, data: data });
   }
 
   async content_delete(id: string): Promise<void> {
