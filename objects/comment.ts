@@ -10,4 +10,10 @@ export class Comment extends Freshable {
     this.content_id = content_id;
     this.path = `/content/${this.content_id}/comments/${this.id}`;
   }
+
+  get data(): Promise<any> {
+    return (async () => {
+      return (await super.data).comment;
+    })();
+  }
 }
