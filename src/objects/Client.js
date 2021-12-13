@@ -431,7 +431,8 @@ class Client extends EventEmitter {
         return (async () => {
             return {
                 'User-Agent': this._user_agent,
-                'Authorization': this._token ? `Bearer ${this._token}` : `Basic ${await this.basic_token}`
+                'Authorization': this._token ? `Bearer ${this._token}` : `Basic ${await this.basic_token}`,
+                'Ifunny-Project-Id': 'iFunny'
             }
         })()
     }
