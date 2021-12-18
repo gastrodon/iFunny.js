@@ -193,6 +193,14 @@ class User extends FreshObject {
     }
 
     /**
+     * Generator iterating through the timeline of this client
+     * @type {Promise<Generator<Post>>}
+     */
+    get timeline() {
+        return methods.paginated_generator(this.client.user_timeline_paginated, { instance: this.client, user: this.id })
+    }
+
+    /**
      * Generator iterating through the active bans of this client
      * Non-self user bans are forbidden to non-admin accounts
      * @type {Promise<Generator<Ban>>}

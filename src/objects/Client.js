@@ -235,6 +235,14 @@ class Client extends EventEmitter {
     }
 
     /**
+     * Generator iterating through the subscriptions of this client
+     * @type {Promise<Generator<Post>>}
+     */
+    get timeline() {
+        return methods.paginated_generator(this.user_timeline_paginated, { instance: this, user: this.id_sync })
+    }
+
+    /**
      * Generator iterating through the active bans of this client
      * @type {Promise<Generator<Ban>>}
      */

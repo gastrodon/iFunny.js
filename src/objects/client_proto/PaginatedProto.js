@@ -508,6 +508,32 @@ Client.prototype.user_subscriptions_paginated = async function(opts = {}) {
 }
 
 /**
+ * Get a chunk of the timeline of a user
+ * @param  {Object}  opts={}        Optional parameters
+ * @param  {User|String}  opts.user User to get the subscriptions of
+ * @param  {String}  opts.query     Search query
+ * @param  {Number}  opts.limit=25  Number of items to fetch
+ * @param  {Number}  opts.next=null Nextpage token
+ * @return {Promise<Object>}        Chunk of users with paging info
+ */
+Client.prototype.user_timeline_paginated = async function(opts = {}) {
+    let Post = require('../Post')
+    let instance = opts.instance || this
+
+    let data = await methods.paginated_data(`${instance.api}/timelines/users/${opts.user.id || opts.user}`, {
+        limit: opts.limit || instance.paginated_size,
+        key: 'content',
+        next: opts.next,
+        headers: await instance.headers,
+    })
+
+    data.items = data.items
+        .map(item => new Post(item.id, {client: instance, data: item}))
+
+    return data
+}
+
+/**
  * Get a chunk of bans of a user
  * @param  {Object}  opts={}        Optional parameters
  * @param  {User|String}  opts.user User to get the bans of
