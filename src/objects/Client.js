@@ -186,6 +186,16 @@ class Client extends EventEmitter {
         }, interval || this.notification_interval)
     }
 
+
+    /**
+     * Query some tag, and iterate the results
+     * @param {String} tag    tag to query
+     * @type  {Promise<Iterator<Post>>}
+     */
+    search_tags(tag) {
+        return methods.paginated_generator(this.search_tags_paginated, { instance: this, query: tag })
+    }
+
     // generators
 
     /**
